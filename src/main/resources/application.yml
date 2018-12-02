@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    username: sdc
+    password: 123456@sdc
+    url: jdbc:mysql://58.119.112.10:11030/sdcdevelop?characterEncoding=utf-8&useSSL=false
+  jpa:
+    show-sql: true
+#  jackson:
+#    default-property-inclusion: non_null   #全局设定返回不为空的值
+server:
+#  servlet-path: /sell
+
+#logging:
+#  pattern:
+#    console: "%d - %msg%n"
+#  level: info
+
+wechat:
+  mpAppId: wx7e585d995f58d7d6
+  mpAppSecret: 311a4e1283aea428d20eb644615b53aa
