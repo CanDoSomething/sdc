@@ -1,0 +1,78 @@
+/*学校热度排行json*/
+{
+  "settings": {
+    "number_of_replicas": 0
+  },
+  "mappings": {
+    "school_ranking": {
+      "dynamic": false,
+      "properties": {
+        "schoolid": {
+          "type": "long"
+        },
+        "schoolname": {
+          "type": "text",
+          "analyzer": "ik_smart",
+          "search_analyzer": "ik_smart"
+
+        },
+        "clicks": {
+          "type": "long"
+        },
+        "monthclicks": {
+          "type": "long"
+        },
+        "weekclicks": {
+          "type": "integer"
+        },
+        "province": {
+          "type": "keyword"
+        },
+        "schooltype": {
+          "type": "text",
+          "analyzer": "ik_smart",
+          "search_analyzer": "ik_smart"
+        },
+        "schoolproperty": {
+          "type": "text",
+          "analyzer": "ik_smart",
+          "search_analyzer": "ik_smart"
+        },
+        "f985": {
+          "type": "integer"
+        },
+        "f211": {
+          "type": "integer"
+        },
+        "level": {
+          "type": "keyword"
+        },
+        "schoolnature": {
+          "type": "keyword"
+        },
+        "shoufei": {
+          "type": "text",
+          "analyzer": "ik_smart",
+          "search_analyzer": "ik_smart"
+        },
+        "jianjie": {
+          "type": "text",
+          "analyzer": "ik_smart",
+          "search_analyzer": "ik_smart"
+        },
+        "schoolcode": {
+          "type": "long"
+        },
+        "ranking": {
+          "type": "integer"
+        },
+        "rankingCollegetype" : {
+          "type": "integer"
+        },
+        "guanwang": {
+          "type": "keyword"
+        }
+      }
+    }
+  }
+}

@@ -184,7 +184,7 @@ public class OrderServiceImpl implements OrderService {
         //判断支付状态
         if(!orderDTO.getPayStatus().equals(PayStatusEnum.WAIT.getCode())){
             log.error("【订单支付完成】 订单支付状态不正确 ,orderDTO={}",orderDTO);
-            throw new SellException(ResultEnum.ORDER_PAY_ERROR);
+            throw new SellException(ResultEnum.ORDER_PAY_STATUS_ERROR);
         }
 
         //修改支付状态

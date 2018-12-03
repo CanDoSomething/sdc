@@ -44,6 +44,7 @@ public enum ResultEnum {
     PRODUCT_STATUS_ERROR(24, "商品状态不正确"),
 
     LOGIN_FAIL(25, "登录失败, 登录信息不正确"),
+    ORDER_PAY_ERROR(27,"支付出错"),
 
     LOGOUT_SUCCESS(26, "登出成功"),
     ;
@@ -56,4 +57,5 @@ public enum ResultEnum {
         this.code = code;
         this.message = message;
     }
+
 }
