@@ -33,6 +33,12 @@ public class TeaCourse {
     private String createTime;
     //更新时间
     private String updateTime;
+    //学生工号
+    private String studentCode;
+    //取消原因
+    private String cause;
+    //是否在线
+    private Integer isOnline;
 
 
 }

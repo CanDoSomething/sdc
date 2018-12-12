@@ -29,5 +29,7 @@ public class StuBase {
     private Date createTime;
     //修改时间
     private Date updateTime;
+    //信用评分
+    private Integer creditScore;
 
 }
