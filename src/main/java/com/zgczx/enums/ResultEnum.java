@@ -13,6 +13,12 @@ public enum ResultEnum {
 
     PARAM_ERROR(1, "参数不正确"),
 
+    COURSE_STATUS_ERROR(2, "课程状态不正确"),
+
+    TEA_NOT_EXIST(3, "教师不存在"),
+
+    TEACODE_INCORRECT(205,"教师编号不正确"),
+
     PRODUCT_NOT_EXIST(10, "商品不存在"),
 
     PRODUCT_STOCK_ERROR(11, "商品库存不正确"),
