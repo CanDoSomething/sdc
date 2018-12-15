@@ -1,4 +1,4 @@
-package com.zgczx.repository.tea;
+package com.zgczx.repository;
 
 import com.zgczx.dataobject.TeaFeedBack;
 import org.springframework.data.jpa.repository.JpaRepository;
