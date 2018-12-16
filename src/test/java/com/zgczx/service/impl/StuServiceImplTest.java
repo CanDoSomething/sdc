@@ -1,12 +1,13 @@
 package com.zgczx.service.impl;
 
 import com.zgczx.SellApplicationTests;
+import com.zgczx.dataobject.StuFeedBack;
 import com.zgczx.dataobject.SubCourse;
+import com.zgczx.dataobject.TeaCourse;
 import com.zgczx.dto.CourseDTO;
 import com.zgczx.enums.SubStatusEnum;
 import com.zgczx.repository.SubCourseRepository;
-import com.zgczx.utils.ResultVOUtil;
-import com.zgczx.utils.SearchUtil;
+import com.zgczx.repository.TeaCourseRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -24,57 +25,48 @@ public class StuServiceImplTest extends SellApplicationTests {
     private StuServiceImpl stuService;
     @Autowired
     private SubCourseRepository subCourseRepository;
+    @Autowired
+    private TeaCourseRepository teaCourseRepository;
     /*查询可预约课程测试*/
     @Test
     public void findAllCourse() {
-        SearchUtil searchUtil=new SearchUtil();
-        /*设置以课程开始时间升序来进行排列*/
-        searchUtil.setOrderBy("courseStartTime");
-        /*设置查询字段*/
-        List<String> keywords=new ArrayList<>();
-        keywords.add("courseStatus");
-        searchUtil.setKeywords(keywords);
-        List<CourseDTO> allCourse = stuService.findAllCourse(searchUtil);
+        List<CourseDTO> allCourse = stuService.findAllCourse(0,10);
         for (CourseDTO courseDTO : allCourse) {
             System.out.println(courseDTO);
         }
-        System.out.println("ok");
     }
     /*预约测试*/
     @Test
     public void ordertest(){
-        stuService.order("zx",4);
+        SubCourse zx = stuService.order("zx", 2);
+        System.out.println(zx);
     }
-    /*取消预约测试*/
+    /*未预约成功前取消预约测试*/
+    @Test
+    public void simpleCancel(){
+        SubCourse zx = stuService.simplecancelorder("zx", 2);
+        System.out.println("取消成功");
+
+    }
+    /*成功预约后取消预约测试*/
     @Test
     public void cancel(){
-        SubCourse subCourse = subCourseRepository.findByStuCodeAndCourseId("zx", 1);
-        /*如果预约信息处于预约等待状态，直接删除预约信息*/
-        subCourseRepository.delete(subCourse);
-        if (subCourse.getSubStatus()== SubStatusEnum.SUB_SUCCESS.getCode()){
-            stuService.cancelorder("有事耽误了",1);
-            System.out.println("取消成功");
-        }
+        TeaCourse cancelorder = stuService.cancelorder("有事", "zx", 1);
+        System.out.println(cancelorder);
     }
     /*查询历史记录*/
     @Test
     public void lookhistory(){
-        /*封装查询中间类*/
-        SearchUtil searchUtil=new SearchUtil();
-        /*设置以课程结束时间降序排序*/
-        searchUtil.setOrderBy("courseEndTime");
-        searchUtil.setOrderDirection(Sort.Direction.DESC);
-        /*设置查询字段为学生工号,课程结束时间和课程状态*/
-        List<String>list=new ArrayList<>();
-        list.add("studentCode");
-        list.add("courseEndTime");
-        list.add("courseStatus");
-        searchUtil.setKeywords(list);
-        List<CourseDTO> courseDTOSs = stuService.lookhistory(searchUtil, "zx");
+        List<CourseDTO> courseDTOSs = stuService.lookhistory(0,10, "zx");
         for (CourseDTO courseDTO : courseDTOSs) {
             System.out.println(courseDTO);
         }
-        System.out.println("ok");
+    }
+    /*提交反馈信息*/
+    @Test
+    public void feed(){
+        StuFeedBack good = stuService.feedback(6, "好的", 5);
+        System.out.println(good);
     }
     @Test
     public void test(){
@@ -92,5 +84,13 @@ public class StuServiceImplTest extends SellApplicationTests {
         }else {
             System.out.println("date2大于date1");
         }
+    }
+    @Test
+    public void find(){
+        Iterable<TeaCourse> all = teaCourseRepository.findAll();
+        for (TeaCourse teaCourse : all) {
+            System.out.println(teaCourse);
+        }
+
     }
 }
