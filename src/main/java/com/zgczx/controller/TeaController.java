@@ -5,6 +5,7 @@ import com.zgczx.dataobject.StuBase;
 import com.zgczx.dataobject.SubCourse;
 import com.zgczx.dataobject.TeaCourse;
 import com.zgczx.dataobject.TeaFeedBack;
+import com.zgczx.dto.CourseDTO;
 import com.zgczx.enums.ResultEnum;
 import com.zgczx.exception.SellException;
 import com.zgczx.service.TeaService;
@@ -12,10 +13,7 @@ import com.zgczx.utils.ResultVOUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.HashMap;
@@ -23,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Auther: Dqd
+ * @Author: Dqd
  * @Date: 2018/12/15 10:29
  * @Description:教师流程控制
  */
@@ -39,7 +37,7 @@ public class TeaController {
      * @param bindingResult
      * @return  创建新创建课程的courseId
      */
-    @GetMapping("/createCourse")
+    @PostMapping("/createCourse")
     public ResultVO<Map<String,Integer>> createCourse(@Valid TeaCourse teaCourse, BindingResult bindingResult){
         //后台进行表单验证，若参数不正确抛出异常
         if(bindingResult.hasErrors()){
@@ -77,10 +75,10 @@ public class TeaController {
      * @return 展示当前老师的历史课程
      */
     @GetMapping("/findTeaHistoryCourse")
-    public ResultVO<List<TeaCourse>> findTeaHistoryCourse( String teaCode,
-                                                           @RequestParam(value = "page", defaultValue = "0") int page,
-                                                           @RequestParam(value = "pageSize", defaultValue = "10") int pageSize){
-        List<TeaCourse> list = teaService.findTeaHistoryCourse(teaCode, page, pageSize);
+    public ResultVO<List<CourseDTO>> findTeaHistoryCourse(String teaCode,
+                                                          @RequestParam(value = "page", defaultValue = "0") int page,
+                                                          @RequestParam(value = "pageSize", defaultValue = "10") int pageSize){
+        List<CourseDTO> list = teaService.findTeaHistoryCourse(teaCode, page, pageSize);
         return ResultVOUtil.success(list);
 
     }
@@ -91,7 +89,7 @@ public class TeaController {
      * @param teaCode 教师编号
      * @return 取消的课程状态
      */
-    @GetMapping("/cancelCourse")
+    @PostMapping("/cancelCourse")
     public ResultVO<TeaCourse> cancelCourse(@RequestParam(value = "courseId")Integer courseId
             ,String teaCode,String cancelReason){
         TeaCourse teaCourse = teaService.cancelCourse(courseId, teaCode,cancelReason);
@@ -104,7 +102,7 @@ public class TeaController {
      * @param stuCode 学生学籍号
      * @return 预定课程的信息
      */
-    @GetMapping("/saveSelectedStu")
+    @PostMapping("/saveSelectedStu")
     public ResultVO<SubCourse> saveSelectedStu(@RequestParam(value = "courseId")Integer courseId,
                                                String stuCode){
         SubCourse subCourse = teaService.saveSelectedStu(stuCode, courseId);
@@ -116,11 +114,14 @@ public class TeaController {
      * @param teaFeedBack 前端封装教师反馈内容
      * @return 反馈课程信息
      */
-    @GetMapping("/createFeedBack")
-    public ResultVO<TeaFeedBack> createFeedBack(TeaFeedBack teaFeedBack){
-        System.out.println("teaFeedBack"+teaFeedBack.toString());
+    @PostMapping("/createFeedBack")
+    public ResultVO<TeaFeedBack> createFeedBack(@Valid TeaFeedBack teaFeedBack,BindingResult bindingResult){
+        //后台进行表单验证，若参数不正确抛出异常
+        if(bindingResult.hasErrors()){
+            log.error("【教师反馈填写】 参数不正确 ，teaFeedBack={}",teaFeedBack);
+            throw new SellException(ResultEnum.PARAM_ERROR.getCode() ,bindingResult.getFieldError().getDefaultMessage());
+        }
         TeaFeedBack feedBack = teaService.createFeedBack(teaFeedBack);
         return ResultVOUtil.success(feedBack);
     }
-
 }
