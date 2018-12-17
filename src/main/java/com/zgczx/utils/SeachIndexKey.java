@@ -11,4 +11,5 @@ public class SeachIndexKey {
     public static final String COURSE_STATUS = "courseStatus";
     public static final String COURSE_END_TIME = "courseEndTime";
     public static final String STUDENT_CODE = "studentCode";
+    public static final String TEA_CODE="teaCode";
 }
