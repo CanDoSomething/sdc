@@ -11,5 +11,6 @@ import java.util.List;
  */
 public interface StuPrepareSubRepository extends JpaRepository<StuPrepareSub,String> {
     List<StuPrepareSub> findByCourserId(Integer courserId,Pageable pageable);
+    List<StuPrepareSub> findByCourserId(Integer courserId);
     List<StuPrepareSub> deleteByCourserId(Integer courseId);
 }

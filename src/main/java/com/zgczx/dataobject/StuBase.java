@@ -11,7 +11,6 @@ import java.util.Date;
 @Data
 @DynamicUpdate
 public class StuBase {
-
     @Id
     //学生学籍号
     private String stuCode;

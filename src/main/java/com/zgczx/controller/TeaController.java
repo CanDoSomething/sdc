@@ -16,7 +16,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +24,8 @@ import java.util.Map;
  * @Date: 2018/12/15 10:29
  * @Description:教师流程控制
  */
+
+
 @Slf4j
 @RestController
 @RequestMapping("/tea")
@@ -47,9 +48,7 @@ public class TeaController {
         //前台传递过来的参数封装之后插入课程中
 
         TeaCourse course = teaService.createCourse(teaCourse);
-        Map<String,Integer> map = new HashMap<>(2);
-        map.put("courseId",course.getCourserId());
-        return ResultVOUtil.success(map);
+        return ResultVOUtil.success(course);
     }
 
     /**
@@ -86,13 +85,15 @@ public class TeaController {
     /**
      *
      * @param courseId 课程编号
-     * @param teaCode 教师编号
      * @return 取消的课程状态
      */
     @PostMapping("/cancelCourse")
     public ResultVO<TeaCourse> cancelCourse(@RequestParam(value = "courseId")Integer courseId
-            ,String teaCode,String cancelReason){
-        TeaCourse teaCourse = teaService.cancelCourse(courseId, teaCode,cancelReason);
+            ,String cancelReason){
+        TeaCourse teaCourse = teaService.cancelCourse(courseId,cancelReason);
+        /*
+            增加给学生推送教师取消预约消息的功能
+         */
         return ResultVOUtil.success(teaCourse);
     }
 
@@ -124,4 +125,45 @@ public class TeaController {
         TeaFeedBack feedBack = teaService.createFeedBack(teaFeedBack);
         return ResultVOUtil.success(feedBack);
     }
+
+    /**
+     * 教师修改课程信息
+     *
+     * @param teaCourse 课程信息
+     * @param bindingResult spring必填参数验证对象
+     * @return 修改之后的课程信息
+     */
+    @PostMapping("/saveUpdateTeaCourse")
+    public ResultVO<TeaCourse> saveUpdateTeaCourse(TeaCourse teaCourse ,BindingResult bindingResult){
+        //后台进行表单验证，若参数不正确抛出异常
+        if(bindingResult.hasErrors()){
+            log.error("【教师修改课程信息】 参数不正确 ，teaFeedBack={}",teaCourse);
+            throw new SellException(ResultEnum.PARAM_ERROR.getCode() ,bindingResult.getFieldError().getDefaultMessage());
+        }
+        TeaCourse teaCourse1 = teaService.saveUpdateTeaCourse(teaCourse);
+        return ResultVOUtil.success(teaCourse1);
+    }
+
+    /**
+     *
+     * @param courseId 课程编号
+     * @return 通过课程编号查找到的课程
+     */
+    @GetMapping("/findTeaCourseById")
+    public ResultVO<TeaCourse> findTeaCourseById(Integer courseId){
+        TeaCourse teaCourse = teaService.findTeaCourseById(courseId);
+        return ResultVOUtil.success(teaCourse);
+    }
+
+    /**
+     *
+     * @param courseId 课程编号
+     * @return 课程状态为结束的课程
+     */
+    @PostMapping("/finishCourse")
+    public ResultVO<TeaCourse> finishCourse(Integer courseId) {
+        TeaCourse teaCourse = teaService.finishCourse(courseId);
+        return ResultVOUtil.success(teaCourse);
+    }
+
 }

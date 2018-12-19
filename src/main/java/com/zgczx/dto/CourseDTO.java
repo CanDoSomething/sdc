@@ -30,8 +30,23 @@ public class CourseDTO {
     private String studentCode;
     //取消原因
     private String cause;
+    //是否在线
+    private Integer isOnline;
+    //上课地点
+    private String courseLocation;
+    //更新时间
+    private Date createTime;
+    //更新时间
+    private Date updateTime;
     //老师对象
     private TeaBase teaBase;
     //反馈信息
     private StuFeedBack stuFeedBack;
+
+
+
+
+
+
+
 }

@@ -4,6 +4,8 @@ import lombok.Data;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.util.Date;
 
@@ -12,8 +14,9 @@ import java.util.Date;
 @DynamicUpdate
 public class TeaBase {
 
-    @Id
     //教师工号
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String teaCode;
     //教师姓名
     private String teaName;

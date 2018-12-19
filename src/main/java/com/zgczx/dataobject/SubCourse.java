@@ -9,8 +9,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.util.Date;
 
-@Entity
 @Data
+@Entity
 @DynamicUpdate
 public class SubCourse {
 
@@ -26,8 +26,6 @@ public class SubCourse {
     //创建时间
     private Date createTime;
     //更新时间
-    private Date  updateTime;
-
-
+    private Date updateTime;
 
 }
