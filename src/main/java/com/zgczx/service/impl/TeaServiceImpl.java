@@ -162,7 +162,7 @@ public class TeaServiceImpl implements TeaService {
             java.util.function.Predicate<CourseDTO> courseStatusFilter = course -> (course.getCourseStatus()
                     .equals(SubStatusEnum.SUB_COURSE_FINISH.getCode()));
             rsList = rsList.stream().filter(courseStatusFilter).collect(Collectors.toList());
-            System.out.println("结果是" + rsList);
+            //System.out.println("结果是" + rsList);
             StuFeedBack stuFeedBack = null;
             for(CourseDTO course: rsList){
                 //通过课程编号查找学生给老师的反馈表
@@ -316,8 +316,6 @@ public class TeaServiceImpl implements TeaService {
             throw new SdcException(SubStatusEnum.COURSE_INFO_IS_NULL);
         }
 
-
-
         if(!teaCourse.getCourseStatus().equals(SubStatusEnum.SUB_WAIT.getCode())){
             log.error("【修改课程表的状态】 该课程的状态status={}不能被修改",teaCourse.getCourseStatus());
             throw new SdcException(SubStatusEnum.COURSE_STATUS_ERROR);
@@ -355,6 +353,7 @@ public class TeaServiceImpl implements TeaService {
      * @return 修改课程状态为结束课程
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public TeaCourse finishCourse(Integer courseId) {
         if(null == courseId){
             log.error("【结束课程】 该课程编号id={}为空",courseId);
@@ -367,13 +366,14 @@ public class TeaServiceImpl implements TeaService {
         }
         Integer vis = one.getCourseStatus();
         //当前课程只有是处于互动状态或者线下互动才能使用此方式结束课程
-        System.out.println(vis+"     "+SubStatusEnum.SUB_COURSE_INTERACT.getCode());
         if(vis.equals(SubStatusEnum.SUB_COURSE_INTERACT.getCode()) || one.getIsOnline().equals(0) ){
             one.setCourseStatus(SubStatusEnum.SUB_COURSE_FINISH.getCode());
+            one.setUpdateTime(new Date());
             TeaCourse save = teaCourseRepository.save(one);
             //同时修改预约课程的状态
             SubCourse byCourseId = subCourseRepository.findByCourseId(courseId);
             byCourseId.setSubStatus(SubStatusEnum.SUB_COURSE_FINISH.getCode());
+            byCourseId.setUpdateTime(new Date());
             subCourseRepository.save(byCourseId);
             return save;
         } else {
