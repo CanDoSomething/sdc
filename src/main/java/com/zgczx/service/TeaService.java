@@ -9,29 +9,94 @@ import com.zgczx.dto.CourseDTO;
 import java.util.List;
 
 /**
- * @Auther: Dqd
+ * @Author: Dqd
  * @Date: 2018/12/12 14:29
  * @Description:教师模块接口
  */
 
 public interface TeaService {
-    //创建订单
+
+    /**
+     * 创建课程
+     *
+     * @param teaCourse 封装的课程信息
+     * @return 创建成功的课程
+     */
     TeaCourse createCourse(TeaCourse teaCourse);
-    //取消课程
+
+    /**
+     *
+     * 取消课程
+     *
+     * @param courseId 课程编号
+     * @param cancelReason 取消课程原因
+     * @return 取消课程之后的信息
+     */
     TeaCourse cancelCourse(Integer courseId,String cancelReason);
-    //查看教师历史课程
+
+    /**
+     *
+     * 查看教师历史课程
+     *
+     * @param teaCode 教师编号
+     * @param page 当前页码
+     * @param pageSize 当前分页大小
+     * @return 教师历史课程列表(仅仅包含结束的课程)
+     */
     List<CourseDTO> findTeaHistoryCourse(String teaCode, int page, int pageSize);
-    //查看课程预约候选人
+
+    /**
+     *
+     * 查看课程预约候选人
+     *
+     * @param courserId 课程编号
+     * @param page 当前页码
+     * @param pageSize 当前分页大小
+     * @return 当前课程所有预约候选人列表
+     */
     List<StuBase> findCandidateByCourseId(Integer courserId, int page, int pageSize);
-    //教师选择成功预约候选人
+
+    /**
+     *
+     * 教师选择成功预约候选人
+     *
+     * @param stuCode 学生编号
+     * @param courseId 课程编号
+     * @return 成功预约课程信息
+     */
     SubCourse saveSelectedStu(String stuCode, Integer courseId);
-    //教师提交给学生的反馈
+
+    /**
+     *
+     * 教师提交给学生的反馈
+     *
+     * @param teaFeedBack 教师给学生的反馈信息
+     * @return 教师给学生的反馈信息
+     */
     TeaFeedBack createFeedBack(TeaFeedBack teaFeedBack);
-    //教师修改课程信息
+
+    /**
+     *
+     * 教师修改课程信息
+     *
+     * @param teaCourse 课程信息
+     * @return 课程信息
+     */
     TeaCourse saveUpdateTeaCourse(TeaCourse teaCourse);
-    //根据课程编号查看教师
+
+    /**
+     * 根据课程编号查看教师
+     * @param courseId 课程编号
+     * @return 课程信息
+     */
     TeaCourse findTeaCourseById(Integer courseId);
 
-    //教师结束课程
+    /**
+     *
+     * 教师结束课程
+     *
+     * @param courseId 课程编号
+     * @return 课程状态为结束的课程
+     */
     TeaCourse finishCourse(Integer courseId);
 }

@@ -16,11 +16,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -82,6 +80,7 @@ public class TeaServiceImpl implements TeaService {
      *教师取消课程
      *
      * @param courseId 课程id
+     * @param cancelReason 课程取消原因
      * @return 取消的课程信息
      *
      */
@@ -125,6 +124,8 @@ public class TeaServiceImpl implements TeaService {
      * 根据教师编号查看其历史课程记录
      *
      * @param teaCode 教师编号
+     * @param page 当前页
+     * @param pageSize 当前页面大小
      * @return 当前教师的所有历史课程
      *
      */
@@ -132,7 +133,7 @@ public class TeaServiceImpl implements TeaService {
     @Override
     public List<CourseDTO> findTeaHistoryCourse(String teaCode,int page,int pageSize) {
 
-        if(teaCode == null || teaCode.equals("")){
+        if(teaCode == null || "".equals(teaCode)){
             log.error("【教师查看历史课程】 教师编号为空");
             throw new SdcException(SubStatusEnum.NOTFIND_TEACHER);
         }
@@ -146,11 +147,7 @@ public class TeaServiceImpl implements TeaService {
             Sort sort = new Sort(Sort.Direction.DESC,SeachIndexKey.COURSE_END_TIME);
             Pageable pageable = new PageRequest(page,pageSize,sort);
             //设置查询条件
-            Specification<TeaCourse> specification1 = (root,query,cb) -> {
-                Predicate predicate = cb.equal(root.get(SeachIndexKey.TEA_CODE),teaCode);
-                return predicate;
-            };
-            Page<TeaCourse> all =  teaCourseRepository.findAll(specification1, pageable);
+            Page<TeaCourse> all =  teaCourseRepository.find(teaCode, pageable);
             if(null == all){
                 throw new SdcException(SubStatusEnum.NOTFIND_TEACOURSE);
             }
@@ -162,7 +159,6 @@ public class TeaServiceImpl implements TeaService {
             java.util.function.Predicate<CourseDTO> courseStatusFilter = course -> (course.getCourseStatus()
                     .equals(SubStatusEnum.SUB_COURSE_FINISH.getCode()));
             rsList = rsList.stream().filter(courseStatusFilter).collect(Collectors.toList());
-            //System.out.println("结果是" + rsList);
             StuFeedBack stuFeedBack = null;
             for(CourseDTO course: rsList){
                 //通过课程编号查找学生给老师的反馈表
@@ -182,6 +178,8 @@ public class TeaServiceImpl implements TeaService {
      *根据课程id获取所有预约同学的基本信息
      *
      * @param courserId 课程编号
+     * @param page 当前页
+     * @param pageSize 当前页面大小
      * @return 所有候选人
      *
      */
@@ -215,7 +213,7 @@ public class TeaServiceImpl implements TeaService {
     @Override
     @Transactional(rollbackFor=Exception.class)
     public SubCourse saveSelectedStu(String stuCode,Integer courseId) {
-        if(stuCode == null || stuCode.equals("")){
+        if(stuCode == null || "".equals(stuCode)){
             log.error("【教师选择预约人】 学生编号为空");
             throw new SdcException(SubStatusEnum.NOTFIND_STUDENT);
         }
