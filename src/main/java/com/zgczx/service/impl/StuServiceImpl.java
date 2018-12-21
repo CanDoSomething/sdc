@@ -14,26 +14,22 @@ import com.zgczx.repository.TeaBaseRepository;
 import com.zgczx.repository.TeaCourseRepository;
 import com.zgczx.service.StuService;
 import com.zgczx.utils.DateUtil;
-import com.zgczx.utils.SeachIndexKey;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-
-import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 /**
- * @Auther: 陈志恒
- * @Date: 2018/12/10 23:50
- * @Description:
- */
+ *
+ * @Author chen
+ * @Date 10:42 2018/12/21
+ **/
+
 @Service
 public class StuServiceImpl implements StuService {
 
@@ -52,7 +48,8 @@ public class StuServiceImpl implements StuService {
      *
      * 功能描述: 显示所有课程信息
      *
-     * @param: page页面数，size页面大小
+     * @param page 页面数
+     * @param size 页面大小
      * @return:
      * @auther: 陈志恒
      * @date: 2018/12/16 17:54
@@ -60,19 +57,10 @@ public class StuServiceImpl implements StuService {
     @Override
     public List<CourseDTO> findAllCourse(Integer page,Integer size) {
         //先按照课程开始日期升序排序
-        Sort sort =new Sort(Sort.Direction.ASC, SeachIndexKey.COURSE_STATR_TIME);
+        Sort sort =new Sort(Sort.Direction.ASC,"courseStartTime");
         /*设置分页*/
         Pageable pageable = new PageRequest(page, size, sort);
-        /*排序比较器设置------为了以后更方便添加设置其他排序条件*/
-        Specification<TeaCourse> specification = (root, query, cb) -> {
-            /*获取预约等待的所有课程信息*/
-            Predicate predicate = cb.equal(root.get(SeachIndexKey.COURSE_STATUS), SubStatusEnum.SUB_WAIT.getCode());
-            /*过滤掉课程完成时间小于当前时间的所有课程*/
-            predicate = cb.and(predicate, cb.greaterThanOrEqualTo(root.get("courseEndTime"), new Date()));
-            return predicate;
-        };
-        /*按照分页信息查找相应的预约等待的课程信息*/
-        Page<TeaCourse> byCourseStatus = teaCourseRepository.findAll(specification, pageable);
+        Page<TeaCourse> byCourseStatus = teaCourseRepository.findByCourseStatusAndAndCourseStartTimeIsAfter(0, new Date(), pageable);
         /*如果课程不存在，返回预约课程不存在*/
         if (byCourseStatus==null){
             throw new SdcException(SubStatusEnum.NOTFIND_TEACOURSE);
@@ -85,13 +73,14 @@ public class StuServiceImpl implements StuService {
      *
      * 功能描述: 提交预约请求
      *
-     * @param: stucode学生编码，courseId 课程id
+     * @param stuCode 学生编码
+     * @param courserId  课程id
      * @return:
      * @auther: 陈志恒
      * @date: 2018/12/16 17:57
      */
     @Override
-    public SubCourse order(String stucode, Integer courserId) {
+    public SubCourse order(String stuCode, Integer courserId) {
         /*查找学生预约的课程信息*/
         TeaCourse teaCourse = teaCourseRepository.findOne(courserId);
         /*如果预约课程不存在，抛出异常*/
@@ -99,12 +88,12 @@ public class StuServiceImpl implements StuService {
             throw new SdcException(SubStatusEnum.NOTFIND_TEACHER);
         }
         /*查询该学生的预约列表*/
-        List<SubCourse> subCourses = subCourseRepository.findByStuCode(stucode);
-        for (SubCourse subCours : subCourses) {
+        List<SubCourse> subCourses = subCourseRepository.findByStuCode(stuCode);
+        for (SubCourse subCourse : subCourses) {
             /*找到等待预约和预约成功的所有预约信息*/
-            if (subCours.getSubStatus().equals(SubStatusEnum.SUB_WAIT.getCode()) || subCours.getSubStatus().equals(SubStatusEnum.SUB_SUCCESS.getCode())){
+            if (subCourse.getSubStatus().equals(SubStatusEnum.SUB_WAIT.getCode()) || subCourse.getSubStatus().equals(SubStatusEnum.SUB_SUCCESS.getCode())){
                 /*根据课程id查找到课程信息*/
-                TeaCourse one = teaCourseRepository.findOne(subCours.getCourseId());
+                TeaCourse one = teaCourseRepository.findOne(subCourse.getCourseId());
                 if (one==null){
                     throw new SdcException(SubStatusEnum.NOTFIND_TEACHER);
                 }
@@ -118,9 +107,8 @@ public class StuServiceImpl implements StuService {
         }
         /*如果运行到这里证明预约时间不冲突可以建立预约对象*/
         SubCourse subCourse=new SubCourse();
-        subCourse.setStuCode(stucode);
+        subCourse.setStuCode(stuCode);
         subCourse.setCourseId(courserId);
-        subCourse.setCreateTime(new Date());
         /*设置新的预约对象为等待预约状态*/
         subCourse.setSubStatus(SubStatusEnum.SUB_WAIT.getCode());
         /*保存到数据库*/
@@ -141,7 +129,7 @@ public class StuServiceImpl implements StuService {
      * @date: 2018/12/16 18:06
      */
     @Override
-    public TeaCourse cancelorder(String cause,String stuCode,Integer courserId) {
+    public TeaCourse cancelOrder(String cause,String stuCode,Integer courserId) {
         /*查找要取消预约的课程信息*/
         TeaCourse teaCourse = teaCourseRepository.findOne(courserId);
         if (teaCourse==null){
@@ -160,8 +148,8 @@ public class StuServiceImpl implements StuService {
             /*如果save等于null，抛出课程更新异常*/
             throw new SdcException(SubStatusEnum.SUB_UPDATE_FAIL);
         }
+        /*更新预约表中的预约状态*/
         SubCourse byStuCodeAndCourseId = subCourseRepository.findByStuCodeAndCourseId(stuCode, courserId);
-        byStuCodeAndCourseId.setUpdateTime(new Date());
         byStuCodeAndCourseId.setSubStatus(SubStatusEnum.SUB_STUFAILURE.getCode());
         SubCourse subCourse = subCourseRepository.save(byStuCodeAndCourseId);
         return save;
@@ -175,7 +163,8 @@ public class StuServiceImpl implements StuService {
      * @auther: 陈志恒
      * @date: 2018/12/16 18:28
      */
-    public SubCourse simplecancelorder(String stuCode,Integer courserId){
+    @Override
+    public SubCourse simpleCancelOrder(String stuCode,Integer courserId){
         /*查找要取消预约的课程信息*/
         TeaCourse teaCourse = teaCourseRepository.findOne(courserId);
         if (teaCourse==null){
@@ -192,9 +181,8 @@ public class StuServiceImpl implements StuService {
             /*抛出预约信息没有发现异常*/
             throw new SdcException(SubStatusEnum.NOTFIND_SUBCOURE);
         }
-        /*删除预约信息*/
+        /*更新预约信息为取消*/
         subCourse.setSubStatus(SubStatusEnum.SUB_STUFAILURE.getCode());
-        subCourse.setUpdateTime(new Date());
         SubCourse save = subCourseRepository.save(subCourse);
         return save;
     }
@@ -202,19 +190,21 @@ public class StuServiceImpl implements StuService {
      *
      * 功能描述: 提交反馈
      *
-     * @param: courseid课程id，message代表反馈内容，score代表反馈评分
+     * @param courseId 课程id
+     * @param message 代表反馈内容
+     * @param score 代表反馈评分
      * @return:
      * @auther: 陈志恒
      * @date: 2018/12/16 19:24
      */
     @Override
-    public StuFeedBack feedback(Integer courseid, String message, Integer score) {
+    public StuFeedBack feedBack(Integer courseId, String message, Integer score) {
         /*如果评分不正确，抛出异常*/
         if (score>5 || score<0){
             throw new SdcException(SubStatusEnum.FEED_STUFAIL);
         }
         StuFeedBack stuFeedBack=new StuFeedBack();
-        stuFeedBack.setCourseId(courseid);
+        stuFeedBack.setCourseId(courseId);
         stuFeedBack.setStuInfo(message);
         stuFeedBack.setStuToScore(score);
         StuFeedBack save = stuFeedBackRepository.save(stuFeedBack);
@@ -225,37 +215,29 @@ public class StuServiceImpl implements StuService {
         return save;
     }
     /**
+     *查询历史记录课程
      *
-     * 功能描述: 查询历史记录
-     *
-     * @param: stucode学生编码,page页数，size页面大小
-     * @return:
-     * @auther: 陈志恒
-     * @date: 2018/12/16 19:44
-     */
+     * @Author chen
+     * @Date 21:02 2018/12/20
+     * @param page 页数
+     * @param size 页面大小
+     * @param stuCode 学生编码
+     * @return List<CourseDTO> 课程封装对象的集合
+     **/
     @Override
-    public List<CourseDTO> lookhistory(Integer page,Integer size,String stucode) {
+    public List<CourseDTO> lookHistory(Integer page,Integer size,String stuCode) {
         //先按照课程结束日期降序排序
-        Sort sort =new Sort(Sort.Direction.DESC,SeachIndexKey.COURSE_END_TIME);
+        Sort sort =new Sort(Sort.Direction.DESC,"courseEndTime");
         /*设置分页*/
         Pageable pageable = new PageRequest(page, size, sort);
-        /*排序比较器设置------按照所有条件过滤*/
-        Specification<TeaCourse> specification = (root, query, cb) -> {
-            /*增加学生工号等于stucode条件*/
-            Predicate predicate = cb.equal(root.get(SeachIndexKey.STUDENT_CODE),stucode);
-            /*增加课程结束日期小于当前日期的所有课程条件*/
-            predicate = cb.and(predicate, cb.lessThanOrEqualTo(root.get(SeachIndexKey.COURSE_END_TIME), new Date()));
-            /*增加预约成功条件*/
-            predicate = cb.and(predicate, cb.equal(root.get(SeachIndexKey.COURSE_STATUS), SubStatusEnum.SUB_SUCCESS.getCode()));
-            return predicate;
-        };
         /*按照分页信息查找相应的预约等待的课程信息*/
-        Page<TeaCourse> byCourseStatus = teaCourseRepository.findAll(specification, pageable);
-        /*将课程信息封装到消息中间件*/
-        List<CourseDTO> getcourse = getCourse(byCourseStatus);
-        return getcourse;
+        Page<TeaCourse> teaCourses = teaCourseRepository.lookHistory(stuCode,new Date(), pageable);
+        /*将课程信息封装到CourseDTO类中*/
+        List<CourseDTO> getCourse = getCourse(teaCourses);
+        return getCourse;
 
     }
+
     /**
      *
      * 功能描述: 封装信息到CourseDTO中
