@@ -21,7 +21,7 @@ public interface StuPrepareSubRepository extends JpaRepository<StuPrepareSub,Str
      * @return 带分页的预约候选学生列表
      *
      */
-    @Query("select stuSub from StuPrepareSub stuSub where stuSub.courserId = ?1")
+    @Query("select stuSub from StuPrepareSub stuSub where stuSub.courserId = ?1 order by stuSub.creditScore desc")
     List<StuPrepareSub> findByCourserId(Integer courserId,Pageable pageable);
 
     /**

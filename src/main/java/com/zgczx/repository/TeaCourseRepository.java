@@ -5,21 +5,23 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import java.util.Date;
 
 /**
- *
- *
- * @Author chen
- * @Date 21:08 2018/12/20
- * @Param
- * @return
- **/
-
+ * @Author: Common
+ * @Date: 2018/12/15 15:10
+ * @Description:教师课程repository接口
+ */
 public interface TeaCourseRepository extends JpaRepository<TeaCourse,Integer> {
     /**
-     *查询学生的历史完成课程
+     * 查找教师所有的历史课程
      *
+     * @param teaCode 学生编号
+     * @param pageable 分页条件
+     * @return 所有课程列表
+     */
+    @Query("select teaCourse from TeaCourse teaCourse where teaCourse.teaCode = ?1 ORDER BY teaCourse.courseEndTime desc")
+    Page<TeaCourse> find(String teaCode,Pageable pageable);
+    /**
      * @Author chen
      * @Date 10:11 2018/12/21
      * @param stuCode 学生编码

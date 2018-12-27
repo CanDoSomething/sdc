@@ -8,14 +8,12 @@ import com.zgczx.exception.SdcException;
 import com.zgczx.repository.*;
 import com.zgczx.service.PushMessageService;
 import com.zgczx.service.TeaService;
-import com.zgczx.utils.SeachIndexKey;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -143,9 +141,8 @@ public class TeaServiceImpl implements TeaService {
          */
         TeaBase teaBase = teaBaseRepository.findOne(teaCode);
         if(teaBase != null) {
-            //设置分页条件
-            Sort sort = new Sort(Sort.Direction.DESC,SeachIndexKey.COURSE_END_TIME);
-            Pageable pageable = new PageRequest(page,pageSize,sort);
+            //设置分页参数
+            Pageable pageable = new PageRequest(page,pageSize);
             //设置查询条件
             Page<TeaCourse> all =  teaCourseRepository.find(teaCode, pageable);
             if(null == all){
@@ -190,9 +187,8 @@ public class TeaServiceImpl implements TeaService {
             throw new SdcException(SubStatusEnum.NOTFIND_TEACOURSE);
         }
         List<StuBase> stuList = new ArrayList<>();
-        //设置分页条件
-        Sort sort = new Sort(Sort.Direction.DESC,SeachIndexKey.CREDIT_SCORE );
-        Pageable pageable = new PageRequest(page,pageSize,sort);
+        //设置分页参数
+        Pageable pageable = new PageRequest(page,pageSize);
         //查看所有候选人
         List<StuPrepareSub> list = stuPrepareSubRepository.findByCourserId(courserId,pageable);
         StuBase stuBase = null;
