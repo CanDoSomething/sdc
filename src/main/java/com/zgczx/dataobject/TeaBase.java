@@ -14,19 +14,39 @@ import java.util.Date;
 @DynamicUpdate
 public class TeaBase {
 
-    //教师工号
+
+    /**
+     * 教师工号
+     */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String teaCode;
-    //教师姓名
+    /**
+     * 教师姓名
+     */
     private String teaName;
-    //教师科目
+    /**
+     * 教师科目
+     */
     private String teaSubject;
-    //教师绑定微信号
+    /**
+     * 教师绑定微信号
+     */
     private String teaOpenid;
-    //创建时间
+    /**
+     * 教师昵称
+     */
+    private String teaNickname;
+    /**
+     * 教师头像地址
+     */
+    private String teaHeadimgurl;
+    /**
+     * 创建时间
+     */
     private Date createTime;
-    //更新时间
+    /**
+     * 更新时间
+     */
     private Date updateTime;
 
 }
