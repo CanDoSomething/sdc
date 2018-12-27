@@ -19,3 +19,5 @@ spring:
 wechat:
   mpAppId: wx7e585d995f58d7d6
   mpAppSecret: 311a4e1283aea428d20eb644615b53aa
+server:
+  port: 8086
