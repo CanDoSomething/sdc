@@ -7,7 +7,7 @@ import com.zgczx.dataobject.TeaCourse;
 import com.zgczx.dataobject.TeaFeedBack;
 import com.zgczx.dto.CourseDTO;
 import com.zgczx.enums.ResultEnum;
-import com.zgczx.exception.SellException;
+import com.zgczx.exception.SdcException;
 import com.zgczx.service.TeaService;
 import com.zgczx.utils.ResultVOUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +43,7 @@ public class TeaController {
         //后台进行表单验证，若参数不正确抛出异常
         if(bindingResult.hasErrors()){
             log.error("【教师课程填写】 参数不正确 ，teaCourse={}",teaCourse);
-            throw new SellException(ResultEnum.PARAM_ERROR.getCode() ,bindingResult.getFieldError().getDefaultMessage());
+            throw new SdcException(ResultEnum.PARAM_ERROR.getCode() ,bindingResult.getFieldError().getDefaultMessage());
         }
         //前台传递过来的参数封装之后插入课程中
 
@@ -120,7 +120,7 @@ public class TeaController {
         //后台进行表单验证，若参数不正确抛出异常
         if(bindingResult.hasErrors()){
             log.error("【教师反馈填写】 参数不正确 ，teaFeedBack={}",teaFeedBack);
-            throw new SellException(ResultEnum.PARAM_ERROR.getCode() ,bindingResult.getFieldError().getDefaultMessage());
+            throw new SdcException(ResultEnum.PARAM_ERROR.getCode() ,bindingResult.getFieldError().getDefaultMessage());
         }
         TeaFeedBack feedBack = teaService.createFeedBack(teaFeedBack);
         return ResultVOUtil.success(feedBack);
@@ -138,7 +138,7 @@ public class TeaController {
         //后台进行表单验证，若参数不正确抛出异常
         if(bindingResult.hasErrors()){
             log.error("【教师修改课程信息】 参数不正确 ，teaFeedBack={}",teaCourse);
-            throw new SellException(ResultEnum.PARAM_ERROR.getCode() ,bindingResult.getFieldError().getDefaultMessage());
+            throw new SdcException(ResultEnum.PARAM_ERROR.getCode() ,bindingResult.getFieldError().getDefaultMessage());
         }
         TeaCourse teaCourse1 = teaService.saveUpdateTeaCourse(teaCourse);
         return ResultVOUtil.success(teaCourse1);

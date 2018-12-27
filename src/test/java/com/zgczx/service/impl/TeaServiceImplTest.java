@@ -51,7 +51,7 @@ public class TeaServiceImplTest{
     }
     @Test
     public void cancelCourse(){
-        TeaCourse course = teaService.cancelCourse(7,"1","工作太忙");
+        TeaCourse course = teaService.cancelCourse(7,"工作太忙");
         Assert.assertNotNull(course);
     }
     @Test

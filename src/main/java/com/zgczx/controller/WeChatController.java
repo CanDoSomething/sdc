@@ -1,7 +1,7 @@
 package com.zgczx.controller;
 
 import com.zgczx.enums.ResultEnum;
-import com.zgczx.exception.SellException;
+import com.zgczx.exception.SdcException;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.api.WxConsts;
 import me.chanjar.weixin.common.exception.WxErrorException;
@@ -45,7 +45,7 @@ public class WeChatController {
             wxMpUser = wxMpService.oauth2getUserInfo(wxMpOAuth2AccessToken, null);
         }catch (WxErrorException e){
             log.error("【微信网页授权】 {}",e);
-            throw new SellException(ResultEnum.WECHAT_MP_ERROR.getCode(),e.getError().getErrorMsg());
+            throw new SdcException(ResultEnum.WECHAT_MP_ERROR.getCode(),e.getError().getErrorMsg());
         }
         String openid = wxMpOAuth2AccessToken.getOpenId();
         String nickname = wxMpUser.getNickname();
