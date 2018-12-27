@@ -9,9 +9,9 @@ import javax.websocket.server.ServerEndpoint;
 @Component
 public class WebSocketConfig {
 
-    @Bean
-    public ServerEndpointExporter serverEndpointExporter(){
-        return new ServerEndpointExporter();
-    }
+//    @Bean
+//    public ServerEndpointExporter serverEndpointExporter(){
+//        return new ServerEndpointExporter();
+//    }
 
 }

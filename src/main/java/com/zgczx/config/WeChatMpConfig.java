@@ -7,6 +7,7 @@ import me.chanjar.weixin.mp.api.impl.WxMpServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+import org.springframework.ui.ModelMap;
 
 @Component
 public class WeChatMpConfig {
