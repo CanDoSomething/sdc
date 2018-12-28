@@ -45,7 +45,7 @@ public class PushMessageServiceImpl implements PushMessageService {
 
         if(courseDTO == null ){
             log.error("【模板消息推送】课程或学生信息为空");
-            throw new SdcException(SubStatusEnum.COURSE_OR_STU_IS_NULL);
+            throw new SdcException(SubStatusEnum.INFO_NOTFOUND_EXCEPTION);
         }
         //设置发送给用户的openid
         String stuOpenID = stuBaseRepository.findOne(courseDTO.getStudentCode()).getStuOpenid();
@@ -85,7 +85,7 @@ public class PushMessageServiceImpl implements PushMessageService {
 
         if(courseDTO == null ){
             log.error("【模板消息推送】课程或学生信息为空");
-            throw new SdcException(SubStatusEnum.COURSE_OR_STU_IS_NULL);
+            throw new SdcException(SubStatusEnum.INFO_NOTFOUND_EXCEPTION);
         }
         //设置发送给用户的openid
         String stuOpenID = stuBaseRepository.findOne(courseDTO.getStudentCode()).getStuOpenid();
@@ -124,7 +124,7 @@ public class PushMessageServiceImpl implements PushMessageService {
 
         if(teaCourse == null ){
             log.error("【模板消息推送】课程信息为空");
-            throw new SdcException(SubStatusEnum.COURSE_INFO_IS_NULL);
+            throw new SdcException(SubStatusEnum.INFO_NOTFOUND_EXCEPTION);
         }
         //设置发送给用户的openid
         String stuOpenID = stuBaseRepository.findOne(teaCourse.getStudentCode()).getStuOpenid();

@@ -61,7 +61,7 @@ public class TeaServiceImpl implements TeaService {
     public TeaCourse createCourse(TeaCourse teaCourse) {
         if(null == teaCourse ){
             log.error("【教师创建课程】 新创建的课程信息为空");
-            throw new SdcException(SubStatusEnum.COURSE_INFO_IS_NULL);
+            throw new SdcException(SubStatusEnum.INFO_NOTFOUND_EXCEPTION);
         }
         teaCourse.setCreateTime(new Date());
         //updatetime可以自动更新但是数据库是根据实体类映射生成的没有ON UPDATE CURRENT_TIMESTAMP
@@ -88,7 +88,7 @@ public class TeaServiceImpl implements TeaService {
 
         if(courseId == null){
             log.error("【教师取消课程】 该课程编号为空");
-            throw new SdcException(SubStatusEnum.NOTFIND_TEACOURSE);
+            throw new SdcException(SubStatusEnum.INFO_NOTFOUND_EXCEPTION);
         }
         TeaCourse teaCourse = teaCourseRepository.findOne(courseId);
         String teaCode = teaCourse.getTeaCode();
@@ -105,7 +105,7 @@ public class TeaServiceImpl implements TeaService {
         } else {
             log.error("【教师取消课程】 课程状态不正确，teaCourseId={},teaCourseIdStatus={}",
                     teaCourse.getCourserId(), teaCourse.getCourseStatus());
-            throw new SdcException(SubStatusEnum.COURSE_STATUS_ERROR);
+            throw new SdcException(SubStatusEnum.PARAM_EXCEPTION);
         }
         SubCourse subCourseByID = subCourseRepository.findByCourseId(courseId);
         subCourseByID.setUpdateTime(new Date());
@@ -133,7 +133,7 @@ public class TeaServiceImpl implements TeaService {
 
         if(teaCode == null || "".equals(teaCode)){
             log.error("【教师查看历史课程】 教师编号为空");
-            throw new SdcException(SubStatusEnum.NOTFIND_TEACHER);
+            throw new SdcException(SubStatusEnum.PARAM_EXCEPTION);
         }
         List<CourseDTO> rsList =  new ArrayList<CourseDTO>();
         /**
@@ -146,7 +146,7 @@ public class TeaServiceImpl implements TeaService {
             //设置查询条件
             Page<TeaCourse> all =  teaCourseRepository.find(teaCode, pageable);
             if(null == all){
-                throw new SdcException(SubStatusEnum.NOTFIND_TEACOURSE);
+                throw new SdcException(SubStatusEnum.INFO_NOTFOUND_EXCEPTION);
             }
             for(TeaCourse course : all){
                 rsList.add(modelMapper.map(course,CourseDTO.class));
@@ -166,7 +166,7 @@ public class TeaServiceImpl implements TeaService {
             }
         } else {
             log.error("【教师查看历史课程记录】 该编号的教师不存在");
-            throw new SdcException(SubStatusEnum.NOTFIND_TEACHER);
+            throw new SdcException(SubStatusEnum.INFO_NOTFOUND_EXCEPTION);
         }
         return rsList;
     }
@@ -184,7 +184,7 @@ public class TeaServiceImpl implements TeaService {
     public List<StuBase> findCandidateByCourseId(Integer courserId,int page,int pageSize){
         if(courserId == null){
             log.error("【教师查看预约候选人】 该课程编号为空");
-            throw new SdcException(SubStatusEnum.NOTFIND_TEACOURSE);
+            throw new SdcException(SubStatusEnum.INFO_NOTFOUND_EXCEPTION);
         }
         List<StuBase> stuList = new ArrayList<>();
         //设置分页参数
@@ -211,11 +211,11 @@ public class TeaServiceImpl implements TeaService {
     public SubCourse saveSelectedStu(String stuCode,Integer courseId) {
         if(stuCode == null || "".equals(stuCode)){
             log.error("【教师选择预约人】 学生编号为空");
-            throw new SdcException(SubStatusEnum.NOTFIND_STUDENT);
+            throw new SdcException(SubStatusEnum.PARAM_EXCEPTION);
         }
         if(courseId == null ){
             log.error("【教师选择预约人】 课程编号为空");
-            throw new SdcException(SubStatusEnum.NOTFIND_TEACOURSE);
+            throw new SdcException(SubStatusEnum.PARAM_EXCEPTION);
         }
 
         //组装预约课程
@@ -270,17 +270,17 @@ public class TeaServiceImpl implements TeaService {
     public TeaFeedBack createFeedBack(TeaFeedBack teaFeedBack) {
         if(null == teaFeedBack){
             log.error("【教师给学生的反馈】 课程反馈内容为空");
-            throw new SdcException(SubStatusEnum.TEAFEEDBACK_INFO_IS_NULL);
+            throw new SdcException(SubStatusEnum.PARAM_EXCEPTION);
         }
         Integer cId = teaFeedBack.getCourseId();
         if(null == cId){
             log.error("【教师给学生的反馈】 课程编号为空");
-            throw new SdcException(SubStatusEnum.NOTFIND_TEACOURSE);
+            throw new SdcException(SubStatusEnum.PARAM_EXCEPTION);
         }
         SubCourse subCourse = subCourseRepository.findByCourseId(cId);
         if(null == subCourse){
             log.error("【教师给学生的反馈】 该课程编号不正确");
-            throw new SdcException(SubStatusEnum.NOTFIND_TEACOURSE);
+            throw new SdcException(SubStatusEnum.PARAM_EXCEPTION);
         }
         subCourse.setSubStatus(SubStatusEnum.SUB_COURSE_FINISH.getCode());
         //修改预订表中课程状态
@@ -289,7 +289,7 @@ public class TeaServiceImpl implements TeaService {
         TeaCourse one = teaCourseRepository.findOne(teaFeedBack.getCourseId());
         if(null == one){
             log.error("【修改课程表的状态】 该课程编号不正确");
-            throw new SdcException(SubStatusEnum.NOTFIND_TEACOURSE);
+            throw new SdcException(SubStatusEnum.PARAM_EXCEPTION);
         }
         one.setCourseStatus(SubStatusEnum.SUB_COURSE_FINISH.getCode());
         teaCourseRepository.save(one);
@@ -307,12 +307,12 @@ public class TeaServiceImpl implements TeaService {
     public TeaCourse saveUpdateTeaCourse(TeaCourse teaCourse) {
         if(teaCourse == null){
             log.error("【修改课程表的状态】 该课程信息为空");
-            throw new SdcException(SubStatusEnum.COURSE_INFO_IS_NULL);
+            throw new SdcException(SubStatusEnum.INFO_NOTFOUND_EXCEPTION);
         }
 
         if(!teaCourse.getCourseStatus().equals(SubStatusEnum.SUB_WAIT.getCode())){
             log.error("【修改课程表的状态】 该课程的状态status={}不能被修改",teaCourse.getCourseStatus());
-            throw new SdcException(SubStatusEnum.COURSE_STATUS_ERROR);
+            throw new SdcException(SubStatusEnum.DATEBASE_OP_EXCEPTION);
         }
         TeaCourse save = teaCourseRepository.save(teaCourse);
         return save;
@@ -329,13 +329,13 @@ public class TeaServiceImpl implements TeaService {
 
         if(null == courseId){
             log.error("【查看课程课程信息】 该课程编号为空");
-            throw new SdcException(SubStatusEnum.NOTFIND_TEACOURSE);
+            throw new SdcException(SubStatusEnum.PARAM_EXCEPTION);
         }
         TeaCourse one = teaCourseRepository.findOne(courseId);
 
         if(null == one){
             log.error("【查看课程id={}的课程信息】 该课程没有找到",one);
-            throw new SdcException(SubStatusEnum.NOTFIND_TEACOURSE);
+            throw new SdcException(SubStatusEnum.INFO_NOTFOUND_EXCEPTION);
         }
         return one;
     }
@@ -351,12 +351,12 @@ public class TeaServiceImpl implements TeaService {
     public TeaCourse finishCourse(Integer courseId) {
         if(null == courseId){
             log.error("【结束课程】 该课程编号id={}为空",courseId);
-            throw new SdcException(SubStatusEnum.NOTFIND_TEACOURSE);
+            throw new SdcException(SubStatusEnum.PARAM_EXCEPTION);
         }
         TeaCourse one = teaCourseRepository.findOne(courseId);
         if(null == one){
             log.error("【结束课程】 课程没有找到");
-            throw new SdcException(SubStatusEnum.NOTFIND_TEACOURSE);
+            throw new SdcException(SubStatusEnum.INFO_NOTFOUND_EXCEPTION);
         }
         Integer vis = one.getCourseStatus();
         //当前课程只有是处于互动状态或者线下互动才能使用此方式结束课程
@@ -372,7 +372,7 @@ public class TeaServiceImpl implements TeaService {
             return save;
         } else {
             log.error("【结束课程】 课程状态不正确");
-            throw new SdcException(SubStatusEnum.COURSE_STATUS_ERROR);
+            throw new SdcException(SubStatusEnum.DATEBASE_OP_EXCEPTION);
         }
     }
 
