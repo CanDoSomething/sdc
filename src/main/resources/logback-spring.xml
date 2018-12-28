@@ -38,7 +38,7 @@
         <!-- 滚动策略-->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!--路径-->
-            <fileNamePattern>../sell/logs/error.%d.log</fileNamePattern>
+            <fileNamePattern>../logs/error.%d.log</fileNamePattern>
         </rollingPolicy>
     </appender>
 
