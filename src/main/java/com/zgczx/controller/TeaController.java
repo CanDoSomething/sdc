@@ -1,10 +1,10 @@
 package com.zgczx.controller;
 
 import com.zgczx.VO.ResultVO;
+import com.zgczx.dataobject.FeedBack;
 import com.zgczx.dataobject.StuBase;
 import com.zgczx.dataobject.SubCourse;
 import com.zgczx.dataobject.TeaCourse;
-import com.zgczx.dataobject.TeaFeedBack;
 import com.zgczx.dto.CourseDTO;
 import com.zgczx.enums.ResultEnum;
 import com.zgczx.exception.SdcException;
@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @Author: Dqd
@@ -39,14 +38,13 @@ public class TeaController {
      * @return  创建新创建课程的courseId
      */
     @PostMapping("/createCourse")
-    public ResultVO<Map<String,Integer>> createCourse(@Valid TeaCourse teaCourse, BindingResult bindingResult){
+    public ResultVO<TeaCourse> createCourse(@Valid TeaCourse teaCourse, BindingResult bindingResult){
         //后台进行表单验证，若参数不正确抛出异常
         if(bindingResult.hasErrors()){
             log.error("【教师课程填写】 参数不正确 ，teaCourse={}",teaCourse);
             throw new SdcException(ResultEnum.PARAM_ERROR.getCode() ,bindingResult.getFieldError().getDefaultMessage());
         }
         //前台传递过来的参数封装之后插入课程中
-
         TeaCourse course = teaService.createCourse(teaCourse);
         return ResultVOUtil.success(course);
     }
@@ -112,17 +110,16 @@ public class TeaController {
 
     /**
      *
-     * @param teaFeedBack 前端封装教师反馈内容
+     * @param subId 预约课程编号
+     * @param teaFeedBack 教师反馈内容
+     * @param score 教师给学生的打分
      * @return 反馈课程信息
      */
     @PostMapping("/createFeedBack")
-    public ResultVO<TeaFeedBack> createFeedBack(@Valid TeaFeedBack teaFeedBack,BindingResult bindingResult){
-        //后台进行表单验证，若参数不正确抛出异常
-        if(bindingResult.hasErrors()){
-            log.error("【教师反馈填写】 参数不正确 ，teaFeedBack={}",teaFeedBack);
-            throw new SdcException(ResultEnum.PARAM_ERROR.getCode() ,bindingResult.getFieldError().getDefaultMessage());
-        }
-        TeaFeedBack feedBack = teaService.createFeedBack(teaFeedBack);
+    public ResultVO<FeedBack> createFeedBack(@RequestParam("subId") Integer subId,
+                                             @RequestParam("teaFeedBack") String teaFeedBack,
+                                             @RequestParam("score")Integer score){
+        FeedBack feedBack = teaService.saveFeedBack(subId, teaFeedBack, score);
         return ResultVOUtil.success(feedBack);
     }
 

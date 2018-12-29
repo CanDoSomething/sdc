@@ -6,8 +6,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.Date;
-
 /**
  * @Author: Common
  * @Date: 2018/12/15 15:10
@@ -32,8 +30,8 @@ public interface TeaCourseRepository extends JpaRepository<TeaCourse,Integer> {
      * @return Page<TeaCourse>
      **/
 
-    @Query("select bean from TeaCourse bean   where bean.studentCode=?1 and bean.courseEndTime<?2")
-    Page<TeaCourse> lookHistory(String stuCode, Date date, Pageable pageable);
+    //@Query("select bean from TeaCourse bean   where bean.studentCode=?1 and bean.courseEndTime<?2")
+    //Page<TeaCourse> lookHistory(String stuCode, Date date, Pageable pageable);
 
     /**
      *功能描述：开始时间在当前时间之后的所有的未预约成功的课程
@@ -46,5 +44,5 @@ public interface TeaCourseRepository extends JpaRepository<TeaCourse,Integer> {
      * @return
      **/
 
-    Page<TeaCourse> findByCourseStatusAndAndCourseStartTimeIsAfter(Integer courseStatus,Date date,Pageable pageable);
+    //Page<TeaCourse> findByCourseStatusAndAndCourseStartTimeIsAfter(Integer courseStatus,Date date,Pageable pageable);
 }
