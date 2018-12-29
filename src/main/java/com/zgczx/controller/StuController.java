@@ -1,10 +1,11 @@
 package com.zgczx.controller;
 
 import com.zgczx.VO.ResultVO;
-import com.zgczx.dataobject.StuFeedBack;
+import com.zgczx.dataobject.FeedBack;
 import com.zgczx.dataobject.SubCourse;
 import com.zgczx.dataobject.TeaCourse;
 import com.zgczx.dto.CourseDTO;
+import com.zgczx.dto.SubDTO;
 import com.zgczx.service.impl.StuServiceImpl;
 import com.zgczx.utils.ResultVOUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,24 +61,7 @@ public class StuController {
     }
     /**
      *
-     * 功能描述:在没有预约成功情况下取消预约课程
-     *
-     * @param stuCode 学生编码
-     * @param courserId 课程信息
-     * @return:
-     * @author: 陈志恒
-     * @date: 2018/12/16 18:43
-     */
-    @GetMapping(value = "/cancelOrder")
-    @ResponseBody
-    public ResultVO cancelOrder(@RequestParam(value = "stuCode")String stuCode,
-                            @RequestParam(value = "courserId")Integer courserId){
-        SubCourse simpleCancelOrder = stuService.simpleCancelOrder(stuCode, courserId);
-        return ResultVOUtil.success(simpleCancelOrder);
-    }
-    /**
-     *
-     * 功能描述: 在已预约成功状态下取消预约课程
+     * 功能描述:取消预约课程
      *
      * @param cause 取消预约原因
      * @param courserId 课程id
@@ -88,11 +72,11 @@ public class StuController {
      */
     @PostMapping(value = "/cancelOrder")
     @ResponseBody
-    public ResultVO cancelOrder2(@RequestParam(value = "cause")String cause,
+    public ResultVO cancelOrder(@RequestParam(value = "cause")String cause,
                                  @RequestParam(value = "stuCode")String stuCode,
                                  @RequestParam(value = "courserId")Integer courserId){
-        TeaCourse teaCourse = stuService.cancelOrder(cause,stuCode, courserId);
-        return ResultVOUtil.success(teaCourse);
+        SubCourse subCourse = stuService.cancelOrder(cause, stuCode, courserId);
+        return ResultVOUtil.success(subCourse);
 
     }
     /**
@@ -102,6 +86,7 @@ public class StuController {
      * @param courserId 课程id
      * @param message 反馈信息
      * @param score 学生向老师打分
+     * @param subId 预约课程id
      * @return:
      * @author: 陈志恒
      * @date: 2018/12/16 18:56
@@ -109,10 +94,11 @@ public class StuController {
     @PostMapping(value = "/feedback")
     @ResponseBody
     public ResultVO feedback(@RequestParam(value = "courserId")Integer courserId,
-                         @RequestParam(value = "message")String message,
-                         @RequestParam(value = "score")Integer score){
-        StuFeedBack feedback = stuService.feedBack(courserId, message, score);
-        return ResultVOUtil.success(feedback);
+                             @RequestParam(value = "message")String message,
+                             @RequestParam(value = "score")Integer score,
+                             @RequestParam(value = "subId")Integer subId){
+        FeedBack feedBack = stuService.feedBack(courserId, message, score, subId);
+        return ResultVOUtil.success(feedBack);
 
     }
     /**
@@ -128,10 +114,10 @@ public class StuController {
      */
     @GetMapping(value = "/lookHistory")
     @ResponseBody
-    public ResultVO lookhistory(@RequestParam(value = "page", defaultValue = "0") Integer page,
+    public ResultVO lookHistory(@RequestParam(value = "page", defaultValue = "0") Integer page,
                                 @RequestParam(value = "size", defaultValue = "10") Integer size,
                                 @RequestParam(value = "stuCode") String stuCode){
-        List<CourseDTO> courseDTOSs = stuService.lookHistory(page,size, stuCode);
+        List<SubDTO> courseDTOSs = stuService.lookHistory(page,size, stuCode);
         return ResultVOUtil.success(courseDTOSs);
     }
 }

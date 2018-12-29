@@ -5,12 +5,12 @@ import lombok.Getter;
 @Getter
 public enum SubStatusEnum {
 
-    SUB_WAIT(0,"预约等待"),
-    SUB_SUCCESS(1,"预约成功"),
-    SUB_STUFAILURE(2,"学生预约失效"),
-    SUB_TEAFAILURE(3,"老师预约失效"),
-    SUB_COURSE_INTERACT(4,"教师与学生互动状态"),
-    SUB_COURSE_FINISH(5,"正常结束"),
+    SUB_WAIT(0,"待预约"),
+    SUB_SUCCESS(1,"已被预约"),
+    SUB_COURSE_INTERACT(2,"课程正在进行"),
+    SUB_COURSE_FINISH(3,"课程正常结束"),
+    TEA_CANCEL_COURSE(4,"课程失效"),
+    SUB_CANDIDATE_FAILD(5,"学生预约落选"),
 
     PARAM_EXCEPTION(500,"参数异常"),
     INFO_NOTFOUND_EXCEPTION(501,"信息未发现异常"),

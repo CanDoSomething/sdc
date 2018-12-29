@@ -48,8 +48,8 @@ public class PushMessageServiceImpl implements PushMessageService {
             throw new SdcException(SubStatusEnum.INFO_NOTFOUND_EXCEPTION);
         }
         //设置发送给用户的openid
-        String stuOpenID = stuBaseRepository.findOne(courseDTO.getStudentCode()).getStuOpenid();
-        templateMessage.setToUser(stuOpenID);
+        //String stuOpenID = stuBaseRepository.findOne(courseDTO.getStudentCode()).getStuOpenid();
+        //templateMessage.setToUser(stuOpenID);
         //设置返回数据
         List<WxMpTemplateData> data = Arrays.asList(
                 new WxMpTemplateData("first","预约课程成功！"),
@@ -88,8 +88,8 @@ public class PushMessageServiceImpl implements PushMessageService {
             throw new SdcException(SubStatusEnum.INFO_NOTFOUND_EXCEPTION);
         }
         //设置发送给用户的openid
-        String stuOpenID = stuBaseRepository.findOne(courseDTO.getStudentCode()).getStuOpenid();
-        templateMessage.setToUser(stuOpenID);
+        //String stuOpenID = stuBaseRepository.findOne(courseDTO.getStudentCode()).getStuOpenid();
+        //templateMessage.setToUser(stuOpenID);
         //设置返回数据
         List<WxMpTemplateData> data = Arrays.asList(
                 new WxMpTemplateData("first","预约课程失败"),
@@ -127,7 +127,7 @@ public class PushMessageServiceImpl implements PushMessageService {
             throw new SdcException(SubStatusEnum.INFO_NOTFOUND_EXCEPTION);
         }
         //设置发送给用户的openid
-        String stuOpenID = stuBaseRepository.findOne(teaCourse.getStudentCode()).getStuOpenid();
+        String stuOpenID = "123";//stuBaseRepository.findOne(teaCourse.get).getStuOpenid();
         templateMessage.setToUser(stuOpenID);
         //设置返回数据
         List<WxMpTemplateData> data = Arrays.asList(
@@ -137,7 +137,7 @@ public class PushMessageServiceImpl implements PushMessageService {
                 //new WxMpTemplateData("keyword3",courseDTO.getCourseStartTime().toString()),
                 //new WxMpTemplateData("keyword4",courseDTO.getCourseEndTime().toString()),
                 //new WxMpTemplateData("keyword5",SubStatusEnum.SUB_SUCCESS.getCode().toString()),
-                new WxMpTemplateData("keyword6",teaCourse.getCause())
+                new WxMpTemplateData("keyword6",teaCourse.getCourseLocation())
         );
         templateMessage.setData(data);
         try {

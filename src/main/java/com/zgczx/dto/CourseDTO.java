@@ -1,6 +1,6 @@
 package com.zgczx.dto;
 
-import com.zgczx.dataobject.StuFeedBack;
+import com.zgczx.dataobject.FeedBack;
 import com.zgczx.dataobject.TeaBase;
 import lombok.Data;
 import lombok.ToString;
@@ -15,23 +15,21 @@ import java.util.Date;
 @Data
 @ToString
 public class CourseDTO {
-    private Integer courserId;
+    private Integer courseId;
     //课程名称
     private String courseName;
     //课程日期
-    private Date course_date;
+    private Date courseDate;
     //课程开始时间
     private Date courseStartTime;
     //课程结束时间
     private Date courseEndTime;
     //课程当前状态
     private Integer courseStatus;
-    //学生工号
-    private String studentCode;
     //取消原因
     private String cause;
     //是否在线
-    private Integer isOnline;
+    private Integer courseInteractive;
     //上课地点
     private String courseLocation;
     //更新时间
@@ -40,13 +38,7 @@ public class CourseDTO {
     private Date updateTime;
     //老师对象
     private TeaBase teaBase;
-    //反馈信息
-    private StuFeedBack stuFeedBack;
-
-
-
-
-
-
+    //反馈对象
+    private FeedBack feedBack;
 
 }

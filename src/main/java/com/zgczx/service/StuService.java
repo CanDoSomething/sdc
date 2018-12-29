@@ -1,9 +1,9 @@
 package com.zgczx.service;
 
-import com.zgczx.dataobject.StuFeedBack;
+import com.zgczx.dataobject.FeedBack;
 import com.zgczx.dataobject.SubCourse;
-import com.zgczx.dataobject.TeaCourse;
 import com.zgczx.dto.CourseDTO;
+import com.zgczx.dto.SubDTO;
 
 import java.util.List;
 
@@ -12,17 +12,6 @@ import java.util.List;
  * @author 陈志恒
  */
 public interface StuService {
-    /**
-     *
-     * 功能描述: 在预约未成功条件下取消预约课程
-     *
-     * @param stuCode 学生编码
-     * @param courserId 课程id
-     * @return:
-     * @auther: 陈志恒
-     * @date: 2018/12/16 18:28
-     */
-    public SubCourse simpleCancelOrder(String stuCode,Integer courserId);
     /**
      *
      * 功能描述: 显示所有课程信息
@@ -47,7 +36,7 @@ public interface StuService {
     public SubCourse order(String stuCode, Integer courserId);
     /**
      *
-     * 功能描述:在预约成功条件下取消预约请求
+     * 功能描述:取消预约请求
      *
      * @param cause 取消原因
      * @param courserId 课程id
@@ -56,7 +45,7 @@ public interface StuService {
      * @auther: 陈志恒
      * @date: 2018/12/16 18:06
      */
-    public TeaCourse cancelOrder(String cause,String stuCode, Integer courserId);
+    public SubCourse cancelOrder(String cause,String stuCode, Integer courserId);
     /**
      *
      * 功能描述: 提交反馈
@@ -64,11 +53,12 @@ public interface StuService {
      * @param courseId 课程id
      * @param message 代表反馈内容
      * @param score 代表反馈评分
+     * @param subId 预约课程id
      * @return:
      * @auther: 陈志恒
      * @date: 2018/12/16 19:24
      */
-    public StuFeedBack feedBack(Integer courseId,String message, Integer score);
+    public FeedBack feedBack(Integer courseId, String message, Integer score,Integer subId);
     /**
      *查询历史记录课程
      *
@@ -79,7 +69,7 @@ public interface StuService {
      * @param stuCode 学生编码
      * @return List<CourseDTO> 课程封装对象的集合
      **/
-    public List<CourseDTO> lookHistory(Integer page,Integer size,String stuCode);
+    public List<SubDTO> lookHistory(Integer page, Integer size, String stuCode);
 
 
 

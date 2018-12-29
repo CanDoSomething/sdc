@@ -1,14 +1,15 @@
 package com.zgczx.service.impl;
 
 
-import com.zgczx.dataobject.StuFeedBack;
+import com.zgczx.dataobject.FeedBack;
 import com.zgczx.dataobject.SubCourse;
 import com.zgczx.dataobject.TeaBase;
 import com.zgczx.dataobject.TeaCourse;
 import com.zgczx.dto.CourseDTO;
+import com.zgczx.dto.SubDTO;
 import com.zgczx.enums.SubStatusEnum;
 import com.zgczx.exception.SdcException;
-import com.zgczx.repository.StuFeedBackRepository;
+import com.zgczx.repository.FeedBackRepository;
 import com.zgczx.repository.SubCourseRepository;
 import com.zgczx.repository.TeaBaseRepository;
 import com.zgczx.repository.TeaCourseRepository;
@@ -45,7 +46,7 @@ public class StuServiceImpl implements StuService {
     @Autowired
     private ModelMapper modelMapper;
     @Autowired
-    private StuFeedBackRepository stuFeedBackRepository;
+    private FeedBackRepository feedBackRepository;
     /**
      *
      * 功能描述: 显示所有课程信息
@@ -62,7 +63,7 @@ public class StuServiceImpl implements StuService {
         Sort sort =new Sort(Sort.Direction.ASC,"courseStartTime");
         /*设置分页*/
         Pageable pageable = new PageRequest(page, size, sort);
-        Page<TeaCourse> byCourseStatus = teaCourseRepository.findByCourseStatusAndAndCourseStartTimeIsAfter(0, new Date(), pageable);
+        Page<TeaCourse> byCourseStatus = teaCourseRepository.findByCourseStatusAndAndCourseStartTimeIsAfter(SubStatusEnum.SUB_WAIT.getCode(), new Date(), pageable);
         /*如果课程不存在，返回预约课程不存在*/
         if (byCourseStatus==null){
             log.error("【学生查看所有课程】 没有发布的课程");
@@ -99,7 +100,7 @@ public class StuServiceImpl implements StuService {
                 /*根据课程id查找到课程信息*/
                 TeaCourse one = teaCourseRepository.findOne(subCourse.getCourseId());
                 if (one==null){
-                    log.error("【学生发起预约课程请求】 预约课程对应的老师信息不存在");
+                    log.error("【学生已经存在的预约课程请求】 预约课程对应的老师信息不存在");
                     throw new SdcException(SubStatusEnum.INFO_NOTFOUND_EXCEPTION);
                 }
                 /*判断预约时间是否冲突*/
@@ -128,7 +129,7 @@ public class StuServiceImpl implements StuService {
 
     /**
      *
-     * 功能描述:在预约成功条件下取消预约请求
+     * 功能描述:取消预约请求
      *
      * @param: cause取消原因，courserId课程id，stuCode学生编码
      * @return:
@@ -136,68 +137,25 @@ public class StuServiceImpl implements StuService {
      * @date: 2018/12/16 18:06
      */
     @Override
-    public TeaCourse cancelOrder(String cause,String stuCode,Integer courserId) {
-        /*查找要取消预约的课程信息*/
-        TeaCourse teaCourse = teaCourseRepository.findOne(courserId);
-        if (teaCourse==null){
-            /*如果课程不存在，抛出课程不存在异常*/
-            log.error("【学生发起取消预约课程请求】 预约课程对应的老师信息不存在");
-            throw new SdcException(SubStatusEnum.INFO_NOTFOUND_EXCEPTION);
-        }
-        /*如果课程中的学生不是提交预约学生，抛出取消预约失败异常*/
-        if (!teaCourse.getStudentCode().equals(stuCode) || !teaCourse.getCourseStatus().equals(SubStatusEnum.SUB_SUCCESS.getCode())){
-            log.error("【学生发起取消预约课程请求】，该学生并不是提交预约课程的学生，取消课程失败");
+    public SubCourse cancelOrder(String cause,String stuCode,Integer courserId) {
+        /*找到预约表信息--根据学生编号与课程id查找到未失效的预约信息*/
+        SubCourse byStuCodeAndCourseId = subCourseRepository.findByStuCodeAndCourseIdAndSubStatusIsNot(stuCode, courserId,SubStatusEnum.SUB_CANDIDATE_FAILD.getCode());
+        if (cause!=null){
+            /*把预约状态更新为失效*/
+            byStuCodeAndCourseId.setSubStatus(SubStatusEnum.SUB_CANDIDATE_FAILD.getCode());
+            /*设置取消原因*/
+            byStuCodeAndCourseId.setStuCause(cause);
+        }else {
+            log.error("【学生发起取消预约课程请求】 参数不正确");
             throw new SdcException(SubStatusEnum.PARAM_EXCEPTION);
         }
-        /*设置预约状态为学生预约失效*/
-        teaCourse.setCourseStatus(SubStatusEnum.SUB_STUFAILURE.getCode());
-        teaCourse.setCause(cause);
-        TeaCourse save = teaCourseRepository.save(teaCourse);
-        if (save==null){
-            /*如果save等于null，抛出课程更新异常*/
-            log.error("【学生发起取消预约课程请求】 更新取消失败");
+        /*保存信息到预约表中*/
+        SubCourse subCourse = subCourseRepository.save(byStuCodeAndCourseId);
+        if (subCourse==null){
+            log.error("【学生发起取消预约课程请求】 报存到数据库中失败");
             throw new SdcException(SubStatusEnum.DATEBASE_OP_EXCEPTION);
         }
-        /*更新预约表中的预约状态*/
-        SubCourse byStuCodeAndCourseId = subCourseRepository.findByStuCodeAndCourseId(stuCode, courserId);
-        byStuCodeAndCourseId.setSubStatus(SubStatusEnum.SUB_STUFAILURE.getCode());
-        SubCourse subCourse = subCourseRepository.save(byStuCodeAndCourseId);
-        return save;
-    }
-    /**
-     *
-     * 功能描述: 在预约未成功条件下取消预约课程
-     *
-     * @param:
-     * @return:
-     * @auther: 陈志恒
-     * @date: 2018/12/16 18:28
-     */
-    @Override
-    public SubCourse simpleCancelOrder(String stuCode,Integer courserId){
-        /*查找要取消预约的课程信息*/
-        TeaCourse teaCourse = teaCourseRepository.findOne(courserId);
-        if (teaCourse==null){
-            /*如果课程不存在，抛出课程不存在异常*/
-            log.error("【学生发起取消预约课程请求】 预约课程信息不存在");
-            throw new SdcException(SubStatusEnum.INFO_NOTFOUND_EXCEPTION);
-        }
-        /*如果该学生成功预约课程，抛出取消预约原因必须填写异常*/
-        if (teaCourse.getCourseStatus().equals(SubStatusEnum.SUB_SUCCESS.getCode()) && teaCourse.getStudentCode().equals(stuCode)){
-            log.error("【学生发起取消预约课程请求】 取消原因必须填写");
-            throw new SdcException(SubStatusEnum.PARAM_EXCEPTION);
-        }
-        /*根据学生code和课程id查找到预约信息*/
-        SubCourse subCourse = subCourseRepository.findByStuCodeAndCourseId(stuCode, courserId);
-        if (subCourse==null){
-            /*抛出预约信息没有发现异常*/
-            log.error("【学生发起取消预约课程请求】 预约课程信息不存在");
-            throw new SdcException(SubStatusEnum.INFO_NOTFOUND_EXCEPTION);
-        }
-        /*更新预约信息为取消*/
-        subCourse.setSubStatus(SubStatusEnum.SUB_STUFAILURE.getCode());
-        SubCourse save = subCourseRepository.save(subCourse);
-        return save;
+        return subCourse;
     }
     /**
      *
@@ -206,25 +164,33 @@ public class StuServiceImpl implements StuService {
      * @param courseId 课程id
      * @param message 代表反馈内容
      * @param score 代表反馈评分
+     * @param subId 预约课程id
      * @return:
      * @auther: 陈志恒
      * @date: 2018/12/16 19:24
      */
     @Override
-    public StuFeedBack feedBack(Integer courseId, String message, Integer score) {
+    public FeedBack feedBack(Integer courseId, String message, Integer score,Integer subId) {
         /*如果评分不正确，抛出异常*/
         if (score>5 || score<0){
             log.error("【学生发起反馈请求】 反馈参数异常");
             throw new SdcException(SubStatusEnum.PARAM_EXCEPTION);
         }
-        StuFeedBack stuFeedBack=new StuFeedBack();
-        stuFeedBack.setCourseId(courseId);
-        stuFeedBack.setStuInfo(message);
-        stuFeedBack.setStuToScore(score);
-        StuFeedBack save = stuFeedBackRepository.save(stuFeedBack);
-        /*如果信息回馈表为空，抛出学生反馈表不存在异常*/
-        if (save ==null){
-            log.error("【学生发起反馈请求】 反馈保存到数据库失败");
+        /*查找反馈表*/
+        FeedBack feedBack=feedBackRepository.findOne(courseId);
+        /*如果反馈表不存在，建立新的反馈表，并设置反馈表主键为课程id*/
+        if (feedBack==null){
+            feedBack=new FeedBack();
+            feedBack.setFeedbackId(courseId);
+        }
+        /*封装学生反馈信息到反馈表中*/
+        feedBack.setStuScore(score);
+        feedBack.setSubId(subId);
+        feedBack.setStuFeedback(message);
+        /*保存数据到反馈表*/
+        FeedBack save=feedBackRepository.save(feedBack);
+        if (save==null){
+            log.error("【学生发起反馈】 报存到数据库中失败");
             throw new SdcException(SubStatusEnum.DATEBASE_OP_EXCEPTION);
         }
         return save;
@@ -240,17 +206,24 @@ public class StuServiceImpl implements StuService {
      * @return List<CourseDTO> 课程封装对象的集合
      **/
     @Override
-    public List<CourseDTO> lookHistory(Integer page,Integer size,String stuCode) {
-        //先按照课程结束日期降序排序
-        Sort sort =new Sort(Sort.Direction.DESC,"courseEndTime");
-        /*设置分页*/
+    public List<SubDTO> lookHistory(Integer page, Integer size, String stuCode) {
+        Sort sort =new Sort(Sort.Direction.DESC,"createTime");
         Pageable pageable = new PageRequest(page, size, sort);
-        /*按照分页信息查找相应的预约等待的课程信息*/
-        Page<TeaCourse> teaCourses = teaCourseRepository.lookHistory(stuCode,new Date(), pageable);
-        /*将课程信息封装到CourseDTO类中*/
-        List<CourseDTO> getCourse = getCourse(teaCourses);
-        return getCourse;
-
+        Page<SubCourse> byStuCode = subCourseRepository.findByStuCode(stuCode, pageable);
+        List<SubDTO> list=new ArrayList<>();
+        for (SubCourse subCourse : byStuCode) {
+            SubDTO map = modelMapper.map(subCourse, SubDTO.class);
+            TeaCourse one = teaCourseRepository.findOne(subCourse.getCourseId());
+            if (one==null){
+                log.error("预约表中的课程信息未发现");
+                throw new SdcException(SubStatusEnum.INFO_NOTFOUND_EXCEPTION);
+            }
+            map.setTeaCourse(one);
+            FeedBack feedBack = feedBackRepository.findOne(one.getCourseId());
+            map.setFeedBack(feedBack);
+            list.add(map);
+        }
+        return list;
     }
 
     /**
@@ -278,10 +251,6 @@ public class StuServiceImpl implements StuService {
             CourseDTO courseDTO = modelMapper.map(courseStatus, CourseDTO.class);
             /*将教师信息放入到封装对象中*/
             courseDTO.setTeaBase(one);
-            /*根据课程编号查找到反馈信息*/
-            StuFeedBack byCourseId = stuFeedBackRepository.findByCourseId(courseStatus.getCourserId());
-            /*将反馈信息封装到封装对象中去*/
-            courseDTO.setStuFeedBack(byCourseId);
             /*添加封装对象到list中*/
             list.add(courseDTO);
         }

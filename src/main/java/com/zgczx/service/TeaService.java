@@ -1,9 +1,6 @@
 package com.zgczx.service;
 
-import com.zgczx.dataobject.StuBase;
-import com.zgczx.dataobject.SubCourse;
-import com.zgczx.dataobject.TeaCourse;
-import com.zgczx.dataobject.TeaFeedBack;
+import com.zgczx.dataobject.*;
 import com.zgczx.dto.CourseDTO;
 
 import java.util.List;
@@ -67,13 +64,14 @@ public interface TeaService {
     SubCourse saveSelectedStu(String stuCode, Integer courseId);
 
     /**
-     *
      * 教师提交给学生的反馈
      *
+     * @param subId 预约课程编号
      * @param teaFeedBack 教师给学生的反馈信息
-     * @return 教师给学生的反馈信息
+     * @param score 教师给学生的打分
+     * @return 该预约课程的反馈信息
      */
-    TeaFeedBack createFeedBack(TeaFeedBack teaFeedBack);
+    FeedBack saveFeedBack(Integer subId,String teaFeedBack,Integer score);
 
     /**
      *

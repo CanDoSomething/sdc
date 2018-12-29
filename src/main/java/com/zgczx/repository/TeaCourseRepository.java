@@ -23,17 +23,19 @@ public interface TeaCourseRepository extends JpaRepository<TeaCourse,Integer> {
      */
     @Query("select teaCourse from TeaCourse teaCourse where teaCourse.teaCode = ?1 ORDER BY teaCourse.courseEndTime desc")
     Page<TeaCourse> find(String teaCode,Pageable pageable);
+
     /**
+     *按照学生编号跟预约情况查找预约信息
+     *
      * @Author chen
-     * @Date 10:11 2018/12/21
-     * @param stuCode 学生编码
-     * @param date 当前时间
+     * @Date 11:15 2018/12/29
+     * @param stuCode 学生编号
      * @param pageable 分页器
-     * @return Page<TeaCourse>
+     * @return
      **/
 
-    @Query("select bean from TeaCourse bean   where bean.studentCode=?1 and bean.courseEndTime<?2")
-    Page<TeaCourse> lookHistory(String stuCode, Date date, Pageable pageable);
+    @Query("select tea from TeaCourse tea,SubCourse sub  where sub.courseId=tea.courseId and (sub.courseId=1 or sub.courseId=0) and sub.stuCode=?1 ")
+    Page<TeaCourse> findLookHistory(String stuCode,Pageable pageable);
 
     /**
      *功能描述：开始时间在当前时间之后的所有的未预约成功的课程

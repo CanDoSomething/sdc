@@ -1,11 +1,12 @@
 package com.zgczx.service.impl;
 
 import com.zgczx.SellApplicationTests;
-import com.zgczx.dataobject.StuFeedBack;
+import com.zgczx.dataobject.FeedBack;
 import com.zgczx.dataobject.SubCourse;
-import com.zgczx.dataobject.TeaCourse;
 import com.zgczx.dto.CourseDTO;
+import com.zgczx.dto.SubDTO;
 import com.zgczx.service.StuService;
+import org.junit.After;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.text.ParseException;
@@ -28,35 +29,28 @@ public class StuServiceImplTest extends SellApplicationTests {
     /*预约测试*/
     @Test
     public void orderTest(){
-        SubCourse zx = stuService.order("zx", 2);
+        SubCourse zx = stuService.order("1", 1);
         System.out.println(zx);
     }
-    /*未预约成功前取消预约测试*/
-    @Test
-    public void simpleCancel(){
-        SubCourse zx = stuService.simpleCancelOrder("zx", 2);
-        System.out.println("取消成功");
-
-    }
-    /*成功预约后取消预约测试*/
+    /*取消预约测试*/
     @Test
     public void cancel(){
-        TeaCourse cancelOrder = stuService.cancelOrder("有事", "zx", 1);
-        System.out.println(cancelOrder);
+        SubCourse subCourse = stuService.cancelOrder("有事", "1", 1);
+        System.out.println(subCourse);
     }
     /*查询历史记录*/
     @Test
     public void lookHistory(){
 
-        List<CourseDTO> courseDTOSs = stuService.lookHistory(0,10, "zx");
-        for (CourseDTO courseDTO : courseDTOSs) {
+        List<SubDTO> courseDTOSs = stuService.lookHistory(0,10, "1");
+        for (SubDTO courseDTO : courseDTOSs) {
             System.out.println(courseDTO);
         }
     }
     /*提交反馈信息*/
     @Test
     public void feed(){
-        StuFeedBack good = stuService.feedBack(6, "好的", 5);
+        FeedBack good = stuService.feedBack(1, "好的", 5,6);
         System.out.println(good);
     }
     @Test

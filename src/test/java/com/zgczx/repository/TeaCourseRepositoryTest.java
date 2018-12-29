@@ -1,6 +1,5 @@
 package com.zgczx.repository;
 
-import com.zgczx.dataobject.TeaBase;
 import com.zgczx.dataobject.TeaCourse;
 import org.junit.Assert;
 import org.junit.Test;
@@ -9,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.xml.ws.soap.Addressing;
 import java.util.Date;
 
 @RunWith(SpringRunner.class)
@@ -25,7 +23,7 @@ public class TeaCourseRepositoryTest {
 
         teaCourse.setTeaCode("2");
         teaCourse.setCourseName("数学");
-        teaCourse.setCourse_date(new Date());
+        teaCourse.setCourseDate(new Date());
         teaCourse.setCourseStartTime(new Date());
         teaCourse.setCourseEndTime(new Date());
         teaCourse.setCourseStatus(1);

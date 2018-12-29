@@ -6,6 +6,8 @@ spring:
     url: jdbc:mysql://58.119.112.10:11030/studevelope?characterEncoding=utf-8&useSSL=false
   jpa:
     show-sql: true
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
 #  jackson:
 #    default-property-inclusion: non_null   #全局设定返回不为空的值
 #server:
