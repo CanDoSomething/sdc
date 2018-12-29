@@ -1,13 +1,13 @@
 package com.zgczx.repository;
 
+import com.zgczx.dataobject.StuBase;
 import com.zgczx.dataobject.SubCourse;
-import com.zgczx.dataobject.TeaCourse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import java.util.List;
 
+import java.util.List;
 public interface SubCourseRepository extends JpaRepository<SubCourse,Integer> {
     List<SubCourse> findByCourseId(Integer courseId);
     /**
@@ -29,7 +29,7 @@ public interface SubCourseRepository extends JpaRepository<SubCourse,Integer> {
      * @param pageable 分页器
      * @return
      **/
-    Page<SubCourse>findByStuCode(String stuCode,Pageable pageable);
+    Page<SubCourse> findByStuCode(String stuCode, Pageable pageable);
     public SubCourse findByStuCodeAndCourseId(String stuCode,Integer courseId);
     /**
      *找到预约等待或预约成功状态的预约信息
@@ -43,4 +43,8 @@ public interface SubCourseRepository extends JpaRepository<SubCourse,Integer> {
      **/
 
     public SubCourse findByStuCodeAndCourseIdAndSubStatusIsNot(String stuCode,Integer courseId,Integer subStatus);
+    List<SubCourse> findByCourseIdAndSubStatus(Integer courseId,Integer status);
+    @Query("select stuBase from com.zgczx.dataobject.StuBase stuBase,SubCourse subCourse where subCourse.courseId = ?1 and subCourse.stuCode = stuBase.stuCode order by stuBase.creditScore desc ")
+    List<StuBase> getAllCandidate(Integer courseId, Pageable pageable);
+
 }
