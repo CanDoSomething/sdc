@@ -44,7 +44,7 @@ public class TeaCourse {
      */
     private Date courseEndTime;
     /**
-     * 课程当前状态（0表示待预约，1表示已被预约，2表示为失效）
+     * 课程当前状态（0表示待预约，1表示已被预约，2表示为正在进行，3表示课程正常结束，4表示课程失效）
      */
     private Integer courseStatus;
     /**
