@@ -1,9 +1,10 @@
+/*
 package com.zgczx.service.tea.impl;
 
 import com.zgczx.dataobject.StuBase;
 import com.zgczx.dataobject.SubCourse;
 import com.zgczx.dataobject.TeaCourse;
-import com.zgczx.dataobject.TeaFeedBack;
+import com.zgczx.dataobject.FeedBack;
 import com.zgczx.dto.CourseDTO;
 import com.zgczx.service.impl.TeaServiceImpl;
 import org.junit.Assert;
@@ -17,9 +18,11 @@ import java.util.Date;
 import java.util.List;
 
 
+*/
 /**
  * Created by Dqd on 2018/12/11.
- */
+ *//*
+
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -81,4 +84,4 @@ public class TeaServiceImplTest{
         System.out.println("教师给学生的反馈信息"+teaFeedBack);
         Assert.assertNotNull(teaFeedBack);
     }
-}
+}*/
