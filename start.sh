@@ -1,4 +1,4 @@
-\#!/bin/bash
+#!/bin/bash
 
 PROJECTNAME=sdc
 
@@ -6,7 +6,7 @@ pid=`ps -ef |grep $PROJECTNAME |grep -v "grep" |awk '{print $2}'`
 
 if [ $pid ]; then
 
-​    echo "$PROJECTNAME  is  running  and pid=$pid"
+    echo "$PROJECTNAME  is  running  and pid=$pid"
 
 else
 
