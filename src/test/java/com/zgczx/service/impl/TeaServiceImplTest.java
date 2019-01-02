@@ -30,32 +30,26 @@ public class TeaServiceImplTest{
     @Test
     public void createCourse(){
         TeaCourse teaCourse = new TeaCourse();
-
         teaCourse.setCourseDate(new Date());
         teaCourse.setCourseEndTime(new Date());
-        teaCourse.setCourseName("大数据");
+        teaCourse.setCourseName("物理");
         teaCourse.setCourseStartTime(new Date());
         teaCourse.setCourseStatus(CourseEnum.SUB_WAIT.getCode());
-        teaCourse.setCourseLocation("计算所");
-        teaCourse.setCourseInteractive(1);
-        teaCourse.setTeaCode("1");
-
-        teaCourse.setCreateTime(new Date());
-        teaCourse.setUpdateTime(new Date());
+        teaCourse.setTeaCode("2");
+        teaCourse.setCourseInteractive(0);
         TeaCourse course = teaService.createCourse(teaCourse);
         System.out.println(course);
-
         Assert.assertNotNull(course);
     }
     @Test
     public void cancelCourse(){
-        TeaCourse course = teaService.cancelCourse(3,"有重要会议啊！！！！");
+        TeaCourse course = teaService.cancelCourse(13,"有重要会议啊！！！！");
         Assert.assertNotNull(course);
     }
     @Test
     public void findTeaHistoryCourse() {
         //String teaCode = "10";
-        String teaCode = "1";
+        String teaCode = "2";
         List<CourseDTO> list =  teaService.findTeaHistoryCourse(teaCode,0,10);
         for(CourseDTO courseDTO : list ){
             System.out.println(courseDTO.toString());
@@ -64,7 +58,7 @@ public class TeaServiceImplTest{
     }
     @Test
     public void findCandidateByCourseId(){
-        Integer courseId = new Integer(6);
+        Integer courseId = new Integer(13);
         //Integer courseId = new Integer(115);
         List<StuBase> list =  teaService.findCandidateByCourseId(courseId,0,10);
         System.out.println("所有预约的学生"+list);
@@ -73,7 +67,7 @@ public class TeaServiceImplTest{
     @Test
     public void  saveSelectedStu() {
         String stuOpenId = "openid1";
-        Integer courseId = 6;
+        Integer courseId = 13;
         SubCourse subCourse = teaService.saveSelectedStu(stuOpenId,courseId);
         System.out.println("被选中的学生"+subCourse);
         Assert.assertNotNull(subCourse);
@@ -82,18 +76,18 @@ public class TeaServiceImplTest{
     @Test
     public void saveFeedBack() {
 
-        FeedBack rs = teaService.saveFeedBack(6, "作为学生干就完了", 5);
+        FeedBack rs = teaService.saveFeedBack(28, "作为学生干就完了", 5);
         System.out.println("教师给学生的反馈信息:"+rs);
         Assert.assertNotNull(rs);
     }
     @Test
     public void findTeaCourseById() {
-        TeaCourse teaCourseById = teaService.findTeaCourseById(6);
+        TeaCourse teaCourseById = teaService.findTeaCourseById(13);
         System.out.println(teaCourseById);
     }
     @Test
     public void updateCourse(){
-        TeaCourse teaCourseById = teaService.findTeaCourseById(6);
+        TeaCourse teaCourseById = teaService.findTeaCourseById(13);
         teaCourseById.setCourseName("大数据分析");
         TeaCourse teaCourse = teaService.saveUpdateTeaCourse(teaCourseById);
         System.out.println(teaCourse);
@@ -101,7 +95,7 @@ public class TeaServiceImplTest{
 
     @Test
     public void finishCourse(){
-        Integer courseId = 3;
+        Integer courseId = 13;
         TeaCourse teaCourseById = teaService.findTeaCourseById(courseId);
         TeaCourse teaCourse = teaService.finishCourse(teaCourseById.getCourseId());
         System.out.println(teaCourse);
