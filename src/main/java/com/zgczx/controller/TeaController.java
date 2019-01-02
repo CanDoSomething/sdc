@@ -42,7 +42,7 @@ public class TeaController {
         //后台进行表单验证，若参数不正确抛出异常
         if(bindingResult.hasErrors()){
             log.error("【教师课程填写】 参数不正确 ，teaCourse={}",teaCourse);
-            throw new SdcException(ResultEnum.PARAM_ERROR.getCode() ,bindingResult.getFieldError().getDefaultMessage());
+            throw new SdcException(ResultEnum.PARAM_EXCEPTION.getCode() ,bindingResult.getFieldError().getDefaultMessage());
         }
         //前台传递过来的参数封装之后插入课程中
         TeaCourse course = teaService.createCourse(teaCourse);
@@ -98,13 +98,13 @@ public class TeaController {
     /**
      *
      * @param courseId 课程编号
-     * @param stuCode 学生学籍号
+     * @param stuOpenId 学生微信唯一Id
      * @return 预定课程的信息
      */
     @PostMapping("/saveSelectedStu")
     public ResultVO<SubCourse> saveSelectedStu(@RequestParam(value = "courseId")Integer courseId,
-                                               String stuCode){
-        SubCourse subCourse = teaService.saveSelectedStu(stuCode, courseId);
+                                               @RequestParam(value = "stuOpenId") String stuOpenId){
+        SubCourse subCourse = teaService.saveSelectedStu(stuOpenId, courseId);
         return ResultVOUtil.success(subCourse);
     }
 
@@ -135,7 +135,7 @@ public class TeaController {
         //后台进行表单验证，若参数不正确抛出异常
         if(bindingResult.hasErrors()){
             log.error("【教师修改课程信息】 参数不正确 ，teaFeedBack={}",teaCourse);
-            throw new SdcException(ResultEnum.PARAM_ERROR.getCode() ,bindingResult.getFieldError().getDefaultMessage());
+            throw new SdcException(ResultEnum.PARAM_EXCEPTION.getCode() ,bindingResult.getFieldError().getDefaultMessage());
         }
         TeaCourse teaCourse1 = teaService.saveUpdateTeaCourse(teaCourse);
         return ResultVOUtil.success(teaCourse1);
