@@ -9,7 +9,13 @@ import lombok.Getter;
 @Getter
 public enum ResultEnum {
 
-    SUCCESS(0, "成功"),
+    PARAM_EXCEPTION(500,"参数异常"),
+    INFO_NOTFOUND_EXCEPTION(501,"信息未发现异常"),
+    DATEBASE_OP_EXCEPTION(502,"数据库操作异常"),
+    SUB_FAIL(503,"预约冲突"),
+    WECHAT_MP_ERROR(504, "微信公众账号方面错误"),
+    ;
+    /*SUCCESS(0, "成功"),
 
     PARAM_ERROR(1, "参数不正确"),
 
@@ -54,7 +60,7 @@ public enum ResultEnum {
 
     LOGOUT_SUCCESS(26, "登出成功"),
     ;
-
+    */
     private Integer code;
 
     private String message;
