@@ -207,7 +207,7 @@ public class TeaServiceImpl implements TeaService {
 
         //设置分页参数
         Pageable pageable = new PageRequest(page,pageSize);
-
+        //查找候选人的时候只将预约状态为提交预约的学生查找出来
         List<StuBase> allCandidate = subCourseRepository.getAllCandidate(courserId,pageable);
         return allCandidate;
     }
@@ -238,7 +238,7 @@ public class TeaServiceImpl implements TeaService {
         }
         String stuCode = byStuOpenid.getStuCode();
         //修改预约表中被成功选择的学生的学号
-        SubCourse subCourse = subCourseRepository.findByStuCodeAndCourseId(stuCode,courseId);
+        SubCourse subCourse = subCourseRepository.findByStuCodeAndCourseIdAndSubStatus(stuCode,courseId,SubCourseEnum.SUB_WAIT.getCode());
         subCourse.setSubStatus(SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode());
         //查找课程表
         TeaCourse one = teaCourseRepository.findOne(courseId);
