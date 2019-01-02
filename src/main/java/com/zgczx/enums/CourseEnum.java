@@ -14,7 +14,7 @@ public enum CourseEnum {
     SUB_SUCCESS(1,"已被预约"),
     SUB_COURSE_INTERACT(2,"课程正在进行"),
     SUB_COURSE_FINISH(3,"课程正常结束"),
-    TEA_CANCEL_COURSE(4,"课程失效"),
+    COURSE_CANCELED(4,"课程失效"),
 
     ;
 
