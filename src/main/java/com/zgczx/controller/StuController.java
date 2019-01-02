@@ -45,7 +45,7 @@ public class StuController {
      *
      * 功能描述: 预约课程
      *
-     * @param stuCode 学生编号
+     * @param stuOpenid 学生微信id
      * @param courserId 课程编号
      * @return: ResultVO
      * @author: 陈志恒
@@ -53,9 +53,9 @@ public class StuController {
      */
     @GetMapping(value = "/order")
     @ResponseBody
-    public ResultVO getOrder(@RequestParam(value = "stuCode")String stuCode,
+    public ResultVO getOrder(@RequestParam(value = "stuOpenid")String stuOpenid,
                           @RequestParam(value = "courserId")Integer courserId){
-        SubCourse order = stuService.order(stuCode, courserId);
+        SubCourse order = stuService.order(stuOpenid, courserId);
         /*返回结果集*/
         return ResultVOUtil.success(order) ;
     }
@@ -65,7 +65,7 @@ public class StuController {
      *
      * @param cause 取消预约原因
      * @param courserId 课程id
-     * @param stuCode 学生编码
+     * @param stuOpenid 学生微信id
      * @return:
      * @author: 陈志恒
      * @date: 2018/12/16 18:43
@@ -73,9 +73,9 @@ public class StuController {
     @PostMapping(value = "/cancelOrder")
     @ResponseBody
     public ResultVO cancelOrder(@RequestParam(value = "cause")String cause,
-                                 @RequestParam(value = "stuCode")String stuCode,
+                                 @RequestParam(value = "stuOpenid")String stuOpenid,
                                  @RequestParam(value = "courserId")Integer courserId){
-        SubCourse subCourse = stuService.cancelOrder(cause, stuCode, courserId);
+        SubCourse subCourse = stuService.cancelOrder(cause, stuOpenid, courserId);
         return ResultVOUtil.success(subCourse);
 
     }
@@ -107,7 +107,7 @@ public class StuController {
      *
      * @param page 页面数
      * @param size 页面大小
-     * @param stuCode 学生编码
+     * @param stuOpenid 学生微信id
      * @return:
      * @author: 陈志恒
      * @date: 2018/12/16 20:00
@@ -116,8 +116,8 @@ public class StuController {
     @ResponseBody
     public ResultVO lookHistory(@RequestParam(value = "page", defaultValue = "0") Integer page,
                                 @RequestParam(value = "size", defaultValue = "10") Integer size,
-                                @RequestParam(value = "stuCode") String stuCode){
-        List<SubDTO> courseDTOSs = stuService.lookHistory(page,size, stuCode);
+                                @RequestParam(value = "stuOpenid") String stuOpenid){
+        List<SubDTO> courseDTOSs = stuService.lookHistory(page,size, stuOpenid);
         return ResultVOUtil.success(courseDTOSs);
     }
 }

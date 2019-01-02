@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 public interface SubCourseRepository extends JpaRepository<SubCourse,Integer> {
+
     List<SubCourse> findByCourseId(Integer courseId);
     /**
      *查找到学生对应的所有课程信息
@@ -42,7 +43,7 @@ public interface SubCourseRepository extends JpaRepository<SubCourse,Integer> {
      * @return
      **/
 
-    public SubCourse findByStuCodeAndCourseIdAndSubStatusIsNot(String stuCode,Integer courseId,Integer subStatus);
+    public SubCourse findByStuCodeAndCourseIdAndSubStatusIsIn(String stuCode,Integer courseId,List<Integer> subStatus);
     List<SubCourse> findByCourseIdAndSubStatus(Integer courseId,Integer status);
     @Query("select stuBase from com.zgczx.dataobject.StuBase stuBase,SubCourse subCourse where subCourse.courseId = ?1 and subCourse.stuCode = stuBase.stuCode order by stuBase.creditScore desc ")
     List<StuBase> getAllCandidate(Integer courseId, Pageable pageable);
