@@ -6,6 +6,7 @@ import com.zgczx.enums.CourseEnum;
 import com.zgczx.enums.ResultEnum;
 import com.zgczx.enums.SubCourseEnum;
 import com.zgczx.exception.SdcException;
+import com.zgczx.form.TeaCourseForm;
 import com.zgczx.repository.*;
 import com.zgczx.service.PushMessageService;
 import com.zgczx.service.TeaService;
@@ -49,29 +50,33 @@ public class TeaServiceImpl implements TeaService {
     /**
      *新增课程
      *
-     * @param teaCourse 新增的课程信息
+     * @param teaCourseForm 新增的课程信息
      * @return 新增的课程信息
      */
     @Override
     @Transactional(rollbackFor=Exception.class)
-    public TeaCourse createCourse(TeaCourse teaCourse) {
-        if(null == teaCourse ){
+    public TeaCourse createCourse(TeaCourseForm teaCourseForm,String teaOpenid) {
+        //TODO 已经通过表单验证，肯定不会为空，所以下面内容删掉
+        /*if(null == teaCourseForm ){
             log.error("【教师创建课程】 新创建的课程信息为空");
             throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION);
-        }
+        }*/
+
+        //TODO 判断课程上课日期，开始时间，结束时间是否合法？通过String来接收参数，格式转换后是否合法？
+        //1.上课日期不得早于当前时间
+        //2.结束时间不得早于开始时间
+
+        /**
+         * TODO 逻辑过程
+         * 1.判断该老师当前时间是否有课程
+         * 2.再新建课程
+         */
+
         //0为线上互动 ， 1线下互动
-        teaCourse.setCourseInteractive(0);
+        //teaCourseForm.setCourseInteractive(CourseService.COURSEINTERACTIVE_ONLINE);
 
-        //-------------前台可传入部分
-        /*
-        teaCourse.setCourseDate(new Date());
-        teaCourse.setCourseLocation("");
-        teaCourse.setCourseStartTime(new Date());
-        teaCourse.setCourseEndTime(new Date());
-        */
-
-        teaCourse.setCourseStatus(CourseEnum.SUB_WAIT.getCode());
-        return teaCourseRepository.save(teaCourse);
+       // teaCourse.setCourseStatus(CourseEnum.SUB_WAIT.getCode());
+        return new TeaCourse();
     }
 
 
@@ -86,7 +91,7 @@ public class TeaServiceImpl implements TeaService {
     @Override
     @Transactional(rollbackFor=Exception.class)
     public TeaCourse cancelCourse(Integer courseId,String cancelReason) {
-
+        // TODO 增加前端结构teaOpenid字段，取消之前需要判断当前课程是否为该老师的课程
         if(courseId == null){
             log.error("【教师取消课程】 该课程编号为空");
             throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION);
@@ -138,7 +143,7 @@ public class TeaServiceImpl implements TeaService {
 
     @Override
     public List<CourseDTO> findTeaHistoryCourse(String teaCode,int page,int pageSize) {
-
+        // TODO 前端只传TeaOpenid，修改
         if(teaCode == null || "".equals(teaCode)){
             log.error("【教师查看历史课程】 教师编号为空");
             throw new SdcException(ResultEnum.PARAM_EXCEPTION);
@@ -200,6 +205,7 @@ public class TeaServiceImpl implements TeaService {
      */
     @Override
     public List<StuBase> findCandidateByCourseId(Integer courserId,int page,int pageSize){
+        //TODO 增加前端的openId字段，判断该课程是否为该老师的课程
         if(courserId == null){
             log.error("【教师查看预约候选人】 该课程编号为空");
             throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION);
@@ -222,6 +228,7 @@ public class TeaServiceImpl implements TeaService {
     @Override
     @Transactional(rollbackFor=Exception.class)
     public SubCourse saveSelectedStu(String stuOpenId,Integer courseId) {
+        // TODO 增加teaOpenid,前端只能传递学籍号，修改
         if(stuOpenId == null || "".equals(stuOpenId)){
             log.error("【教师选择候选预约学生】 学生编号为空");
             throw new SdcException(ResultEnum.PARAM_EXCEPTION);
@@ -294,6 +301,14 @@ public class TeaServiceImpl implements TeaService {
     @Override
     @Transactional(rollbackFor=Exception.class)
     public FeedBack saveFeedBack(Integer subId,String feedBack,Integer score) {
+        // TODO 增加teaOpenid 参数，逻辑修改为学生和教师都可以提交反馈
+        /**
+         * TODO  大致逻辑
+         * 1. 判断当前课程的状态是否可以提交反馈？
+         * 2. 根据subId判断是否学生已经创建记录，若未创建，则创建新纪录
+         * 3. 若已创建，判断教师的反馈内容是否为空，若为空，则提交，不为空，则不能提交（限制只能提交一次）
+         */
+
         if(null == subId){
             log.error("【教师给学生的反馈】 预约课程编号为空");
             throw new SdcException(ResultEnum.PARAM_EXCEPTION);

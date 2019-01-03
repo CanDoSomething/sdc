@@ -8,10 +8,12 @@ import com.zgczx.dataobject.TeaCourse;
 import com.zgczx.dto.CourseDTO;
 import com.zgczx.enums.ResultEnum;
 import com.zgczx.exception.SdcException;
+import com.zgczx.form.TeaCourseForm;
 import com.zgczx.service.TeaService;
 import com.zgczx.utils.ResultVOUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,19 +35,31 @@ public class TeaController {
     private TeaService teaService;
 
     /**
-     * @param teaCourse 前端封装传递过来的参数
-     * @param bindingResult
+     * 创建课程
+     *
+     * @param teaCourseForm 教师课程表单信息
+     * @param bindingResult 表单信息验证结果
      * @return  创建新创建课程的courseId
      */
     @PostMapping("/createCourse")
-    public ResultVO<TeaCourse> createCourse(@Valid TeaCourse teaCourse, BindingResult bindingResult){
+    public ResultVO<TeaCourse> createCourse(@Valid TeaCourseForm teaCourseForm,
+                                            BindingResult bindingResult,
+                                            @RequestParam("teaOpenid") String teaOpenid){
         //后台进行表单验证，若参数不正确抛出异常
         if(bindingResult.hasErrors()){
-            log.error("【教师课程填写】 参数不正确 ，teaCourse={}",teaCourse);
+            log.error("【教师课程填写】 参数不正确 ，teaCourse={}",teaCourseForm);
             throw new SdcException(ResultEnum.PARAM_EXCEPTION.getCode() ,bindingResult.getFieldError().getDefaultMessage());
         }
+
+        if(StringUtils.isEmpty(teaOpenid)){
+            log.error("【创建课程】 教师openid为空");
+            throw new SdcException(ResultEnum.PARAM_EXCEPTION.getCode(),
+                    ResultEnum.PARAM_EXCEPTION.getMessage());
+        }
+
+
         //前台传递过来的参数封装之后插入课程中
-        TeaCourse course = teaService.createCourse(teaCourse);
+        TeaCourse course = teaService.createCourse(teaCourseForm,teaOpenid);
         return ResultVOUtil.success(course);
     }
 

@@ -1,7 +1,11 @@
 package com.zgczx.service;
 
-import com.zgczx.dataobject.*;
+import com.zgczx.dataobject.FeedBack;
+import com.zgczx.dataobject.StuBase;
+import com.zgczx.dataobject.SubCourse;
+import com.zgczx.dataobject.TeaCourse;
 import com.zgczx.dto.CourseDTO;
+import com.zgczx.form.TeaCourseForm;
 
 import java.util.List;
 
@@ -16,10 +20,11 @@ public interface TeaService {
     /**
      * 创建课程
      *
-     * @param teaCourse 封装的课程信息
+     * @param teaCourseForm 封装的课程信息表单
+     * @param teaOpenid 教师微信唯一凭证
      * @return 创建成功的课程
      */
-    TeaCourse createCourse(TeaCourse teaCourse);
+    TeaCourse createCourse(TeaCourseForm teaCourseForm,String teaOpenid);
 
     /**
      *

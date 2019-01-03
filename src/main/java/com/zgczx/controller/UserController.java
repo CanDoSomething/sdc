@@ -83,6 +83,14 @@ public class UserController {
         return "" ;
     }
 
+    /**
+     *
+     *  学生根据openid创建表单信息
+     * @param stuInfoForm 学生信息表单信息
+     * @param bindingResult 表单验证结果
+     * @param stuOpenid 学生微信唯一凭证
+     * @return ResultVO
+     */
     @PostMapping("/registerStuBaseByOpenid")
     public ResultVO<?> registerStuBaseByOpenid(@Valid StuInfoForm stuInfoForm, BindingResult bindingResult,
                                 @RequestParam("stuOpenid") String stuOpenid ){
