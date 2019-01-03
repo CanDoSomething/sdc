@@ -23,3 +23,9 @@ wechat:
   mpAppSecret: 311a4e1283aea428d20eb644615b53aa
 server:
   port: 8086
+
+projectUrl:
+  weChatMpAuthorize: http://zhiheyikaoqin.cn
+  weChatOpenAuthorize: http://zhiheyikaoqin.cn
+  sdc: http://zhiheyikaoqin.cn
+

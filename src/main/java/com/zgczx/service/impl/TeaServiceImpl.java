@@ -114,14 +114,14 @@ public class TeaServiceImpl implements TeaService {
                 SubCourse save = subCourseRepository.save(subCourseByID);
                 if (null == save) {
                     log.error("【取消课程】取消课程失败！");
-                    throw new SdcException(ResultEnum.DATEBASE_OP_EXCEPTION);
+                    throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION);
                 }
             }
         }
         TeaCourse save = teaCourseRepository.save(teaCourse);
         if(null == save) {
             log.error("【取消课程】取消课程失败！");
-            throw new SdcException(ResultEnum.DATEBASE_OP_EXCEPTION);
+            throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION);
         }
         return save;
     }
@@ -250,13 +250,13 @@ public class TeaServiceImpl implements TeaService {
         subCourse = subCourseRepository.save(subCourse);
         if(null == subCourse){
             log.error("【教师选择候选预约学生】更新预约表失败");
-            throw new SdcException(ResultEnum.DATEBASE_OP_EXCEPTION);
+            throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION);
         }
         //更新课程状态
         TeaCourse teaCourseAfterUpdate = teaCourseRepository.save(one);
         if(null == teaCourseAfterUpdate){
             log.error("【教师选择候选预约学生】更新教师课程表失败");
-            throw new SdcException(ResultEnum.DATEBASE_OP_EXCEPTION);
+            throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION);
         }
         //给学生推送预约成功的模板消息
         CourseDTO courseDTO  = modelMapper.map(one,CourseDTO.class);
@@ -270,11 +270,11 @@ public class TeaServiceImpl implements TeaService {
         for(SubCourse subCourse1 : byCourseIdAndSubStatus){
             if(!subCourse1.getStuCode().equals(stuCode)){
                 //将当前预约信息改成学生预约失效
-                subCourse1.setSubStatus(SubCourseEnum.SUB_CANDIDATE_FAILD.getCode());
+                subCourse1.setSubStatus(SubCourseEnum.SUB_CANDIDATE_FAILED.getCode());
                 SubCourse save = subCourseRepository.save(subCourse1);
                 if(null == save){
                     log.error("【教师选择候选预约学生】更新教师课程表失败");
-                    throw new SdcException(ResultEnum.DATEBASE_OP_EXCEPTION);
+                    throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION);
                 }
                 //推送预约失败的模板消息
                 //courseDTO.setStudentCode(subCourse1.getStuCode());
@@ -346,7 +346,7 @@ public class TeaServiceImpl implements TeaService {
 
         if(!teaCourse.getCourseStatus().equals(CourseEnum.SUB_WAIT.getCode())){
             log.error("【修改课程表的状态】 该课程的状态status={}不能被修改",teaCourse.getCourseStatus());
-            throw new SdcException(ResultEnum.DATEBASE_OP_EXCEPTION);
+            throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION);
         }
         TeaCourse save = teaCourseRepository.save(teaCourse);
         return save;
@@ -400,12 +400,12 @@ public class TeaServiceImpl implements TeaService {
             TeaCourse save = teaCourseRepository.save(one);
             if(null == save ){
                 log.error("【结束课程】 修改课程状态异常");
-                throw new SdcException(ResultEnum.DATEBASE_OP_EXCEPTION);
+                throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION);
             }
             return save;
         } else {
             log.error("【结束课程】 课程状态不正确");
-            throw new SdcException(ResultEnum.DATEBASE_OP_EXCEPTION);
+            throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION);
         }
     }
 }

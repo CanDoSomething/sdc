@@ -10,4 +10,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface TeaBaseRepository extends JpaRepository<TeaBase,String> {
 
+    /**
+     * 根据教师openid确定该教师
+     *
+     * @param teaOpenid 微信唯一凭证
+     * @return  TeaBase
+     */
+    TeaBase findByteaOpenid(String teaOpenid);
+
 }

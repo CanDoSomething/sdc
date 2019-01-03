@@ -1,5 +1,7 @@
 package com.zgczx.exception;
 
+import com.zgczx.config.ProjectUrlConfig;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -13,10 +15,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @ControllerAdvice
 public class UserAuthorizeExceptionHandler {
 
+    @Autowired
+    private ProjectUrlConfig projectUrlConfig;
+
     @ResponseBody
     @ExceptionHandler(value = UserAuthorizeException.class)
-    public String handlerAuthorizeException(){
-        return "redirect:".concat("跳转地址");
+    public String handlerAuthorizeException(UserAuthorizeException userAuthorizeException){
+        return "redirect:".concat(projectUrlConfig.getWeChatMpAuthorize())
+                .concat("/wechat/authorizeByOpenid/?returnUrl=")
+                .concat(userAuthorizeException.getReturnUrl());
     }
 
 }

@@ -124,7 +124,7 @@ public class StuServiceImpl implements StuService {
         SubCourse save = subCourseRepository.save(subCourse);
         if (save==null){
             log.error("【学生发起预约课程请求】 预约信息没有保存到数据库，预约课程失败");
-            throw new SdcException(ResultEnum.DATEBASE_OP_EXCEPTION);
+            throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION);
         }
         return save;
     }
@@ -165,7 +165,7 @@ public class StuServiceImpl implements StuService {
         SubCourse subCourse = subCourseRepository.save(byStuCodeAndCourseId);
         if (subCourse==null){
             log.error("【学生发起取消预约课程请求】 报存到数据库中失败");
-            throw new SdcException(ResultEnum.DATEBASE_OP_EXCEPTION);
+            throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION);
         }
         return subCourse;
     }
@@ -203,7 +203,7 @@ public class StuServiceImpl implements StuService {
         FeedBack save=feedBackRepository.save(feedBack);
         if (save==null){
             log.error("【学生发起反馈】 报存到数据库中失败");
-            throw new SdcException(ResultEnum.DATEBASE_OP_EXCEPTION);
+            throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION);
         }
         return save;
     }

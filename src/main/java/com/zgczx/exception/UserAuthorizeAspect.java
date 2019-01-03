@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 @Component
 @Slf4j
 public class UserAuthorizeAspect {
+
     @Pointcut("execution(public * com.zgczx.controller.WeChatController*.*(..))")
     public void verify(){}
 
@@ -30,13 +31,15 @@ public class UserAuthorizeAspect {
         ServletRequestAttributes attributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
 
+        String requestURL = request.getRequestURL().toString();
+
         Cookie cookie = CookieUtil.get(request,"openid");
         if (cookie == null){
             log.warn("【登录检验】 Cookie中查不到openid");
-            throw new UserAuthorizeException();
+            throw new UserAuthorizeException(requestURL);
         }
 
-        /**
+        /*
          * 或者去redis中查询
          */
 

@@ -25,12 +25,12 @@ public class UserServiceTest {
 
     @Test
     public void saveStu(){
-        StuBase stuBase = userService.saveStuBase("openid", "nickname", "headingurl");
+        StuBase stuBase = userService.createStuBase("openid", "nickname", "headingurl");
         Assert.assertNotNull(stuBase);
     }
     @Test
     public void saveTea(){
-        TeaBase teaBase = userService.saveTeaBase("111","nickname","headimgurl");
+        TeaBase teaBase = userService.createTeaBase("111","nickname","headimgurl");
         Assert.assertNotNull(teaBase);
     }
 
