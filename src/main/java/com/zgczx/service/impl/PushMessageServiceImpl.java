@@ -3,7 +3,7 @@ package com.zgczx.service.impl;
 import com.zgczx.config.PushMessageConfig;
 import com.zgczx.dataobject.TeaCourse;
 import com.zgczx.dto.CourseDTO;
-import com.zgczx.enums.SubStatusEnum;
+import com.zgczx.enums.ResultEnum;
 import com.zgczx.exception.SdcException;
 import com.zgczx.repository.StuBaseRepository;
 import com.zgczx.service.PushMessageService;
@@ -45,7 +45,7 @@ public class PushMessageServiceImpl implements PushMessageService {
 
         if(courseDTO == null ){
             log.error("【模板消息推送】课程或学生信息为空");
-            throw new SdcException(SubStatusEnum.INFO_NOTFOUND_EXCEPTION);
+            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION);
         }
         //设置发送给用户的openid
         //String stuOpenID = stuBaseRepository.findOne(courseDTO.getStudentCode()).getStuOpenid();
@@ -85,7 +85,7 @@ public class PushMessageServiceImpl implements PushMessageService {
 
         if(courseDTO == null ){
             log.error("【模板消息推送】课程或学生信息为空");
-            throw new SdcException(SubStatusEnum.INFO_NOTFOUND_EXCEPTION);
+            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION);
         }
         //设置发送给用户的openid
         //String stuOpenID = stuBaseRepository.findOne(courseDTO.getStudentCode()).getStuOpenid();
@@ -124,7 +124,7 @@ public class PushMessageServiceImpl implements PushMessageService {
 
         if(teaCourse == null ){
             log.error("【模板消息推送】课程信息为空");
-            throw new SdcException(SubStatusEnum.INFO_NOTFOUND_EXCEPTION);
+            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION);
         }
         //设置发送给用户的openid
         String stuOpenID = "123";//stuBaseRepository.findOne(teaCourse.get).getStuOpenid();

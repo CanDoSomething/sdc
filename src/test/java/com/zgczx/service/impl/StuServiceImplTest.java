@@ -6,13 +6,13 @@ import com.zgczx.dataobject.SubCourse;
 import com.zgczx.dto.CourseDTO;
 import com.zgczx.dto.SubDTO;
 import com.zgczx.service.StuService;
-import org.junit.After;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+
 
 
 public class StuServiceImplTest extends SellApplicationTests {
@@ -29,20 +29,20 @@ public class StuServiceImplTest extends SellApplicationTests {
     /*预约测试*/
     @Test
     public void orderTest(){
-        SubCourse zx = stuService.order("1", 1);
+        SubCourse zx = stuService.order("openid1", 1);
         System.out.println(zx);
     }
     /*取消预约测试*/
     @Test
     public void cancel(){
-        SubCourse subCourse = stuService.cancelOrder("有事", "1", 1);
+        SubCourse subCourse = stuService.cancelOrder("有事", "openid1", 6);
         System.out.println(subCourse);
     }
     /*查询历史记录*/
     @Test
     public void lookHistory(){
 
-        List<SubDTO> courseDTOSs = stuService.lookHistory(0,10, "1");
+        List<SubDTO> courseDTOSs = stuService.lookHistory(0,10, "openid1");
         for (SubDTO courseDTO : courseDTOSs) {
             System.out.println(courseDTO);
         }

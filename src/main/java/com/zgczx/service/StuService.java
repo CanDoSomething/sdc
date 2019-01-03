@@ -27,25 +27,25 @@ public interface StuService {
      *
      * 功能描述: 提交预约请求
      *
-     * @param stuCode 学生编码
+     * @param stuOpenid 学生微信id
      * @param courserId  课程id
      * @return:
      * @auther: 陈志恒
      * @date: 2018/12/16 17:57
      */
-    public SubCourse order(String stuCode, Integer courserId);
+    public SubCourse order(String stuOpenid, Integer courserId);
     /**
      *
      * 功能描述:取消预约请求
      *
      * @param cause 取消原因
      * @param courserId 课程id
-     * @param stuCode 学生编码
+     * @param stuOpenid 学生微信id
      * @return:
      * @auther: 陈志恒
      * @date: 2018/12/16 18:06
      */
-    public SubCourse cancelOrder(String cause,String stuCode, Integer courserId);
+    public SubCourse cancelOrder(String cause,String stuOpenid, Integer courserId);
     /**
      *
      * 功能描述: 提交反馈
@@ -66,10 +66,10 @@ public interface StuService {
      * @Date 21:02 2018/12/20
      * @param page 页数
      * @param size 页面大小
-     * @param stuCode 学生编码
+     * @param stuOpenid 学生微信id
      * @return List<CourseDTO> 课程封装对象的集合
      **/
-    public List<SubDTO> lookHistory(Integer page, Integer size, String stuCode);
+    public List<SubDTO> lookHistory(Integer page, Integer size, String stuOpenid);
 
 
 
