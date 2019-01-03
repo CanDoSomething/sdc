@@ -1,6 +1,7 @@
 package com.zgczx.exception;
 
 import com.zgczx.config.ProjectUrlConfig;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
  * @Description:
  */
 @ControllerAdvice
+@Slf4j
 public class UserAuthorizeExceptionHandler {
 
     @Autowired
@@ -20,7 +22,7 @@ public class UserAuthorizeExceptionHandler {
 
     @ExceptionHandler(value = UserAuthorizeException.class)
     public String handlerAuthorizeException(UserAuthorizeException userAuthorizeException){
-        System.out.println("url---->"+userAuthorizeException.getReturnUrl()+"?"+userAuthorizeException.getQueryString());
+        log.info("url---->"+userAuthorizeException.getReturnUrl()+"?"+userAuthorizeException.getQueryString());
         return "redirect:".concat(projectUrlConfig.getWeChatMpAuthorize())
                 .concat("/wechat/authorizeByOpenid/?returnUrl=")
                 .concat(userAuthorizeException.getReturnUrl())
