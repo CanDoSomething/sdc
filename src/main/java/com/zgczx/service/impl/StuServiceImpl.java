@@ -4,6 +4,7 @@ package com.zgczx.service.impl;
 import com.zgczx.dataobject.*;
 import com.zgczx.dto.CourseDTO;
 import com.zgczx.dto.SubDTO;
+import com.zgczx.enums.CourseEnum;
 import com.zgczx.enums.ResultEnum;
 import com.zgczx.enums.SubCourseEnum;
 import com.zgczx.exception.SdcException;
@@ -136,7 +137,9 @@ public class StuServiceImpl implements StuService {
      * @param cause 取消原因
      * @param courserId courserId课程id
      * @param stuOpenid 学生微信id
-     * @return SubCourse
+     * @return:
+     * @auther: 陈志恒
+     * @date: 2018/12/16 18:06
      */
     @Override
     public SubCourse cancelOrder(String cause,String stuOpenid,Integer courserId) {
@@ -175,31 +178,39 @@ public class StuServiceImpl implements StuService {
      * @param message 代表反馈内容
      * @param score 代表反馈评分
      * @param subId 预约课程id
-     * @return FeedBack
+     * @return:
+     * @auther: 陈志恒
+     * @date: 2018/12/16 19:24
      */
     @Override
     public FeedBack feedBack(Integer courseId, String message, Integer score,Integer subId) {
         /*如果评分不正确，抛出异常*/
-        if (score > 5 || score<0){
-            log.error("【学生提交反馈】 评分数据非法");
+        if (score>5 || score<0){
+            log.error("【学生发起反馈请求】 反馈参数异常");
             throw new SdcException(ResultEnum.PARAM_EXCEPTION);
         }
-        // TODO
-        // 1.查询是否已经提交反馈（前期指定只能提交一次）
-        // 2.判断该课程当前状态是否可以提交反馈
-        // 3.提交反馈信息
-
-        /*查找反馈表*/
-        FeedBack feedBack=feedBackRepository.findOne(courseId);
-        /*如果反馈表不存在，建立新的反馈表，并设置反馈表主键为课程id*/
-        if (feedBack==null){
-            feedBack=new FeedBack();
-            feedBack.setFeedbackId(courseId);
+        /*查找课程信息*/
+        TeaCourse one = teaCourseRepository.findOne(courseId);
+        /*判断课程信息是否正常结束,如果不是抛出异常*/
+        if (one==null || !one.getCourseStatus().equals(CourseEnum.COURSE_FINISH.getCode())){
+            log.error("课程没有正常结束,不能提交反馈信息");
+            throw new SdcException(ResultEnum.PARAM_EXCEPTION);
         }
+        /*根据预约课程id来查找用户是否提交反馈*/
+        FeedBack bySubId = feedBackRepository.findBySubId(subId);
+        if (bySubId!=null){
+            log.error("学生已经反馈成功，无需多次反馈");
+
+            throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION);
+        }
+        /*代码执行到这里证明没有异常可以正常执行反馈*/
+        FeedBack feedBack=new FeedBack();
         /*封装学生反馈信息到反馈表中*/
         feedBack.setStuScore(score);
         feedBack.setSubId(subId);
         feedBack.setStuFeedback(message);
+//        feedBack.setCreateTime(new Date());
+//        feedBack.setUpdateTime(new Date());
         /*保存数据到反馈表*/
         FeedBack save=feedBackRepository.save(feedBack);
         if (save==null){
