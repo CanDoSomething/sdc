@@ -19,8 +19,8 @@ spring:
 #  level: info
 
 wechat:
-  mpAppId: wx7e585d995f58d7d6
-  mpAppSecret: 311a4e1283aea428d20eb644615b53aa
+  mpAppId: wx0b6356c5690adc27
+  mpAppSecret: 9d09164246aeb4bbae46ec50d7afc6d4
 server:
   port: 8086
 
