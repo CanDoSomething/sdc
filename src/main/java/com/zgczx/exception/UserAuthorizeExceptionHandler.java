@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
  * @ClassName: Jason
@@ -21,13 +22,13 @@ public class UserAuthorizeExceptionHandler {
 
 
     @ExceptionHandler(value = UserAuthorizeException.class)
-    public String handlerAuthorizeException(UserAuthorizeException userAuthorizeException){
+    public String handlerAuthorizeException(UserAuthorizeException userAuthorizeException, RedirectAttributes redirectAttributes){
         log.info("url---->"+userAuthorizeException.getReturnUrl()+"?"+userAuthorizeException.getQueryString());
 
         String returnUrl = userAuthorizeException.getReturnUrl()+"?"+userAuthorizeException.getQueryString();
+        redirectAttributes.addAttribute("returnUrl",returnUrl);
         return "redirect:".concat(projectUrlConfig.getWeChatMpAuthorize())
-                .concat("/wechat/authorizeByOpenid/?returnUrl=")
-                .concat(returnUrl);
+                .concat("/wechat/authorizeByOpenid");
     }
 
 }
