@@ -3,7 +3,6 @@ package com.zgczx.controller;
 import com.zgczx.VO.ResultVO;
 import com.zgczx.dataobject.FeedBack;
 import com.zgczx.dataobject.SubCourse;
-import com.zgczx.dataobject.TeaCourse;
 import com.zgczx.dto.CourseDTO;
 import com.zgczx.dto.SubDTO;
 import com.zgczx.service.impl.StuServiceImpl;
@@ -11,6 +10,7 @@ import com.zgczx.utils.ResultVOUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 /**
@@ -47,9 +47,7 @@ public class StuController {
      *
      * @param stuOpenid 学生微信id
      * @param courserId 课程编号
-     * @return: ResultVO
-     * @author: 陈志恒
-     * @date: 2018/12/16 18:41
+     * @return ResultVO
      */
     @GetMapping(value = "/order")
     @ResponseBody
