@@ -23,7 +23,9 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 public class UserAuthorizeAspect {
 
-    @Pointcut("execution(public * com.zgczx.controller.WeChatController*.*(..))")
+    @Pointcut("execution(public * com.zgczx.controller.TeaController*.*(..)) "
+            +"&& execution(public * com.zgczx.controller.StuController*.*(..))"
+            +"&& execution(public * com.zgczx.controller.UserController*.*(..))")
     public void verify(){}
 
     @Before("verify()")
