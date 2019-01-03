@@ -90,6 +90,7 @@ public class WeChatController {
     @GetMapping("/authorizeByOpenid")
     public String authorizeByOpenid(@RequestParam("returnUrl") String returnUrl) throws UnsupportedEncodingException {
 
+        log.info("returnUrl-->"+returnUrl);
         //1.配置
         //2.调用方法
         String url = projectUrlConfig.getWeChatMpAuthorize() + "/wechat/userInfoByOpenid";
