@@ -8,6 +8,7 @@ spring:
     show-sql: true
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
 #  jackson:
 #    default-property-inclusion: non_null   #全局设定返回不为空的值
 #server:

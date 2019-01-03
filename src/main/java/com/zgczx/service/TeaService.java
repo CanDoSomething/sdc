@@ -31,10 +31,11 @@ public interface TeaService {
      * 取消课程
      *
      * @param courseId 课程编号
+     * @param teaOpenid 教师微信编号
      * @param cancelReason 取消课程原因
      * @return 取消课程之后的信息
      */
-    TeaCourse cancelCourse(Integer courseId,String cancelReason);
+    TeaCourse cancelCourse(Integer courseId,String teaOpenid,String cancelReason);
 
     /**
      *
@@ -52,11 +53,12 @@ public interface TeaService {
      * 查看课程预约候选人
      *
      * @param courserId 课程编号
+     * @param teaOpenid 教师微信编号
      * @param page 当前页码
      * @param pageSize 当前分页大小
      * @return 当前课程所有预约候选人列表
      */
-    List<StuBase> findCandidateByCourseId(Integer courserId, int page, int pageSize);
+    List<StuBase> findCandidateByCourseId(Integer courserId,String teaOpenid, int page, int pageSize);
 
     /**
      *
@@ -72,11 +74,12 @@ public interface TeaService {
      * 教师提交给学生的反馈
      *
      * @param subId 预约课程编号
+     * @param teaOpenid 教师微信编号
      * @param teaFeedBack 教师给学生的反馈信息
      * @param score 教师给学生的打分
      * @return 该预约课程的反馈信息
      */
-    FeedBack saveFeedBack(Integer subId,String teaFeedBack,Integer score);
+    FeedBack saveFeedBack(Integer subId,String teaOpenid,String teaFeedBack,Integer score);
 
     /**
      *

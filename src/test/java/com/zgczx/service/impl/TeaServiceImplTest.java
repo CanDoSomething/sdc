@@ -5,7 +5,7 @@ import com.zgczx.dataobject.StuBase;
 import com.zgczx.dataobject.SubCourse;
 import com.zgczx.dataobject.TeaCourse;
 import com.zgczx.dto.CourseDTO;
-import com.zgczx.enums.CourseEnum;
+import com.zgczx.form.TeaCourseForm;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Date;
 import java.util.List;
 
 
@@ -29,21 +28,22 @@ public class TeaServiceImplTest{
 
     @Test
     public void createCourse(){
-        TeaCourse teaCourse = new TeaCourse();
-        teaCourse.setCourseDate(new Date());
-        teaCourse.setCourseEndTime(new Date());
+        TeaCourseForm teaCourse = new TeaCourseForm();
+        teaCourse.setCourseDate("");
+        teaCourse.setCourseEndTime("");
         teaCourse.setCourseName("物理");
-        teaCourse.setCourseStartTime(new Date());
-        teaCourse.setCourseStatus(CourseEnum.SUB_WAIT.getCode());
+        teaCourse.setCourseStartTime("");
+        //teaCourse.setCourse
+        //teaCourse.setCourseStatus(CourseEnum.SUB_WAIT.getCode());
         teaCourse.setTeaCode("2");
         teaCourse.setCourseInteractive(0);
-        TeaCourse course = teaService.createCourse(teaCourse);
+        TeaCourse course = teaService.createCourse(teaCourse,"openidjiaoshi");
         System.out.println(course);
         Assert.assertNotNull(course);
     }
     @Test
     public void cancelCourse(){
-        TeaCourse course = teaService.cancelCourse(13,"有重要会议啊！！！！");
+        TeaCourse course = teaService.cancelCourse(13,"openidjiaoshi","有重要会议啊！！！！");
         Assert.assertNotNull(course);
     }
     @Test
@@ -60,7 +60,7 @@ public class TeaServiceImplTest{
     public void findCandidateByCourseId(){
         Integer courseId = new Integer(13);
         //Integer courseId = new Integer(115);
-        List<StuBase> list =  teaService.findCandidateByCourseId(courseId,0,10);
+        List<StuBase> list =  teaService.findCandidateByCourseId(courseId,"openidjiaoshi",0,10);
         System.out.println("所有预约的学生"+list);
         Assert.assertNotNull(list);
     }
@@ -76,7 +76,7 @@ public class TeaServiceImplTest{
     @Test
     public void saveFeedBack() {
 
-        FeedBack rs = teaService.saveFeedBack(28, "作为学生干就完了", 5);
+        FeedBack rs = teaService.saveFeedBack(28, "openidjiaoshi","作为学生干就完了", 5);
         System.out.println("教师给学生的反馈信息:"+rs);
         Assert.assertNotNull(rs);
     }
