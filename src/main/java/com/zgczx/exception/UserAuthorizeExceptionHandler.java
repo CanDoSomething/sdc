@@ -23,7 +23,8 @@ public class UserAuthorizeExceptionHandler {
     public String handlerAuthorizeException(UserAuthorizeException userAuthorizeException){
         return "redirect:".concat(projectUrlConfig.getWeChatMpAuthorize())
                 .concat("/wechat/authorizeByOpenid/?returnUrl=")
-                .concat(userAuthorizeException.getReturnUrl());
+                .concat(userAuthorizeException.getReturnUrl())
+                .concat("?"+userAuthorizeException.getQueryString());
     }
 
 }
