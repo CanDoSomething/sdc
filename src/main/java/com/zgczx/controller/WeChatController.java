@@ -20,8 +20,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.websocket.server.PathParam;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.UUID;
 
 @Controller
 @RequestMapping("/wechat")
@@ -89,12 +89,12 @@ public class WeChatController {
     }
 
     @GetMapping("/authorizeByOpenid")
-    public String authorizeByOpenid(@PathParam("returnUrl") String returnUrl){
+    public String authorizeByOpenid(@PathParam("returnUrl") String returnUrl) throws UnsupportedEncodingException {
 
         //1.配置
         //2.调用方法
         String url = projectUrlConfig.getWeChatMpAuthorize() + "/wechat/userInfoByOpenid";
-        String redirectUrl =  wxMpService.oauth2buildAuthorizationUrl(url, WxConsts.OAUTH2_SCOPE_BASE, URLEncoder.encode(returnUrl));
+        String redirectUrl =  wxMpService.oauth2buildAuthorizationUrl(url, WxConsts.OAUTH2_SCOPE_BASE, URLEncoder.encode(returnUrl,"utf-8"));
         log.info("【微信网页授权 仅获取openid】 获取code，result={}",redirectUrl);
         return "redirect:" + redirectUrl;
     }
