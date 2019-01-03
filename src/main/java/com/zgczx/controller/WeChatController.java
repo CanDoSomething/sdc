@@ -1,9 +1,11 @@
 package com.zgczx.controller;
 
 import com.zgczx.config.ProjectUrlConfig;
+import com.zgczx.constant.CookieConstant;
 import com.zgczx.enums.ResultEnum;
 import com.zgczx.exception.SdcException;
 import com.zgczx.service.UserService;
+import com.zgczx.utils.CookieUtil;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.api.WxConsts;
 import me.chanjar.weixin.common.exception.WxErrorException;
@@ -16,8 +18,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.websocket.server.PathParam;
 import java.net.URLEncoder;
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/wechat")
@@ -96,7 +100,8 @@ public class WeChatController {
     }
     @GetMapping("/userInfoByOpenid")
     public String userInfoByOpenid(@RequestParam("code") String code,
-                           @RequestParam("state") String returnUrl) {
+                                   @RequestParam("state") String returnUrl,
+                                   HttpServletResponse response) {
         WxMpOAuth2AccessToken wxMpOAuth2AccessTokenByOpenid;
         try {
             wxMpOAuth2AccessTokenByOpenid = wxMpService.oauth2getAccessToken(code);
@@ -106,6 +111,11 @@ public class WeChatController {
         }
         String openid = wxMpOAuth2AccessTokenByOpenid.getOpenId();
 
-        return "redirect:" + returnUrl + "?openid=" + openid;
+        Integer expire = CookieConstant.EXPIRE;
+
+        //2. 设置token至cookie
+        CookieUtil.set(response, CookieConstant.TOKEN,openid,expire);
+
+        return "redirect:" + returnUrl;
     }
 }

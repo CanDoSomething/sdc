@@ -23,20 +23,32 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 public class UserAuthorizeAspect {
 
-    @Pointcut("execution(public * com.zgczx.controller.WeChatController*.*(..))")
-    public void verify(){}
+    /**
+     * 对需要openid验证的添加切点
+     */
+    @Pointcut("execution(public * com.zgczx.controller.StuController*.*(..)) ")
+    public void verifyStu(){}
 
-    @Before("verify()")
+    @Pointcut("execution(public * com.zgczx.controller.TeaController*.*(..)) ")
+    public void verifyTea(){}
+
+    @Pointcut("execution(public * com.zgczx.controller.UserController*.*(..)) ")
+    public void verifyUser(){}
+
+    @Before(value = "verifyStu() || verifyTea() || verifyUser()")
     public void doVerify(){
         ServletRequestAttributes attributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
 
         String requestURL = request.getRequestURL().toString();
+        String queryString = request.getQueryString();
 
         Cookie cookie = CookieUtil.get(request,"openid");
         if (cookie == null){
             log.warn("【登录检验】 Cookie中查不到openid");
-            throw new UserAuthorizeException(requestURL);
+            throw new UserAuthorizeException(requestURL,queryString);
+        }else{
+            log.info("【登录检验】 Cookie查到了openid！！！");
         }
 
         /*

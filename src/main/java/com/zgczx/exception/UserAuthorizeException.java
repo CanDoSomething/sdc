@@ -1,24 +1,22 @@
 package com.zgczx.exception;
 
+import lombok.Getter;
+
 /**
  * @ClassName: Jason
  * @Author: Administrator
  * @Date: 2018/12/13 14:53
  * @Description:
  */
+@Getter
 public class UserAuthorizeException extends RuntimeException {
 
     private String returnUrl;
+    private String queryString;
 
-    public UserAuthorizeException(String url){
+    public UserAuthorizeException(String url,String queryString){
         this.returnUrl = url;
+        this.queryString = queryString;
     }
 
-    public String getReturnUrl() {
-        return returnUrl;
-    }
-
-    public void setReturnUrl(String returnUrl) {
-        this.returnUrl = returnUrl;
-    }
 }
