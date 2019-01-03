@@ -94,7 +94,7 @@ public class WeChatController {
         //1.配置
         //2.调用方法
         String url = projectUrlConfig.getWeChatMpAuthorize() + "/wechat/userInfoByOpenid";
-        String redirectUrl =  wxMpService.oauth2buildAuthorizationUrl(url, WxConsts.OAUTH2_SCOPE_BASE, URLEncoder.encode(returnUrl,"utf-8"));
+        String redirectUrl =  wxMpService.oauth2buildAuthorizationUrl(url, WxConsts.OAUTH2_SCOPE_BASE, returnUrl);
         log.info("【微信网页授权 仅获取openid】 获取code，result={}",redirectUrl);
         return "redirect:" + redirectUrl;
     }
