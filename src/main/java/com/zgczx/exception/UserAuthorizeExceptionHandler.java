@@ -4,7 +4,6 @@ import com.zgczx.config.ProjectUrlConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * @ClassName: Jason
@@ -18,7 +17,7 @@ public class UserAuthorizeExceptionHandler {
     @Autowired
     private ProjectUrlConfig projectUrlConfig;
 
-    @ResponseBody
+
     @ExceptionHandler(value = UserAuthorizeException.class)
     public String handlerAuthorizeException(UserAuthorizeException userAuthorizeException){
         return "redirect:".concat(projectUrlConfig.getWeChatMpAuthorize())
