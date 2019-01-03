@@ -198,21 +198,21 @@ public class StuServiceImpl implements StuService {
         }
         /*根据预约课程id来查找用户是否提交反馈*/
         FeedBack bySubId = feedBackRepository.findBySubId(subId);
-        if (bySubId!=null){
+        if (bySubId!=null && !bySubId.getStuFeedback().isEmpty()){
             log.error("学生已经反馈成功，无需多次反馈");
-
             throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION);
         }
-        /*代码执行到这里证明没有异常可以正常执行反馈*/
-        FeedBack feedBack=new FeedBack();
+        if (bySubId==null){
+            bySubId=new FeedBack();
+        }
         /*封装学生反馈信息到反馈表中*/
-        feedBack.setStuScore(score);
-        feedBack.setSubId(subId);
-        feedBack.setStuFeedback(message);
+        bySubId.setStuScore(score);
+        bySubId.setSubId(subId);
+        bySubId.setStuFeedback(message);
 //        feedBack.setCreateTime(new Date());
 //        feedBack.setUpdateTime(new Date());
         /*保存数据到反馈表*/
-        FeedBack save=feedBackRepository.save(feedBack);
+        FeedBack save=feedBackRepository.save(bySubId);
         if (save==null){
             log.error("【学生发起反馈】 报存到数据库中失败");
             throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION);
