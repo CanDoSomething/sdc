@@ -33,6 +33,7 @@ import java.util.List;
 public class StuServiceImpl implements StuService {
 
 
+
     @Autowired
     private TeaCourseRepository teaCourseRepository;
     @Autowired
@@ -209,15 +210,14 @@ public class StuServiceImpl implements StuService {
         bySubId.setStuScore(score);
         bySubId.setSubId(subId);
         bySubId.setStuFeedback(message);
-//        feedBack.setCreateTime(new Date());
-//        feedBack.setUpdateTime(new Date());
         /*保存数据到反馈表*/
-        FeedBack save=feedBackRepository.save(bySubId);
+        FeedBack save=feedBackRepository.saveAndFlush(bySubId);
         if (save==null){
             log.error("【学生发起反馈】 报存到数据库中失败");
             throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION);
         }
-        return save;
+        FeedBack one1 = feedBackRepository.findOne(save.getFeedbackId());
+        return one1;
     }
     /**
      *查询历史记录课程
