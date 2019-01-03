@@ -9,4 +9,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface StuBaseRepository extends JpaRepository<StuBase,String> {
 
+    /**
+     * 根据学生的openid确定学生
+     *
+     * @param stuOpenid 学生的openid
+     * @return  StuBase
+     */
+    StuBase findByStuOpenid(String stuOpenid);
+
 }
