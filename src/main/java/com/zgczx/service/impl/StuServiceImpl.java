@@ -136,9 +136,7 @@ public class StuServiceImpl implements StuService {
      * @param cause 取消原因
      * @param courserId courserId课程id
      * @param stuOpenid 学生微信id
-     * @return:
-     * @auther: 陈志恒
-     * @date: 2018/12/16 18:06
+     * @return SubCourse
      */
     @Override
     public SubCourse cancelOrder(String cause,String stuOpenid,Integer courserId) {
@@ -177,17 +175,20 @@ public class StuServiceImpl implements StuService {
      * @param message 代表反馈内容
      * @param score 代表反馈评分
      * @param subId 预约课程id
-     * @return:
-     * @auther: 陈志恒
-     * @date: 2018/12/16 19:24
+     * @return FeedBack
      */
     @Override
     public FeedBack feedBack(Integer courseId, String message, Integer score,Integer subId) {
         /*如果评分不正确，抛出异常*/
-        if (score>5 || score<0){
-            log.error("【学生发起反馈请求】 反馈参数异常");
+        if (score > 5 || score<0){
+            log.error("【学生提交反馈】 评分数据非法");
             throw new SdcException(ResultEnum.PARAM_EXCEPTION);
         }
+        // TODO
+        // 1.查询是否已经提交反馈（前期指定只能提交一次）
+        // 2.判断该课程当前状态是否可以提交反馈
+        // 3.提交反馈信息
+
         /*查找反馈表*/
         FeedBack feedBack=feedBackRepository.findOne(courseId);
         /*如果反馈表不存在，建立新的反馈表，并设置反馈表主键为课程id*/

@@ -53,7 +53,7 @@ public interface SubCourseRepository extends JpaRepository<SubCourse,Integer> {
      * @return
      **/
 
-    public SubCourse findByStuCodeAndCourseIdAndSubStatusIsIn(String stuCode,Integer courseId,List<Integer> subStatus);
+    SubCourse findByStuCodeAndCourseIdAndSubStatusIsIn(String stuCode,Integer courseId,List<Integer> subStatus);
     List<SubCourse> findByCourseIdAndSubStatus(Integer courseId,Integer status);
 
     /**
