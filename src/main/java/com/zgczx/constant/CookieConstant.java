@@ -8,7 +8,7 @@ package com.zgczx.constant;
  */
 public interface CookieConstant {
 
-    String TOKEN = "openid";
+    String TOKEN = "token";
 
     Integer EXPIRE = 7200;
 
