@@ -41,13 +41,11 @@ public class UserAuthorizeAspect {
         ServletRequestAttributes attributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
 
-        String requestURL = request.getRequestURL().toString();
-        String queryString = request.getQueryString();
 
         Cookie cookie = CookieUtil.get(request, CookieConstant.TOKEN);
         if (cookie == null){
             log.warn("【登录检验】 Cookie中查不到openid");
-            throw new UserAuthorizeException(requestURL,queryString);
+            throw new UserAuthorizeException();
         }else{
             log.info("【登录检验】 Cookie查到了openid！！！");
         }

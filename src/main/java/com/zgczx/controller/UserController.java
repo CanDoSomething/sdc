@@ -83,7 +83,7 @@ public class UserController {
         }
         return new ModelAndView("redirect:"
                 .concat(projectUrlConfig.getSdc()
-                        .concat(projectUrlConfig.homeAddress)));
+                .concat(projectUrlConfig.homeAddress)));
     }
 
     /**
