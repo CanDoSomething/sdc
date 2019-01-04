@@ -33,10 +33,10 @@ public class UserAuthorizeAspect {
     @Pointcut("execution(public * com.zgczx.controller.TeaController*.*(..)) ")
     public void verifyTea(){}
 
-    @Pointcut("execution(public * com.zgczx.controller.UserController*.*(..)) ")
-    public void verifyUser(){}
+ /*   @Pointcut("execution(public * com.zgczx.controller.UserController*.*(..)) ")
+    public void verifyUser(){}*/
 
-    @Before(value = "verifyStu() || verifyTea() || verifyUser()")
+    @Before(value = "verifyStu() || verifyTea()")
     public void doVerify(){
         ServletRequestAttributes attributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
