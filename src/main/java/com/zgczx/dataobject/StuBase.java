@@ -41,6 +41,10 @@ public class StuBase {
      */
     private String stuOpenid;
     /**
+     * 学生密码
+     */
+    private String stuPasswd;
+    /**
      * 信用评分
      */
     private Integer creditScore;

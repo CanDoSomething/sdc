@@ -97,6 +97,7 @@ public class WeChatController {
     @GetMapping("/userInfoByOpenid")
     public String userInfoByOpenid(@RequestParam("code") String code,
                                    @RequestParam("state") String returnUrl) {
+        log.info("returnUrl-->"+returnUrl);
         WxMpOAuth2AccessToken wxMpOAuth2AccessTokenByOpenid;
         try {
             wxMpOAuth2AccessTokenByOpenid = wxMpService.oauth2getAccessToken(code);

@@ -31,5 +31,10 @@ public class TeaInfoForm {
     @NotEmpty(message = "教师科目 必填")
     private String teaSubject;
 
+    /**
+     * 教师密码
+     */
+    @NotEmpty(message = "密码必填")
+    private String teaPasswd;
 
 }

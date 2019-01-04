@@ -2,6 +2,7 @@ package com.zgczx.service.impl;
 
 import com.zgczx.dataobject.StuBase;
 import com.zgczx.dataobject.TeaBase;
+import com.zgczx.enums.ResultEnum;
 import com.zgczx.exception.SdcException;
 import com.zgczx.form.StuInfoForm;
 import com.zgczx.form.TeaInfoForm;
@@ -72,6 +73,7 @@ public class UserServiceImpl implements UserService {
         stuBase.setStuLevel(stuInfoForm.getStuLevel());
         stuBase.setStuGrade(stuInfoForm.getStuGrade());
         stuBase.setStuClass(stuInfoForm.getStuClass());
+        stuBase.setStuPasswd(stuInfoForm.getStuPasswd());
 
         StuBase updatedStuBase = stuBaseRepository.save(stuBase);
 
@@ -79,7 +81,7 @@ public class UserServiceImpl implements UserService {
             return updatedStuBase;
         }else{
             //TODO 更新枚举类
-            throw new SdcException(12,"更新出错");
+            throw new SdcException(ResultEnum.PARAM_EXCEPTION);
         }
     }
 
@@ -93,6 +95,7 @@ public class UserServiceImpl implements UserService {
         teaBase.setTeaCode(teaInfoForm.getTeaCode());
         teaBase.setTeaName(teaInfoForm.getTeaName());
         teaBase.setTeaSubject(teaInfoForm.getTeaSubject());
+        teaBase.setTeaPasswd(teaInfoForm.getTeaPasswd());
 
         TeaBase updatedTeaBase = teaBaseRepository.save(teaBase);
 
@@ -100,7 +103,7 @@ public class UserServiceImpl implements UserService {
             return updatedTeaBase;
         }else {
             // TODO 更新枚举类
-            throw new SdcException(12,"更新出错了");
+            throw new SdcException(ResultEnum.PARAM_EXCEPTION);
         }
     }
 }

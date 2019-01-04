@@ -34,6 +34,10 @@ public class TeaBase {
      */
     private String teaOpenid;
     /**
+     * 教师密码
+     */
+    private String teaPasswd;
+    /**
      * 教师昵称
      */
     private String teaNickname;

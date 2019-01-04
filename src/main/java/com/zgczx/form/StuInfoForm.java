@@ -42,6 +42,12 @@ public class StuInfoForm {
     @NotEmpty(message = "班级必填")
     private String stuClass;
 
+    /**
+     * 学生密码
+     */
+    @NotEmpty(message = "密码必填")
+    private String stuPasswd;
+
 
 
 }
