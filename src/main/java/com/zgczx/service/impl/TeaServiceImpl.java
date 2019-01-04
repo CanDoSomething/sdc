@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -81,9 +82,14 @@ public class TeaServiceImpl implements TeaService {
 
         int startDateRs = courseStartDate.compareTo(new Date());
         int endDateRs = courseStartDate.compareTo(courseEndDate);
-        int courseDateRs = courseDate.compareTo(new Date());
+        int courseDateRs = 0;
+        try {
+            courseDateRs = courseDate.compareTo(sdf2.parse(new Date().toLocaleString()) );
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         if(startDateRs != 1 ){
-            log.error("【教师创建课程】 上课时间不得早于或等于当前时间");
+            log.error("【教师创建课程】 上课开始时间不得早于或等于当前时间");
             throw new SdcException(ResultEnum.PARAM_EXCEPTION);
         }
 
@@ -93,7 +99,7 @@ public class TeaServiceImpl implements TeaService {
             throw new SdcException(ResultEnum.PARAM_EXCEPTION);
         }
         //3.上课日期不能小于当前日期
-        if(courseDateRs != 1){
+        if(courseDateRs == -1){
             log.error("【教师创建课程】 上课日期不得早于当前时间");
             throw new SdcException(ResultEnum.PARAM_EXCEPTION);
         }
@@ -177,9 +183,9 @@ public class TeaServiceImpl implements TeaService {
             throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION);
         }
         TeaCourse teaCourse = teaCourseRepository.findOne(courseId);
-        //只有当前课程不为结束的情况下才能取消
+        //只有当前课程为等待预约和已被预约的情况下才能取消，课程进行时的取消应当属于提前结束课程
         Integer status = teaCourse.getCourseStatus();
-        if(status.intValue() != CourseEnum.COURSE_FINISH.getCode()){
+        if(status.intValue() == CourseEnum.SUB_WAIT.getCode() || status.intValue() == CourseEnum.SUB_SUCCESS.getCode() ){
             teaCourse.setCourseCause(cancelReason);
             //如果当前已经有学生预约成功则给该学生发送消息通知
             if(status.intValue() == SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode()){

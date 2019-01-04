@@ -29,14 +29,14 @@ public class TeaServiceImplTest{
     @Test
     public void createCourse(){
         TeaCourseForm teaCourse = new TeaCourseForm();
-        teaCourse.setCourseDate("");
-        teaCourse.setCourseEndTime("");
-        teaCourse.setCourseName("物理");
-        teaCourse.setCourseStartTime("");
-        //teaCourse.setCourse
+        teaCourse.setCourseDate("2019-01-06");
+        teaCourse.setCourseEndTime("2019-01-06 09:30:00");
+        teaCourse.setCourseName("原子弹理论");
+        teaCourse.setCourseStartTime("2019-01-06 08:30:00");
         //teaCourse.setCourseStatus(CourseEnum.SUB_WAIT.getCode());
-        teaCourse.setTeaCode("2");
+        teaCourse.setTeaCode("1");
         teaCourse.setCourseInteractive(0);
+        teaCourse.setCourseLocation("");
         TeaCourse course = teaService.createCourse(teaCourse,"openidjiaoshi");
         System.out.println(course);
         Assert.assertNotNull(course);
@@ -49,8 +49,8 @@ public class TeaServiceImplTest{
     @Test
     public void findTeaHistoryCourse() {
         //String teaCode = "10";
-        String teaCode = "2";
-        List<CourseDTO> list =  teaService.findTeaHistoryCourse(teaCode,0,10);
+        String openid = "openidjiaoshi";
+        List<CourseDTO> list =  teaService.findTeaHistoryCourse(openid,0,10);
         for(CourseDTO courseDTO : list ){
             System.out.println(courseDTO.toString());
         }
@@ -58,7 +58,7 @@ public class TeaServiceImplTest{
     }
     @Test
     public void findCandidateByCourseId(){
-        Integer courseId = new Integer(13);
+        Integer courseId = new Integer(17);
         //Integer courseId = new Integer(115);
         List<StuBase> list =  teaService.findCandidateByCourseId(courseId,"openidjiaoshi",0,10);
         System.out.println("所有预约的学生"+list);
@@ -76,7 +76,7 @@ public class TeaServiceImplTest{
     @Test
     public void saveFeedBack() {
 
-        FeedBack rs = teaService.saveFeedBack(28, "openidjiaoshi","作为学生干就完了", 5);
+        FeedBack rs = teaService.saveFeedBack(28, "openidjiaoshi","积极上课", 5);
         System.out.println("教师给学生的反馈信息:"+rs);
         Assert.assertNotNull(rs);
     }
@@ -88,7 +88,7 @@ public class TeaServiceImplTest{
     @Test
     public void updateCourse(){
         TeaCourse teaCourseById = teaService.findTeaCourseById(13);
-        teaCourseById.setCourseName("大数据分析");
+        teaCourseById.setCourseName("数据挖掘");
         TeaCourse teaCourse = teaService.saveUpdateTeaCourse(teaCourseById);
         System.out.println(teaCourse);
     }
