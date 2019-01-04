@@ -64,8 +64,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public StuBase registerStuBaseByOpenid(String stuOpenid, StuInfoForm stuInfoForm) {
 
-        // 1.根据openid找到该学生
-        StuBase stuBase = stuBaseRepository.findByStuOpenid(stuOpenid);
+        // 1.新建学生
+        StuBase stuBase = new StuBase();
 
         // 2.根据学生提交的信息更新
         stuBase.setStuCode(stuInfoForm.getStuCode());
@@ -89,7 +89,7 @@ public class UserServiceImpl implements UserService {
     public TeaBase registerTeaBaseByOpenid(String teaOpenid, TeaInfoForm teaInfoForm) {
 
         // 1.根据openid找到该教师
-        TeaBase teaBase = teaBaseRepository.findByteaOpenid(teaOpenid);
+        TeaBase teaBase = new TeaBase();
 
         // 2.根据教师提交的信息更新
         teaBase.setTeaCode(teaInfoForm.getTeaCode());

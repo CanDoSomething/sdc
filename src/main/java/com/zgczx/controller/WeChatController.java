@@ -97,7 +97,6 @@ public class WeChatController {
     @GetMapping("/userInfoByOpenid")
     public String userInfoByOpenid(@RequestParam("code") String code,
                                    @RequestParam("state") String returnUrl) {
-        log.info("returnUrl-->"+returnUrl);
         WxMpOAuth2AccessToken wxMpOAuth2AccessTokenByOpenid;
         try {
             wxMpOAuth2AccessTokenByOpenid = wxMpService.oauth2getAccessToken(code);
@@ -106,7 +105,7 @@ public class WeChatController {
             throw new SdcException(ResultEnum.WECHAT_MP_ERROR.getCode(), e.getError().getErrorMsg());
         }
         String openid = wxMpOAuth2AccessTokenByOpenid.getOpenId();
-
+        log.info("returnUrl-->"+returnUrl);
         return "redirect:" + returnUrl + "?openid="+openid;
 
     }
