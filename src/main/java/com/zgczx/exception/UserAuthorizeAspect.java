@@ -41,6 +41,8 @@ public class UserAuthorizeAspect {
         ServletRequestAttributes attributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
 
+        log.info("cookie length =" +request.getCookies().length);
+
 
         Cookie cookie = CookieUtil.get(request, CookieConstant.TOKEN);
         if (cookie == null){
