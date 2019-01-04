@@ -65,6 +65,7 @@ public class UserController {
         //2. 设置token至cookie
         Integer expire = CookieConstant.EXPIRE;
         CookieUtil.set(response, CookieConstant.TOKEN,openid,expire);
+        log.info("cookie 添加成功 openid = "+openid);
 
         return new ModelAndView("redirect:"
                 .concat(projectUrlConfig.getSdc()
