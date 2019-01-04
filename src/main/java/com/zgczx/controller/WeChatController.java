@@ -116,6 +116,6 @@ public class WeChatController {
         //2. 设置token至cookie
         CookieUtil.set(response, CookieConstant.TOKEN,openid,expire);
         log.info("Cookie 设置成功，" +CookieConstant.TOKEN+"="+openid);
-        return "redirect:" + "Cookie 设置成功,显示主页";
+        return "Cookie 设置成功,显示主页";
     }
 }
