@@ -1,5 +1,6 @@
 package com.zgczx.exception;
 
+import com.zgczx.constant.CookieConstant;
 import com.zgczx.utils.CookieUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.Aspect;
@@ -43,7 +44,7 @@ public class UserAuthorizeAspect {
         String requestURL = request.getRequestURL().toString();
         String queryString = request.getQueryString();
 
-        Cookie cookie = CookieUtil.get(request,"openid");
+        Cookie cookie = CookieUtil.get(request, CookieConstant.TOKEN);
         if (cookie == null){
             log.warn("【登录检验】 Cookie中查不到openid");
             throw new UserAuthorizeException(requestURL,queryString);
