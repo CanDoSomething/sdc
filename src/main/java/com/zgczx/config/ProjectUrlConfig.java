@@ -29,4 +29,9 @@ public class ProjectUrlConfig {
      */
     public String sdc;
 
+    /**
+     * 主页地址
+     */
+    public String homeAddress;
+
 }

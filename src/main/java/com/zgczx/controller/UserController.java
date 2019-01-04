@@ -2,6 +2,7 @@ package com.zgczx.controller;
 
 
 import com.zgczx.VO.ResultVO;
+import com.zgczx.config.ProjectUrlConfig;
 import com.zgczx.constant.CookieConstant;
 import com.zgczx.dataobject.StuBase;
 import com.zgczx.dataobject.TeaBase;
@@ -14,19 +15,19 @@ import com.zgczx.utils.CookieUtil;
 import com.zgczx.utils.ResultVOUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * @ClassName: UserController
@@ -34,53 +35,55 @@ import java.util.UUID;
  * @Date: 2019/1/1 14:58
  * @Description:
  */
-@RestController
+@Controller
 @Slf4j
+@RequestMapping("/user")
 public class UserController {
 
     private  final UserService userService;
 
+    private final ProjectUrlConfig projectUrlConfig;
+
     @Autowired
-    public UserController(UserService service) {
+    public UserController(UserService service, ProjectUrlConfig projectUrlConfig) {
         this.userService = service;
+        this.projectUrlConfig = projectUrlConfig;
     }
 
     @GetMapping("/login")
-    public String login(@RequestParam("openid") String openid,
-                            @RequestParam("role") Integer role,
-                            HttpServletResponse response,
-                            Map<String,Object> map){
+    public ModelAndView login(@RequestParam("openid") String openid,
+                              HttpServletResponse response
+                              ){
 
-        //1. openid 去和数据库里匹配
-        if(role == 1){
-            StuBase stuBase = userService.findStuBaseByOpenid(openid);
-        }else if(role == 2){
-            TeaBase teaBase = userService.findTeaBaseByOpenid(openid);
-        }else{
-            //身份信息非法
-            throw new SdcException(1,"message");
+        //1. openid是否存在数据库
+        if(null == userService.findStuBaseByOpenid(openid) &&
+                null ==userService.findTeaBaseByOpenid(openid)){
+            log.info("【该openid没有注册】 openid = {}",openid);
+            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION);
         }
 
-        String token = UUID.randomUUID().toString();
-        Integer expire = CookieConstant.EXPIRE;
-
         //2. 设置token至cookie
-        CookieUtil.set(response, CookieConstant.TOKEN,token,expire);
+        Integer expire = CookieConstant.EXPIRE;
+        CookieUtil.set(response, CookieConstant.TOKEN,openid,expire);
 
-        return "";
+        return new ModelAndView("redirect:"
+                .concat(projectUrlConfig.getSdc()
+                .concat(projectUrlConfig.homeAddress)));
     }
     @GetMapping("/logout")
-    public String logout(HttpServletRequest request,
-                       HttpServletResponse response,
-                       Map<String,Object> map){
+    public ModelAndView logout(HttpServletRequest request,
+                       HttpServletResponse response){
         //1. 从cookie里查询
         Cookie cookie = CookieUtil.get(request, CookieConstant.TOKEN);
 
         if (cookie != null){
             //2. 清除cookie
             CookieUtil.set(response,CookieConstant.TOKEN,null,0);
+            log.info("【用户管理】 清除cookie中的openid");
         }
-        return "" ;
+        return new ModelAndView("redirect:"
+                .concat(projectUrlConfig.getSdc()
+                        .concat(projectUrlConfig.homeAddress)));
     }
 
     /**

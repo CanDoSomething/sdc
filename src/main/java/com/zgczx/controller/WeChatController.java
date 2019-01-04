@@ -1,11 +1,9 @@
 package com.zgczx.controller;
 
 import com.zgczx.config.ProjectUrlConfig;
-import com.zgczx.constant.CookieConstant;
 import com.zgczx.enums.ResultEnum;
 import com.zgczx.exception.SdcException;
 import com.zgczx.service.UserService;
-import com.zgczx.utils.CookieUtil;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.api.WxConsts;
 import me.chanjar.weixin.common.exception.WxErrorException;
@@ -18,8 +16,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 @Controller
@@ -88,7 +84,7 @@ public class WeChatController {
     }
 
     @GetMapping("/authorizeByOpenid")
-    public String authorizeByOpenid(@RequestParam("returnUrl") String returnUrl) throws UnsupportedEncodingException {
+    public String authorizeByOpenid(@RequestParam("returnUrl") String returnUrl) {
 
         log.info("returnUrl-->"+returnUrl);
         //1.配置
@@ -100,8 +96,7 @@ public class WeChatController {
     }
     @GetMapping("/userInfoByOpenid")
     public String userInfoByOpenid(@RequestParam("code") String code,
-                                   @RequestParam("state") String returnUrl,
-                                   HttpServletResponse response) {
+                                   @RequestParam("state") String returnUrl) {
         WxMpOAuth2AccessToken wxMpOAuth2AccessTokenByOpenid;
         try {
             wxMpOAuth2AccessTokenByOpenid = wxMpService.oauth2getAccessToken(code);
@@ -111,11 +106,7 @@ public class WeChatController {
         }
         String openid = wxMpOAuth2AccessTokenByOpenid.getOpenId();
 
-        Integer expire = CookieConstant.EXPIRE;
+        return "redirect:" + returnUrl + "?openid="+openid;
 
-        //2. 设置token至cookie
-        CookieUtil.set(response, CookieConstant.TOKEN,openid,expire);
-        log.info("Cookie 设置成功，" +CookieConstant.TOKEN+"="+openid);
-        return "Cookie 设置成功,显示主页";
     }
 }
