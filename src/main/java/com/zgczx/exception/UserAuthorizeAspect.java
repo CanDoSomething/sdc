@@ -4,7 +4,6 @@ import com.zgczx.constant.CookieConstant;
 import com.zgczx.utils.CookieUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -36,7 +35,7 @@ public class UserAuthorizeAspect {
  /*   @Pointcut("execution(public * com.zgczx.controller.UserController*.*(..)) ")
     public void verifyUser(){}*/
 
-    @Before(value = "verifyStu() || verifyTea()")
+   //@Before(value = "verifyStu() || verifyTea()")
     public void doVerify(){
         ServletRequestAttributes attributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
