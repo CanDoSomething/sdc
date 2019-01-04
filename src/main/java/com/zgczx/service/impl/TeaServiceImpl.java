@@ -19,6 +19,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -56,27 +59,99 @@ public class TeaServiceImpl implements TeaService {
     @Override
     @Transactional(rollbackFor=Exception.class)
     public TeaCourse createCourse(TeaCourseForm teaCourseForm,String teaOpenid) {
-        //TODO 已经通过表单验证，肯定不会为空，所以下面内容删掉
-        /*if(null == teaCourseForm ){
-            log.error("【教师创建课程】 新创建的课程信息为空");
-            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION);
-        }*/
 
-        //TODO 判断课程上课日期，开始时间，结束时间是否合法？通过String来接收参数，格式转换后是否合法？
-        //1.上课日期不得早于当前时间
+        // 判断课程上课日期，开始时间，结束时间是否合法？通过String来接收参数，格式转换后是否合法？
+        //1.上课时间不得早于当前时间
+        String strCourseStartTime = teaCourseForm.getCourseStartTime();
+        String strCourseEndTime = teaCourseForm.getCourseEndTime();
+        String strCourseTime = teaCourseForm.getCourseDate();
+        Date courseStartDate = null;
+        Date courseEndDate = null;
+        Date courseDate = null;
+        //字符串类型的时间要转化为Date类型
+        DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        DateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            courseStartDate = sdf.parse(strCourseStartTime);
+            courseEndDate = sdf.parse(strCourseEndTime);
+            courseDate = sdf2.parse(strCourseTime);
+        } catch (Exception e) {
+            log.error("【教师创建课程】 日期格式转化错误");
+            e.printStackTrace();
+        }
+
+        int startDateRs = courseStartDate.compareTo(new Date());
+        int endDateRs = courseStartDate.compareTo(courseEndDate);
+        int courseDateRs = 0;
+        try {
+            courseDateRs = courseDate.compareTo(sdf2.parse(new Date().toLocaleString()) );
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        if(startDateRs != 1 ){
+            log.error("【教师创建课程】 上课开始时间不得早于或等于当前时间");
+            throw new SdcException(ResultEnum.PARAM_EXCEPTION);
+        }
+
         //2.结束时间不得早于开始时间
-
+        if(endDateRs != -1 ){
+            log.error("【教师创建课程】 上课结束时间不得早于或等于上课开始时间");
+            throw new SdcException(ResultEnum.PARAM_EXCEPTION);
+        }
+        //3.上课日期不能小于当前日期
+        if(courseDateRs == -1){
+            log.error("【教师创建课程】 上课日期不得早于当前时间");
+            throw new SdcException(ResultEnum.PARAM_EXCEPTION);
+        }
         /**
-         * TODO 逻辑过程
+         *  逻辑过程
          * 1.判断该老师当前时间是否有课程
          * 2.再新建课程
          */
+        TeaBase byteaOpenid = teaBaseRepository.findByteaOpenid(teaOpenid);
+        List<TeaCourse> byTeaCode = teaCourseRepository.findByTeaCode(byteaOpenid.getTeaCode());
+        //比较当前教师的所有未结束和未取消的课程的交互时间
 
-        //0为线上互动 ， 1线下互动
-        //teaCourseForm.setCourseInteractive(CourseService.COURSEINTERACTIVE_ONLINE);
+        //s1,s2分别表示新创建课程的开始时间和当前查找的课程开始和结束时间的比较值
+        //e1,e2分别表示新创建课程的结束时间和当前查找的课程开始和结束时间的比较值
+        int s1,s2,e1,e2;
+        for(TeaCourse teaCourse : byTeaCode){
+            if( !(teaCourse.getCourseStatus().equals(CourseEnum.COURSE_CANCELED)) ||
+                    !(teaCourse.getCourseStatus().equals(CourseEnum.COURSE_FINISH))){
+                s1 = courseStartDate.compareTo(teaCourse.getCourseStartTime());
+                s2 = courseStartDate.compareTo(teaCourse.getCourseEndTime());
+                if( (s1 == 1|| s1 == 0) && (s2 == -1 || s2 == 0)  ){
+                    log.error("【教师创建课程】 新创建的课程和原有课程时间冲突");
+                    throw new SdcException(ResultEnum.PARAM_EXCEPTION);
+                }
+                e1 = courseEndDate.compareTo(teaCourse.getCourseStartTime());
+                e2 = courseEndDate.compareTo(teaCourse.getCourseEndTime());
 
-       // teaCourse.setCourseStatus(CourseEnum.SUB_WAIT.getCode());
-        return new TeaCourse();
+                if( (e1 == 1|| e1 == 0) && (e2 == -1 || e2 == 0) ){
+                    log.error("【教师创建课程】 新创建的课程和原有课程时间冲突");
+                    throw new SdcException(ResultEnum.PARAM_EXCEPTION);
+                }
+            }
+        }
+
+        TeaCourse teaCourse = new TeaCourse();
+        //由于前台时间传递的是String不能直接使用modelMapper转化
+        teaCourse.setTeaCode(teaCourseForm.getTeaCode());
+        teaCourse.setCourseDate(courseDate);
+        teaCourse.setCourseStartTime(courseStartDate);
+        teaCourse.setCourseEndTime(courseEndDate);
+        teaCourse.setCourseLocation(teaCourseForm.getCourseLocation());
+        teaCourse.setCourseName(teaCourseForm.getCourseName());
+        teaCourse.setCourseStatus(CourseEnum.SUB_WAIT.getCode());
+        teaCourse.setCourseInteractive(teaCourseForm.getCourseInteractive());
+        teaCourse.setCourseLocation(teaCourseForm.getCourseLocation());
+
+        TeaCourse save = teaCourseRepository.save(teaCourse);
+        if(null == save){
+            log.error("【教师创建课程】 课程信息插入数据库出现异常");
+            throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION);
+        }
+        return save;
     }
 
 
@@ -90,16 +165,27 @@ public class TeaServiceImpl implements TeaService {
      */
     @Override
     @Transactional(rollbackFor=Exception.class)
-    public TeaCourse cancelCourse(Integer courseId,String cancelReason) {
-        // TODO 增加前端结构teaOpenid字段，取消之前需要判断当前课程是否为该老师的课程
+    public TeaCourse cancelCourse(Integer courseId,String teaOpenid,String cancelReason) {
+
         if(courseId == null){
             log.error("【教师取消课程】 该课程编号为空");
             throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION);
         }
+        // 取消课程之前需要判断当前课程是否为该老师的课程
+        TeaBase byteaOpenid = teaBaseRepository.findByteaOpenid(teaOpenid);
+        if(byteaOpenid == null){
+            log.error("【教师取消课程】 该微信id没有找到对应教师");
+            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION);
+        }
+        TeaCourse byTeaCodeAndCourseId = teaCourseRepository.findByTeaCodeAndCourseId(byteaOpenid.getTeaCode(), courseId);
+        if(null == byTeaCodeAndCourseId){
+            log.error("【教师取消课程】 该课程和您当前身份不匹配，取消课程失败");
+            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION);
+        }
         TeaCourse teaCourse = teaCourseRepository.findOne(courseId);
-        //只有当前课程不为结束的情况下才能取消
+        //只有当前课程为等待预约和已被预约的情况下才能取消，课程进行时的取消应当属于提前结束课程
         Integer status = teaCourse.getCourseStatus();
-        if(status.intValue() != CourseEnum.COURSE_FINISH.getCode()){
+        if(status.intValue() == CourseEnum.SUB_WAIT.getCode() || status.intValue() == CourseEnum.SUB_SUCCESS.getCode() ){
             teaCourse.setCourseCause(cancelReason);
             //如果当前已经有学生预约成功则给该学生发送消息通知
             if(status.intValue() == SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode()){
@@ -134,7 +220,7 @@ public class TeaServiceImpl implements TeaService {
     /**
      * 根据教师编号查看其历史课程记录
      *
-     * @param teaCode 教师编号
+     * @param teaOpenid 教师微信编号
      * @param page 当前页
      * @param pageSize 当前页面大小
      * @return 当前教师的所有历史课程
@@ -142,12 +228,18 @@ public class TeaServiceImpl implements TeaService {
      */
 
     @Override
-    public List<CourseDTO> findTeaHistoryCourse(String teaCode,int page,int pageSize) {
-        // TODO 前端只传TeaOpenid，修改
-        if(teaCode == null || "".equals(teaCode)){
-            log.error("【教师查看历史课程】 教师编号为空");
+    public List<CourseDTO> findTeaHistoryCourse(String teaOpenid,int page,int pageSize) {
+
+        if(teaOpenid == null || "".equals(teaOpenid)){
+            log.error("【教师查看历史课程】 教师微信编号为空");
             throw new SdcException(ResultEnum.PARAM_EXCEPTION);
         }
+        TeaBase byteaOpenid = teaBaseRepository.findByteaOpenid(teaOpenid);
+        if(null == byteaOpenid){
+            log.error("【教师查看历史课程】 根据教师微信编号未找到对应教师信息");
+            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION);
+        }
+        String teaCode = byteaOpenid.getTeaCode();
         List<CourseDTO> rsList =  new ArrayList<CourseDTO>();
         /**
          * 查询当前编号教师的所有课程记录
@@ -198,16 +290,28 @@ public class TeaServiceImpl implements TeaService {
      *根据课程id获取所有预约同学的基本信息
      *
      * @param courserId 课程编号
+     * @param teaOpenid 教师微信编号
      * @param page 当前页
      * @param pageSize 当前页面大小
      * @return 所有候选人
      *
      */
     @Override
-    public List<StuBase> findCandidateByCourseId(Integer courserId,int page,int pageSize){
-        //TODO 增加前端的openId字段，判断该课程是否为该老师的课程
+    public List<StuBase> findCandidateByCourseId(Integer courserId,String teaOpenid,int page,int pageSize){
+
         if(courserId == null){
             log.error("【教师查看预约候选人】 该课程编号为空");
+            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION);
+        }
+        //判断该课程是否为该老师的课程
+        TeaBase byteaOpenid = teaBaseRepository.findByteaOpenid(teaOpenid);
+        if(byteaOpenid == null){
+            log.error("【教师查看预约候选人】 该微信id没有找到对应教师");
+            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION);
+        }
+        TeaCourse byTeaCodeAndCourseId = teaCourseRepository.findByTeaCodeAndCourseId(byteaOpenid.getTeaCode(),courserId);
+        if(null == byTeaCodeAndCourseId){
+            log.error("【教师查看预约候选人】 该课程和您当前身份不匹配，不能查看课程预约候选人");
             throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION);
         }
 
@@ -228,7 +332,7 @@ public class TeaServiceImpl implements TeaService {
     @Override
     @Transactional(rollbackFor=Exception.class)
     public SubCourse saveSelectedStu(String stuOpenId,Integer courseId) {
-        // TODO 增加teaOpenid,前端只能传递学籍号，修改
+
         if(stuOpenId == null || "".equals(stuOpenId)){
             log.error("【教师选择候选预约学生】 学生编号为空");
             throw new SdcException(ResultEnum.PARAM_EXCEPTION);
@@ -294,16 +398,18 @@ public class TeaServiceImpl implements TeaService {
     /**
      *提交教师给学生的信息反馈
      *
-     * @param feedBack 封装的反馈信息
+     * @param subId 课程预约编号
+     * @param teaOpenid 教师微信编号
+     * @param feedBack 教师给学生的反馈信息
+     * @param score 教师给学生的打分
      * @return 教师反馈信息
      *
      */
     @Override
     @Transactional(rollbackFor=Exception.class)
-    public FeedBack saveFeedBack(Integer subId,String feedBack,Integer score) {
-        // TODO 增加teaOpenid 参数，逻辑修改为学生和教师都可以提交反馈
+    public FeedBack saveFeedBack(Integer subId,String teaOpenid,String feedBack,Integer score) {
         /**
-         * TODO  大致逻辑
+         * 大致逻辑
          * 1. 判断当前课程的状态是否可以提交反馈？
          * 2. 根据subId判断是否学生已经创建记录，若未创建，则创建新纪录
          * 3. 若已创建，判断教师的反馈内容是否为空，若为空，则提交，不为空，则不能提交（限制只能提交一次）
@@ -313,20 +419,28 @@ public class TeaServiceImpl implements TeaService {
             log.error("【教师给学生的反馈】 预约课程编号为空");
             throw new SdcException(ResultEnum.PARAM_EXCEPTION);
         }
-        if(null == feedBack || null == score){
+        if(null == feedBack || "".equals(feedBack) || null == score){
             log.error("【教师给学生的反馈】 课程反馈信息不为空");
             throw new SdcException(ResultEnum.PARAM_EXCEPTION);
         }
         //通过预约课程信息获取课程信息
         SubCourse one1 = subCourseRepository.findOne(subId);
-        List<SubCourse> list = subCourseRepository.findByCourseIdAndSubStatus(one1.getCourseId(),SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode());
+        Integer courseId = one1.getCourseId();
+        TeaBase byteaOpenid = teaBaseRepository.findByteaOpenid(teaOpenid);
+        TeaCourse byTeaCodeAndCourseId = teaCourseRepository.findByTeaCodeAndCourseId(byteaOpenid.getTeaCode(), courseId);
+        if(null == byTeaCodeAndCourseId){
+            log.error("【教师给学生的反馈】 当前教师没有对应课程，提交课程反馈失败");
+            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION);
+        }
+
+        List<SubCourse> list = subCourseRepository.findByCourseIdAndSubStatus(courseId,SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode());
         SubCourse subCourse = list.get(0);
         if(null == subCourse){
             log.error("【教师给学生的反馈】 找不到对应的预约课程");
             throw new SdcException(ResultEnum.PARAM_EXCEPTION);
         }
-
-        //修改课程表中课程状态
+        //如果当前课程状态是课程交互状态或者上课状态为线下，则可以提交反馈结果
+        //其中判断状态在finishCourse方法中已经处理了
         TeaCourse one = teaCourseRepository.findOne(subCourse.getCourseId());
         if(null == one){
             log.error("【教师给学生的反馈】 该课程编号不正确");
@@ -336,10 +450,16 @@ public class TeaServiceImpl implements TeaService {
         finishCourse(one.getCourseId());
 
         FeedBack proFeedBack = feedBackRepository.findBySubId(subId);
+        //若反馈没有被创建，则创建
         if(null == proFeedBack){
-            log.error("【教师给学生的反馈】 反馈表未创建");
-            throw new SdcException(ResultEnum.PARAM_EXCEPTION);
+            proFeedBack = new FeedBack();
         }
+        //限定反馈只能提交一次
+        if(proFeedBack.getTeaScore() != null  && proFeedBack.getTeaFeedback() != null){
+            log.error("【教师给学生的反馈】 反馈只能提交一次");
+            throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION);
+        }
+        proFeedBack.setSubId(subId);
         proFeedBack.setTeaFeedback(feedBack);
         proFeedBack.setTeaScore(score);
         return feedBackRepository.save(proFeedBack);

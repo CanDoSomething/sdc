@@ -66,30 +66,32 @@ public class TeaController {
     /**
      *
      * @param courserId 课程编号
+     * @param teaOpenid 教师微信编号
      * @param page 当前页数
      * @param pageSize 一页所展示的数据条数
      * @return 当前所有候选人
      */
     @GetMapping("/findCandidatesByCourseId")
     public ResultVO<List<StuBase>> findCandidatesByCourseId(@RequestParam(value = "courseId") Integer courserId,
+                                                            @RequestParam(value = "teaOpenid") String teaOpenid,
                                                             @RequestParam(value = "page", defaultValue = "0") int page,
                                                             @RequestParam(value = "pageSize", defaultValue = "10") int pageSize){
-        List<StuBase> list = teaService.findCandidateByCourseId(courserId, page, pageSize);
+        List<StuBase> list = teaService.findCandidateByCourseId(courserId,teaOpenid, page, pageSize);
         return ResultVOUtil.success(list);
     }
 
     /**
      *
-     * @param teaCode 教师编号
+     * @param teaOpenid 教师编号
      * @param page 当前页数
      * @param pageSize 一页所展示的数据条数
      * @return 展示当前老师的历史课程
      */
     @GetMapping("/findTeaHistoryCourse")
-    public ResultVO<List<CourseDTO>> findTeaHistoryCourse(String teaCode,
+    public ResultVO<List<CourseDTO>> findTeaHistoryCourse(@RequestParam(value = "teaOpenid") String teaOpenid,
                                                           @RequestParam(value = "page", defaultValue = "0") int page,
                                                           @RequestParam(value = "pageSize", defaultValue = "10") int pageSize){
-        List<CourseDTO> list = teaService.findTeaHistoryCourse(teaCode, page, pageSize);
+        List<CourseDTO> list = teaService.findTeaHistoryCourse(teaOpenid, page, pageSize);
         return ResultVOUtil.success(list);
 
     }
@@ -100,9 +102,10 @@ public class TeaController {
      * @return 取消的课程状态
      */
     @PostMapping("/cancelCourse")
-    public ResultVO<TeaCourse> cancelCourse(@RequestParam(value = "courseId")Integer courseId
-            ,String cancelReason){
-        TeaCourse teaCourse = teaService.cancelCourse(courseId,cancelReason);
+    public ResultVO<TeaCourse> cancelCourse(@RequestParam(value = "courseId")Integer courseId,
+                                            @RequestParam(value = "teaOpenid") String teaOpenid,
+                                            @RequestParam(value = "cancelReason") String cancelReason){
+        TeaCourse teaCourse = teaService.cancelCourse(courseId,teaOpenid,cancelReason);
         /*
             增加给学生推送教师取消预约消息的功能
          */
@@ -112,28 +115,30 @@ public class TeaController {
     /**
      *
      * @param courseId 课程编号
-     * @param stuOpenId 学生微信唯一Id
+     * @param stuOpenid 学生微信编号
      * @return 预定课程的信息
      */
     @PostMapping("/saveSelectedStu")
     public ResultVO<SubCourse> saveSelectedStu(@RequestParam(value = "courseId")Integer courseId,
-                                               @RequestParam(value = "stuOpenId") String stuOpenId){
-        SubCourse subCourse = teaService.saveSelectedStu(stuOpenId, courseId);
+                                               @RequestParam(value = "stuOpenid") String stuOpenid){
+        SubCourse subCourse = teaService.saveSelectedStu(stuOpenid, courseId);
         return ResultVOUtil.success(subCourse);
     }
 
     /**
      *
      * @param subId 预约课程编号
+     * @param teaOpenid 教师微信编号
      * @param teaFeedBack 教师反馈内容
      * @param score 教师给学生的打分
      * @return 反馈课程信息
      */
     @PostMapping("/createFeedBack")
     public ResultVO<FeedBack> createFeedBack(@RequestParam("subId") Integer subId,
+                                             @RequestParam("teaOpenid") String teaOpenid,
                                              @RequestParam("teaFeedBack") String teaFeedBack,
                                              @RequestParam("score")Integer score){
-        FeedBack feedBack = teaService.saveFeedBack(subId, teaFeedBack, score);
+        FeedBack feedBack = teaService.saveFeedBack(subId,teaOpenid, teaFeedBack, score);
         return ResultVOUtil.success(feedBack);
     }
 

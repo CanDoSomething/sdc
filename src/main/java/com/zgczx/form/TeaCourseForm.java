@@ -3,6 +3,8 @@ package com.zgczx.form;
 import lombok.Data;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * 教师课程表单信息
  *
@@ -43,7 +45,12 @@ public class TeaCourseForm {
     /**
      * 课程上课方式，上课方式(0表示线上，1表示线下)
      */
-    @NotEmpty(message = "课程上课方式 必填，上课方式(0表示线上，1表示线下)")
-    private int courseInteractive;
+    @NotNull(message = "课程上课方式 必填，上课方式(0表示线上，1表示线下)")
+    private Integer courseInteractive;
+
+    /**
+     * 上课地点
+     */
+    private String courseLocation;
 
 }

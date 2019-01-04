@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @Author: Common
@@ -17,12 +18,27 @@ public interface TeaCourseRepository extends JpaRepository<TeaCourse,Integer> {
     /**
      * 查找教师所有的历史课程
      *
-     * @param teaCode 学生编号
+     * @param teaCode 教师编号
      * @param pageable 分页条件
      * @return 所有课程列表
      */
     @Query("select teaCourse from TeaCourse teaCourse where teaCourse.teaCode = ?1 ORDER BY teaCourse.courseEndTime desc")
     Page<TeaCourse> find(String teaCode,Pageable pageable);
+
+    /**
+     * 查看教师的所有课程（不分页）
+     * @param teaCode 教师编号
+     * @return 所有课程列表
+     */
+    List<TeaCourse> findByTeaCode(String teaCode);
+
+    /**
+     * 通过教师编号和课程编号查找对应课程
+     * @param teaCode
+     * @param courseId
+     * @return
+     */
+    TeaCourse findByTeaCodeAndCourseId(String teaCode,Integer courseId);
 
     /**
      *按照学生编号跟预约情况查找预约信息
