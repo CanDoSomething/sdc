@@ -65,4 +65,8 @@ public class StuBase {
      */
     private Date updateTime;
 
+    @Override
+    public String toString() {
+        return "StuBase{" + "stuCode='" + stuCode + '\'' + ", stuName='" + stuName + '\'' + ", stuLevel='" + stuLevel + '\'' + ", stuGrade='" + stuGrade + '\'' + ", stuClass='" + stuClass + '\'' + ", stuOpenid='" + stuOpenid + '\'' + ", stuPasswd='" + stuPasswd + '\'' + ", creditScore=" + creditScore + ", stuNickname='" + stuNickname + '\'' + ", stuHeadimgurl='" + stuHeadimgurl + '\'' + ", createTime=" + createTime + ", updateTime=" + updateTime + '}';
+    }
 }

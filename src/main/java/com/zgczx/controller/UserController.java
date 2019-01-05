@@ -18,10 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.Cookie;
@@ -40,7 +37,7 @@ import javax.validation.Valid;
 @RequestMapping("/user")
 public class UserController {
 
-    private  final UserService userService;
+    private final UserService userService;
 
     private final ProjectUrlConfig projectUrlConfig;
 
@@ -88,16 +85,17 @@ public class UserController {
     }
 
     /**
+     * 学生根据openid创建表单信息
      *
-     *  学生根据openid创建表单信息
      * @param stuInfoForm 学生信息表单信息
      * @param bindingResult 表单验证结果
      * @param stuOpenid 学生微信唯一凭证
      * @return ResultVO
      */
     @PostMapping("/registerStuBaseByOpenid")
+    @ResponseBody
     public ResultVO<?> registerStuBaseByOpenid(@Valid StuInfoForm stuInfoForm, BindingResult bindingResult,
-                                @RequestParam("stuOpenid") String stuOpenid ){
+                                               @RequestParam("stuOpenid") String stuOpenid ){
         if(bindingResult.hasErrors()){
             log.error("【学生注册】参数不正确，stuInfoForm={}",stuInfoForm.toString());
             throw new SdcException(ResultEnum.PARAM_EXCEPTION.getCode(),
@@ -114,6 +112,7 @@ public class UserController {
     }
 
     @PostMapping("/registerTeaBaseByOpenid")
+    @ResponseBody
     public ResultVO<?> registerTeaBaseByOpenid(@Valid TeaInfoForm teaInfoForm,BindingResult bindingResult,
                                                @RequestParam("teaOpenid") String teaOpenid){
         if(bindingResult.hasErrors()){

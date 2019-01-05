@@ -3,12 +3,14 @@ package com.zgczx.service.impl;
 import com.zgczx.dataobject.StuBase;
 import com.zgczx.dataobject.TeaBase;
 import com.zgczx.enums.ResultEnum;
+import com.zgczx.enums.UserEnum;
 import com.zgczx.exception.SdcException;
 import com.zgczx.form.StuInfoForm;
 import com.zgczx.form.TeaInfoForm;
 import com.zgczx.repository.StuBaseRepository;
 import com.zgczx.repository.TeaBaseRepository;
 import com.zgczx.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
  * @Description:
  */
 @Service
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     @Autowired
@@ -64,32 +67,44 @@ public class UserServiceImpl implements UserService {
     @Override
     public StuBase registerStuBaseByOpenid(String stuOpenid, StuInfoForm stuInfoForm) {
 
-        // 1.新建学生
-        StuBase stuBase = new StuBase();
 
-        // 2.根据学生提交的信息更新
+        //1.判断stuOpenid是否已经注册过
+        if(null == stuBaseRepository.findByStuOpenid(stuOpenid)){
+            log.info("【学生注册】 stuOpenid没有注册过，请走'/wechat/authorize' 接口,stuOpenid = {}",stuOpenid);
+            throw new SdcException(UserEnum.stuOpenid_not_registered.getCode(),
+            UserEnum.stuOpenid_not_registered.getMessage());
+        }
+
+        //2.根据学生提交的信息更新
+        StuBase stuBase = stuBaseRepository.findByStuOpenid(stuOpenid);
+
         stuBase.setStuCode(stuInfoForm.getStuCode());
         stuBase.setStuName(stuInfoForm.getStuName());
         stuBase.setStuLevel(stuInfoForm.getStuLevel());
         stuBase.setStuGrade(stuInfoForm.getStuGrade());
         stuBase.setStuClass(stuInfoForm.getStuClass());
         stuBase.setStuPasswd(stuInfoForm.getStuPasswd());
-
+        log.info("【学生注册】 更新学生个人信息 {}",stuBase.toString());
         StuBase updatedStuBase = stuBaseRepository.save(stuBase);
 
         if(updatedStuBase != null){
             return updatedStuBase;
         }else{
-            //TODO 更新枚举类
-            throw new SdcException(ResultEnum.PARAM_EXCEPTION);
+            throw new SdcException(UserEnum.DB_ERROR);
         }
     }
 
     @Override
     public TeaBase registerTeaBaseByOpenid(String teaOpenid, TeaInfoForm teaInfoForm) {
 
-        // 1.根据openid找到该教师
-        TeaBase teaBase = new TeaBase();
+        //1.判断teaOpenid是否已经注册过
+        if(null == teaBaseRepository.findByteaOpenid(teaOpenid)){
+            log.info("【教师注册】 teaOpenid，，请走'/wechat/authorize' 接口,teaOpenid = {}",teaOpenid);
+            throw new SdcException(UserEnum.teaOpenid_not_registered);
+        }
+
+        //2.根据教师提交的信息更新
+        TeaBase teaBase = teaBaseRepository.findByteaOpenid(teaOpenid);
 
         // 2.根据教师提交的信息更新
         teaBase.setTeaCode(teaInfoForm.getTeaCode());
@@ -97,13 +112,13 @@ public class UserServiceImpl implements UserService {
         teaBase.setTeaSubject(teaInfoForm.getTeaSubject());
         teaBase.setTeaPasswd(teaInfoForm.getTeaPasswd());
 
+        log.info("【教师注册】 更新教师个人信息 {}",teaBase.toString());
         TeaBase updatedTeaBase = teaBaseRepository.save(teaBase);
 
         if(updatedTeaBase != null){
             return updatedTeaBase;
         }else {
-            // TODO 更新枚举类
-            throw new SdcException(ResultEnum.PARAM_EXCEPTION);
+            throw new SdcException(UserEnum.DB_ERROR);
         }
     }
 }

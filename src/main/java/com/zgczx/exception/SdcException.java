@@ -2,6 +2,7 @@ package com.zgczx.exception;
 
 
 import com.zgczx.enums.ResultEnum;
+import com.zgczx.enums.UserEnum;
 import lombok.Data;
 
 
@@ -22,5 +23,10 @@ public class SdcException extends RuntimeException {
     public SdcException(ResultEnum resultEnum) {
         super(resultEnum.getMessage());
         this.code = resultEnum.getCode();
+    }
+
+    public SdcException(UserEnum userEnum){
+        super(userEnum.getMessage());
+        this.code = userEnum.getCode();
     }
 }

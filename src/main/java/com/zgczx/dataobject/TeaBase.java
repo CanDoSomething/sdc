@@ -54,4 +54,8 @@ public class TeaBase {
      */
     private Date updateTime;
 
+    @Override
+    public String toString() {
+        return "TeaBase{" + "teaCode='" + teaCode + '\'' + ", teaName='" + teaName + '\'' + ", teaSubject='" + teaSubject + '\'' + ", teaOpenid='" + teaOpenid + '\'' + ", teaPasswd='" + teaPasswd + '\'' + ", teaNickname='" + teaNickname + '\'' + ", teaHeadimgurl='" + teaHeadimgurl + '\'' + ", createTime=" + createTime + ", updateTime=" + updateTime + '}';
+    }
 }

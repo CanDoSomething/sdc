@@ -44,11 +44,12 @@ public class WeChatController {
 
     @GetMapping("/authorize")
     public String authorize(@RequestParam("returnUrl") String returnUrl,
-                            @RequestParam("role") Integer role){
+                            @RequestParam("role") Integer role,
+                            @RequestParam("path") String path){
 
         //1.配置
         //2.调用方法
-        String url = projectUrlConfig.getWeChatMpAuthorize() + "/wechat/userInfo?role="+role;
+        String url = projectUrlConfig.getWeChatMpAuthorize() + "/wechat/userInfo?role="+role+"&path="+path;
         String redirectUrl =  wxMpService.oauth2buildAuthorizationUrl(url, WxConsts.OAUTH2_SCOPE_USER_INFO, URLEncoder.encode(returnUrl));
         log.info("【微信网页授权】 获取code，result={}",redirectUrl);
         return "redirect:" + redirectUrl;
@@ -57,7 +58,8 @@ public class WeChatController {
     @GetMapping("/userInfo")
     public String userInfo(@RequestParam("code") String code,
                            @RequestParam("state") String returnUrl,
-                           @RequestParam("role") Integer role){
+                           @RequestParam("role") Integer role,
+                           @RequestParam("path") String path){
         WxMpOAuth2AccessToken wxMpOAuth2AccessToken = new WxMpOAuth2AccessToken();
         WxMpUser wxMpUser = new WxMpUser();
         try{
@@ -79,7 +81,7 @@ public class WeChatController {
             // 创建教师账号
             userService.createTeaBase(openid,nickname,headImgUrl);
         }
-        return "redirect:"+returnUrl+"?openid="+openid;
+        return "redirect:"+returnUrl+"?openid="+openid+"&path="+path;
 
     }
 
