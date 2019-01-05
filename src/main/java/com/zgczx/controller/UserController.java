@@ -47,26 +47,25 @@ public class UserController {
         this.projectUrlConfig = projectUrlConfig;
     }
 
-    @GetMapping("/login")
-    public ModelAndView login(@RequestParam("openid") String openid,
-                              HttpServletResponse response
-                              ){
+    @GetMapping("/queryUserInfo")
+    public ResultVO<?> queryUserInfo(@RequestParam("openid") String openid){
+
+        StuBase stuBase = userService.findStuBaseByOpenid(openid);
+        TeaBase teaBase = userService.findTeaBaseByOpenid(openid);
+
 
         //1. openid是否存在数据库
-        if(null == userService.findStuBaseByOpenid(openid) &&
-                null ==userService.findTeaBaseByOpenid(openid)){
+        if(null == stuBase && null ==teaBase){
             log.info("【该openid没有注册】 openid = {}",openid);
             throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION);
         }
 
-        //2. 设置token至cookie
-        Integer expire = CookieConstant.EXPIRE;
-        CookieUtil.set(response, CookieConstant.TOKEN,openid,expire);
-        log.info("cookie 添加成功 openid = "+openid);
+        if(stuBase != null){
+            return ResultVOUtil.success(stuBase);
+        }else {
+            return ResultVOUtil.success(teaBase);
+        }
 
-        return new ModelAndView("redirect:"
-                .concat(projectUrlConfig.getSdc()
-                .concat(projectUrlConfig.homeAddress)));
     }
     @GetMapping("/logout")
     public ModelAndView logout(HttpServletRequest request,

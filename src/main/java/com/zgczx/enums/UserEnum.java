@@ -23,7 +23,15 @@ public enum UserEnum {
      */
     teaOpenid_not_registered(602,"该teaOpenid已经被注册"),
 
+    /**
+     * 该stuOpenid已经被创建
+     */
+    stuOpenid_is_created(603,"该stuOpenid已经被创建"),
 
+    /**
+     * 该teaOpenid已经被创建
+     */
+    teaOpenid_is_created(603,"该teaOpenid已经被创建"),
 
 
 

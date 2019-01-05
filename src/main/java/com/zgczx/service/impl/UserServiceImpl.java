@@ -31,6 +31,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public StuBase createStuBase(String stuOpenid, String nickname, String headImgUrl) {
+
+        StuBase stuBase_check = stuBaseRepository.findByStuOpenid(stuOpenid);
+        if(stuBase_check !=null){
+            log.info("【创建学生】 该学生的openid已经创建，stuOpenid={}",stuOpenid);
+            throw new SdcException(UserEnum.stuOpenid_is_created);
+        }
+
         StuBase stuBase = new StuBase();
         // 学生学籍号暂用openid 代替
         stuBase.setStuCode(stuOpenid);
@@ -43,6 +50,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public TeaBase createTeaBase(String teaOpenid, String nickname, String headImgUrl) {
+
+        TeaBase teaBase_check = teaBaseRepository.findByteaOpenid(teaOpenid);
+        if(teaBase_check != null){
+            log.info("【创建老师】 该老师的teaOpenid已经被创建,teaOpenid={}",teaOpenid);
+        }
+
         TeaBase teaBase = new TeaBase();
         // 教师工号暂用openid 代替
         teaBase.setTeaCode(teaOpenid);

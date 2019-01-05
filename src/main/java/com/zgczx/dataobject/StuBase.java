@@ -43,6 +43,7 @@ public class StuBase {
     /**
      * 学生密码
      */
+
     private String stuPasswd;
     /**
      * 信用评分
@@ -53,7 +54,7 @@ public class StuBase {
      */
     private String stuNickname;
     /**
-     * 教师头像地址
+     * 学生头像地址
      */
     private String stuHeadimgurl;
     /**
