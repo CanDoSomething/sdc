@@ -48,6 +48,7 @@ public class UserController {
     }
 
     @GetMapping("/queryUserInfo")
+    @ResponseBody
     public ResultVO<?> queryUserInfo(@RequestParam("openid") String openid){
 
         StuBase stuBase = userService.findStuBaseByOpenid(openid);
