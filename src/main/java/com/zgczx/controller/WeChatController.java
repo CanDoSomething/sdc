@@ -81,6 +81,7 @@ public class WeChatController {
             // 创建教师账号
             userService.createTeaBase(openid,nickname,headImgUrl);
         }
+        log.info("returnUrl====>"+returnUrl);
         return "redirect:"+returnUrl+"?openid="+openid+"&path="+path;
 
     }
