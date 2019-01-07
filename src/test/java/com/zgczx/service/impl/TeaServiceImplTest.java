@@ -76,7 +76,7 @@ public class TeaServiceImplTest{
     @Test
     public void saveFeedBack() {
 
-        FeedBack rs = teaService.saveFeedBack(28, "openidjiaoshi","积极上课", 5);
+        FeedBack rs = teaService.saveFeedBack(8, "openidjiaoshi","积极上课", 5);
         System.out.println("教师给学生的反馈信息:"+rs);
         Assert.assertNotNull(rs);
     }

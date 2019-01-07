@@ -53,12 +53,12 @@ public class PushMessageServiceImpl implements PushMessageService {
         //设置返回数据
         List<WxMpTemplateData> data = Arrays.asList(
                 new WxMpTemplateData("first","预约课程成功！"),
-                new WxMpTemplateData("keyword1",courseDTO.getCourseName()),
+                new WxMpTemplateData("keyword1",courseDTO.getTeaCourse().getCourseName()),
                 new WxMpTemplateData("keyword2",courseDTO.getTeaBase().getTeaName()),
-                new WxMpTemplateData("keyword3",courseDTO.getCourseStartTime().toString()),
-                new WxMpTemplateData("keyword4",courseDTO.getCourseEndTime().toString()),
+                new WxMpTemplateData("keyword3",courseDTO.getTeaCourse().getCourseStartTime().toString()),
+                new WxMpTemplateData("keyword4",courseDTO.getTeaCourse().getCourseEndTime().toString()),
                 //new WxMpTemplateData("keyword5",SubStatusEnum.SUB_SUCCESS.getCode().toString()),
-                new WxMpTemplateData("keyword6",courseDTO.getCourseLocation() == null?"在线互动平台":courseDTO.getCourseLocation()),
+                new WxMpTemplateData("keyword6",courseDTO.getTeaCourse().getCourseLocation() == null?"在线互动平台":courseDTO.getTeaCourse().getCourseLocation()),
                 new WxMpTemplateData("remark","同学们上门不要迟到哦")
 
         );
@@ -93,12 +93,12 @@ public class PushMessageServiceImpl implements PushMessageService {
         //设置返回数据
         List<WxMpTemplateData> data = Arrays.asList(
                 new WxMpTemplateData("first","预约课程失败"),
-                new WxMpTemplateData("keyword1",courseDTO.getCourseName()),
+                new WxMpTemplateData("keyword1",courseDTO.getTeaCourse().getCourseName()),
                 new WxMpTemplateData("keyword2",courseDTO.getTeaBase().getTeaName()),
-                new WxMpTemplateData("keyword3",courseDTO.getCourseStartTime().toString()),
-                new WxMpTemplateData("keyword4",courseDTO.getCourseEndTime().toString()),
+                new WxMpTemplateData("keyword3",courseDTO.getTeaCourse().getCourseStartTime().toString()),
+                new WxMpTemplateData("keyword4",courseDTO.getTeaCourse().getCourseEndTime().toString()),
                 //new WxMpTemplateData("keyword5",SubStatusEnum.SUB_SUCCESS.getCode().toString()),
-                new WxMpTemplateData("keyword6",courseDTO.getCourseLocation() == null?"在线互动平台":courseDTO.getCourseLocation()),
+                new WxMpTemplateData("keyword6",courseDTO.getTeaCourse().getCourseLocation() == null?"在线互动平台":courseDTO.getTeaCourse().getCourseLocation()),
                 new WxMpTemplateData("remark","祝下次好运")
         );
         templateMessage.setData(data);

@@ -265,7 +265,7 @@ public class TeaServiceImpl implements TeaService {
             Integer courserId = null;
             for(CourseDTO course: rsList){
                 //通过课程编号查找学生给老师的反馈表
-                courserId = course.getCourseId();
+                courserId = course.getTeaCourse().getCourseId();
                 List<SubCourse> byCourseIdAndSubStatus = subCourseRepository.findByCourseId(courserId);
                 for(SubCourse subCourse : byCourseIdAndSubStatus ){
                     feedBack = feedBackRepository.findBySubId(subCourse.getSubId());
