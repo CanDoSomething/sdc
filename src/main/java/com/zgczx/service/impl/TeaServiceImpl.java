@@ -108,7 +108,7 @@ public class TeaServiceImpl implements TeaService {
          * 1.判断该老师当前时间是否有课程
          * 2.再新建课程
          */
-        TeaBase byteaOpenid = teaBaseRepository.findByteaOpenid(teaOpenid);
+        TeaBase byteaOpenid = teaBaseRepository.findByTeaOpenid(teaOpenid);
         List<TeaCourse> byTeaCode = teaCourseRepository.findByTeaCode(byteaOpenid.getTeaCode());
         //比较当前教师的所有未结束和未取消的课程的交互时间
 
@@ -172,7 +172,7 @@ public class TeaServiceImpl implements TeaService {
             throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION);
         }
         // 取消课程之前需要判断当前课程是否为该老师的课程
-        TeaBase byteaOpenid = teaBaseRepository.findByteaOpenid(teaOpenid);
+        TeaBase byteaOpenid = teaBaseRepository.findByTeaOpenid(teaOpenid);
         if(byteaOpenid == null){
             log.error("【教师取消课程】 该微信id没有找到对应教师");
             throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION);
@@ -234,7 +234,7 @@ public class TeaServiceImpl implements TeaService {
             log.error("【教师查看历史课程】 教师微信编号为空");
             throw new SdcException(ResultEnum.PARAM_EXCEPTION);
         }
-        TeaBase byteaOpenid = teaBaseRepository.findByteaOpenid(teaOpenid);
+        TeaBase byteaOpenid = teaBaseRepository.findByTeaOpenid(teaOpenid);
         if(null == byteaOpenid){
             log.error("【教师查看历史课程】 根据教师微信编号未找到对应教师信息");
             throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION);
@@ -304,7 +304,7 @@ public class TeaServiceImpl implements TeaService {
             throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION);
         }
         //判断该课程是否为该老师的课程
-        TeaBase byteaOpenid = teaBaseRepository.findByteaOpenid(teaOpenid);
+        TeaBase byteaOpenid = teaBaseRepository.findByTeaOpenid(teaOpenid);
         if(byteaOpenid == null){
             log.error("【教师查看预约候选人】 该微信id没有找到对应教师");
             throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION);
@@ -426,7 +426,7 @@ public class TeaServiceImpl implements TeaService {
         //通过预约课程信息获取课程信息
         SubCourse one1 = subCourseRepository.findOne(subId);
         Integer courseId = one1.getCourseId();
-        TeaBase byteaOpenid = teaBaseRepository.findByteaOpenid(teaOpenid);
+        TeaBase byteaOpenid = teaBaseRepository.findByTeaOpenid(teaOpenid);
         TeaCourse byTeaCodeAndCourseId = teaCourseRepository.findByTeaCodeAndCourseId(byteaOpenid.getTeaCode(), courseId);
         if(null == byTeaCodeAndCourseId){
             log.error("【教师给学生的反馈】 当前教师没有对应课程，提交课程反馈失败");

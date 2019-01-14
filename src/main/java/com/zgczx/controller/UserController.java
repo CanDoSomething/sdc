@@ -131,11 +131,21 @@ public class UserController {
         return ResultVOUtil.success(teaBase);
 
     }
+    @GetMapping("/deleteTeaByOpenid")
+    public  ResultVO<?> deleteTeaByOpenid(@RequestParam("teaOpenid") String teaOpenid){
 
-    @GetMapping("/home")
-    public ModelAndView home(){
-        return new ModelAndView("/home");
+        String str = userService.deleteTeaByOpenid(teaOpenid);
+
+        return ResultVOUtil.success(str);
     }
+    @GetMapping("/deleteStuByOpenid")
+    public  ResultVO<?> deleteStuByOpenid(@RequestParam("stuOpenid") String stuOpenid){
+
+        String str = userService.deleteStuByOpenid(stuOpenid);
+
+        return ResultVOUtil.success(str);
+    }
+
 
 
 }

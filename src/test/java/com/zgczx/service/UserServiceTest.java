@@ -33,6 +33,19 @@ public class UserServiceTest {
         TeaBase teaBase = userService.createTeaBase("111","nickname","headimgurl");
         Assert.assertNotNull(teaBase);
     }
+    @Test
+    public void deleteTeaByOpenid(){
+        String str = userService.deleteTeaByOpenid("111");
+        System.out.println(str);
+        Assert.assertNotNull(str);
+    }
+
+    @Test
+    public void deleteStuByOpenid(){
+        String str = userService.deleteStuByOpenid("openid2");
+        System.out.println(str);
+        Assert.assertNotNull(str);
+    }
 
 
 }

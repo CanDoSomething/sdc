@@ -2,7 +2,6 @@ package com.zgczx.service.impl;
 
 import com.zgczx.dataobject.StuBase;
 import com.zgczx.dataobject.TeaBase;
-import com.zgczx.enums.ResultEnum;
 import com.zgczx.enums.UserEnum;
 import com.zgczx.exception.SdcException;
 import com.zgczx.form.StuInfoForm;
@@ -51,7 +50,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public TeaBase createTeaBase(String teaOpenid, String nickname, String headImgUrl) {
 
-        TeaBase teaBase_check = teaBaseRepository.findByteaOpenid(teaOpenid);
+        TeaBase teaBase_check = teaBaseRepository.findByTeaOpenid(teaOpenid);
         if(teaBase_check != null){
             log.info("【创建老师】 该老师的teaOpenid已经被创建,teaOpenid={}",teaOpenid);
         }
@@ -74,7 +73,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public TeaBase findTeaBaseByOpenid(String teaOpenid) {
-        return teaBaseRepository.findByteaOpenid(teaOpenid);
+        return teaBaseRepository.findByTeaOpenid(teaOpenid);
     }
 
     @Override
@@ -111,13 +110,13 @@ public class UserServiceImpl implements UserService {
     public TeaBase registerTeaBaseByOpenid(String teaOpenid, TeaInfoForm teaInfoForm) {
 
         //1.判断teaOpenid是否已经注册过
-        if(null == teaBaseRepository.findByteaOpenid(teaOpenid)){
+        if(null == teaBaseRepository.findByTeaOpenid(teaOpenid)){
             log.info("【教师注册】 teaOpenid，，请走'/wechat/authorize' 接口,teaOpenid = {}",teaOpenid);
             throw new SdcException(UserEnum.teaOpenid_not_registered);
         }
 
         //2.根据教师提交的信息更新
-        TeaBase teaBase = teaBaseRepository.findByteaOpenid(teaOpenid);
+        TeaBase teaBase = teaBaseRepository.findByTeaOpenid(teaOpenid);
 
         // 2.根据教师提交的信息更新
         teaBase.setTeaCode(teaInfoForm.getTeaCode());
@@ -132,6 +131,31 @@ public class UserServiceImpl implements UserService {
             return updatedTeaBase;
         }else {
             throw new SdcException(UserEnum.DB_ERROR);
+        }
+    }
+
+    @Override
+    public String deleteTeaByOpenid(String teaOpenid) {
+
+        TeaBase teaBase = teaBaseRepository.findByTeaOpenid(teaOpenid);
+        if(teaBase!=null){
+            teaBaseRepository.delete(teaBase);
+            return "删除成功";
+        }else {
+            return "没有找到，删除失败";
+        }
+
+
+    }
+
+    @Override
+    public String deleteStuByOpenid(String stuOpenid) {
+        StuBase stuBase = stuBaseRepository.findByStuOpenid(stuOpenid);
+        if(stuBase != null){
+            stuBaseRepository.delete(stuBase);
+            return "删除成功";
+        }else{
+            return "没有找到，删除失败";
         }
     }
 }

@@ -72,5 +72,23 @@ public interface UserService {
     TeaBase registerTeaBaseByOpenid(String teaOpenid, TeaInfoForm teaInfoForm);
 
 
+    /**
+     * 删除教师账户
+     *
+     * @param teaOpenid 教师openid
+     * @return 删除结果
+     */
+    String deleteTeaByOpenid(String teaOpenid);
+
+
+    /**
+     * 删除学生账户
+     *
+     * @param stuOpenid 学生id
+     * @return  删除结果
+     */
+    String deleteStuByOpenid(String stuOpenid);
+
+
 
 }

@@ -16,6 +16,6 @@ public interface TeaBaseRepository extends JpaRepository<TeaBase,String> {
      * @param teaOpenid 微信唯一凭证
      * @return  TeaBase
      */
-    TeaBase findByteaOpenid(String teaOpenid);
+    TeaBase findByTeaOpenid(String teaOpenid);
 
 }
