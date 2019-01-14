@@ -132,6 +132,7 @@ public class UserController {
 
     }
     @GetMapping("/deleteTeaByOpenid")
+    @ResponseBody
     public  ResultVO<?> deleteTeaByOpenid(@RequestParam("teaOpenid") String teaOpenid){
 
         String str = userService.deleteTeaByOpenid(teaOpenid);
@@ -139,6 +140,7 @@ public class UserController {
         return ResultVOUtil.success(str);
     }
     @GetMapping("/deleteStuByOpenid")
+    @ResponseBody
     public  ResultVO<?> deleteStuByOpenid(@RequestParam("stuOpenid") String stuOpenid){
 
         String str = userService.deleteStuByOpenid(stuOpenid);
