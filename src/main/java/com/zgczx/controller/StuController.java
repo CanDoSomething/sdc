@@ -37,7 +37,7 @@ public class StuController {
     public ResultVO findAllCourse(@RequestParam(value = "page", defaultValue = "0") Integer page,
                               @RequestParam(value = "size", defaultValue = "10") Integer size){
         /*去stuService中查找所有课程信息*/
-        List<CourseDTO> allCourse = stuService.findAllCourse(page,size);
+        List<CourseDTO> allCourse = stuService.findAllCourse(page-1,size);
         /*返回结果集*/
         return ResultVOUtil.success(allCourse);
     }
