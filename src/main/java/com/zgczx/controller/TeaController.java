@@ -89,9 +89,9 @@ public class TeaController {
      */
     @GetMapping("/findTeaHistoryCourse")
     public ResultVO<List<CourseDTO>> findTeaHistoryCourse(@RequestParam(value = "teaOpenid") String teaOpenid,
-                                                          @RequestParam(value = "page", defaultValue = "0") int page,
+                                                          @RequestParam(value = "page", defaultValue = "1") int page,
                                                           @RequestParam(value = "pageSize", defaultValue = "10") int pageSize){
-        List<CourseDTO> list = teaService.findTeaHistoryCourse(teaOpenid, page, pageSize);
+        List<CourseDTO> list = teaService.findTeaHistoryCourse(teaOpenid, page-1, pageSize);
         return ResultVOUtil.success(list);
 
     }
