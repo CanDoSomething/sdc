@@ -112,10 +112,10 @@ public class StuController {
      */
     @GetMapping(value = "/lookHistory")
     @ResponseBody
-    public ResultVO lookHistory(@RequestParam(value = "page", defaultValue = "0") Integer page,
+    public ResultVO lookHistory(@RequestParam(value = "page", defaultValue = "1") Integer page,
                                 @RequestParam(value = "size", defaultValue = "10") Integer size,
                                 @RequestParam(value = "stuOpenid") String stuOpenid){
-        List<SubDTO> courseDTOSs = stuService.lookHistory(page,size, stuOpenid);
+        List<SubDTO> courseDTOSs = stuService.lookHistory(page-1, size, stuOpenid);
         return ResultVOUtil.success(courseDTOSs);
     }
 }
