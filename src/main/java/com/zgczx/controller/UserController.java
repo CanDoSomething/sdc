@@ -41,6 +41,7 @@ public class UserController {
 
     private final ProjectUrlConfig projectUrlConfig;
 
+    private String info = null;
     @Autowired
     public UserController(UserService service, ProjectUrlConfig projectUrlConfig) {
         this.userService = service;
@@ -57,8 +58,9 @@ public class UserController {
 
         //1. openid是否存在数据库
         if(null == stuBase && null ==teaBase){
-            log.info("【该openid没有注册】 openid = {}",openid);
-            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION);
+            info = "【该openid没有注册】 "+openid;
+            log.info(info);
+            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
         }
 
         if(stuBase != null){
@@ -97,7 +99,8 @@ public class UserController {
     public ResultVO<?> registerStuBaseByOpenid(@Valid StuInfoForm stuInfoForm, BindingResult bindingResult,
                                                @RequestParam("stuOpenid") String stuOpenid ){
         if(bindingResult.hasErrors()){
-            log.error("【学生注册】参数不正确，stuInfoForm={}",stuInfoForm.toString());
+            info = "【学生注册】参数不正确，"+ stuInfoForm.toString();
+            log.error(info);
             throw new SdcException(ResultEnum.PARAM_EXCEPTION.getCode(),
                     bindingResult.getFieldError().getDefaultMessage());
         }

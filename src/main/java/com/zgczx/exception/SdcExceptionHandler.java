@@ -18,6 +18,6 @@ public class SdcExceptionHandler {
     @ResponseBody
     @ExceptionHandler(value = SdcException.class)
     public ResultVO<?> handleSdcException(SdcException sdc){
-        return ResultVOUtil.error(sdc.getCode(),sdc.getMessage());
+        return ResultVOUtil.error(sdc.getCode(),sdc.getMessage(),sdc.getData());
     }
 }
