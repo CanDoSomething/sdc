@@ -136,6 +136,11 @@ public class StuServiceImpl implements StuService {
             log.error(info);
             throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,info);
         }
+        /**
+         * 课程状态改为已被预约
+         */
+        teaCourse.setCourseStatus(CourseEnum.SUB_SUCCESS.getCode());
+        teaCourseRepository.save(teaCourse);
         return save;
     }
 
