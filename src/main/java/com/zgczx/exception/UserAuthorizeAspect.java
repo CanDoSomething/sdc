@@ -29,8 +29,8 @@ public class UserAuthorizeAspect {
     @Pointcut("execution(public * com.zgczx.controller.StuController*.*(..)) ")
     public void verifyStu(){}
 
-    @Pointcut("execution(public * com.zgczx.controller.TeaController*.*(..)) ")
-    public void verifyTea(){}
+ /*   @Pointcut("execution(public * com.zgczx.controller.TeaController*.*(..)) ")
+    public void verifyTea(){}*/
 
  /*   @Pointcut("execution(public * com.zgczx.controller.UserController*.*(..)) ")
     public void verifyUser(){}*/

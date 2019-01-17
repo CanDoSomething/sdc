@@ -24,6 +24,10 @@ public class SubDTO {
      */
     private Integer  courseId;
     /**
+     * 教师姓名
+     */
+    private String teaName;
+    /**
      * 预约状态（0表示提交预约请求，1表示预约成功，2表示为预约失败）
      */
     private Integer  subStatus;

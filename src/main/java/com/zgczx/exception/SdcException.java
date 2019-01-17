@@ -16,13 +16,16 @@ public class SdcException extends RuntimeException {
 
     public Integer code;
 
+    public String data;
+
     public SdcException(Integer code, String message){
         super(message);
         this.code =code;
     }
-    public SdcException(ResultEnum resultEnum) {
+    public SdcException(ResultEnum resultEnum,String data) {
         super(resultEnum.getMessage());
         this.code = resultEnum.getCode();
+        this.data = data;
     }
 
     public SdcException(UserEnum userEnum){

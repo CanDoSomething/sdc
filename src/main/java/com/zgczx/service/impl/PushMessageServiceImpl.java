@@ -31,6 +31,8 @@ public class PushMessageServiceImpl implements PushMessageService {
     private WxMpService wxMpService;
     @Autowired
     private StuBaseRepository stuBaseRepository;
+    private String info = null;
+
     /**
      * 推送给学生的预约课程模板状态消息
      *
@@ -44,8 +46,9 @@ public class PushMessageServiceImpl implements PushMessageService {
         templateMessage.setTemplateId(PushMessageConfig.SUB_SUCCESS_MESSAGE_ID);
 
         if(courseDTO == null ){
-            log.error("【模板消息推送】课程或学生信息为空");
-            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION);
+            info = "【模板消息推送】课程或学生信息为空";
+            log.error(info);
+            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
         }
         //设置发送给用户的openid
         //String stuOpenID = stuBaseRepository.findOne(courseDTO.getStudentCode()).getStuOpenid();
@@ -84,8 +87,9 @@ public class PushMessageServiceImpl implements PushMessageService {
         templateMessage.setTemplateId(PushMessageConfig.SUB_FAIL_MESSAGE_ID);
 
         if(courseDTO == null ){
-            log.error("【模板消息推送】课程或学生信息为空");
-            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION);
+            info = "【模板消息推送】课程或学生信息为空";
+            log.error(info);
+            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
         }
         //设置发送给用户的openid
         //String stuOpenID = stuBaseRepository.findOne(courseDTO.getStudentCode()).getStuOpenid();
@@ -123,8 +127,9 @@ public class PushMessageServiceImpl implements PushMessageService {
         templateMessage.setTemplateId(PushMessageConfig.SUB_FAIL_MESSAGE_ID);
 
         if(teaCourse == null ){
-            log.error("【模板消息推送】课程信息为空");
-            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION);
+            info = "【模板消息推送】课程信息为空";
+            log.error(info);
+            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
         }
         //设置发送给用户的openid
         String stuOpenID = "123";//stuBaseRepository.findOne(teaCourse.get).getStuOpenid();
@@ -144,7 +149,9 @@ public class PushMessageServiceImpl implements PushMessageService {
             wxMpService.getTemplateMsgService()
                     .sendTemplateMsg(templateMessage);
         } catch (WxErrorException e){
-            log.error("【预约课程状态模板消息】 发送消息失败,{}",e);
+            info = "【预约课程状态模板消息】 发送消息失败";
+            log.error(info);
+            throw new SdcException(ResultEnum.WECHAT_MP_ERROR,info);
         }
     }
 
