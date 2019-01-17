@@ -6,6 +6,9 @@ spring:
     url: jdbc:mysql://58.119.112.10:11030/studevelope?characterEncoding=utf-8&useSSL=false
   jpa:
     show-sql: true
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
 #  jackson:
 #    default-property-inclusion: non_null   #全局设定返回不为空的值
 #server:
@@ -17,5 +20,13 @@ spring:
 #  level: info
 
 wechat:
-  mpAppId: wx7e585d995f58d7d6
-  mpAppSecret: 311a4e1283aea428d20eb644615b53aa
+  mpAppId: wx0b6356c5690adc27
+  mpAppSecret: 9d09164246aeb4bbae46ec50d7afc6d4
+server:
+  port: 8086
+
+projectUrl:
+  weChatMpAuthorize: http://zhiheyikaoqin.cn
+  weChatOpenAuthorize: http://zhiheyikaoqin.cn
+  sdc: http://zhiheyikaoqin.cn
+  homeAddress: /user/home

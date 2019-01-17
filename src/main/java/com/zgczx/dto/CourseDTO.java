@@ -1,11 +1,10 @@
 package com.zgczx.dto;
 
-import com.zgczx.dataobject.StuFeedBack;
+import com.zgczx.dataobject.FeedBack;
 import com.zgczx.dataobject.TeaBase;
+import com.zgczx.dataobject.TeaCourse;
 import lombok.Data;
 import lombok.ToString;
-
-import java.util.Date;
 
 /**
  * @Auther: 陈志恒
@@ -15,23 +14,18 @@ import java.util.Date;
 @Data
 @ToString
 public class CourseDTO {
-    private Integer courserId;
-    //课程名称
-    private String courseName;
-    //课程日期
-    private Date course_date;
-    //课程开始时间
-    private Date courseStartTime;
-    //课程结束时间
-    private Date courseEndTime;
-    //课程当前状态
-    private Integer courseStatus;
-    //学生工号
-    private String studentCode;
-    //取消原因
-    private String cause;
-    //老师对象
+
+    /**
+     * 课程信息
+     */
+    private TeaCourse teaCourse;
+    /**
+     * 教师信息
+     */
     private TeaBase teaBase;
-    //反馈信息
-    private StuFeedBack stuFeedBack;
+    /**
+     * 反馈对象
+     */
+    private FeedBack feedBack;
+
 }

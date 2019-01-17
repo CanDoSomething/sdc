@@ -16,10 +16,11 @@ public class ResultVOUtil {
         return success(null);
     }
 
-    public static ResultVO error(Integer code, String msg){
+    public static ResultVO error(Integer code, String msg,Object o){
         ResultVO resultVO = new ResultVO();
         resultVO.setCode(code);
         resultVO.setMsg(msg);
+        resultVO.setData(o);
         return resultVO;
     }
 }
