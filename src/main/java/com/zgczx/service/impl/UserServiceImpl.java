@@ -90,6 +90,7 @@ public class UserServiceImpl implements UserService {
         //2.根据学生提交的信息更新
         StuBase stuBase = stuBaseRepository.findByStuOpenid(stuOpenid);
 
+        stuBaseRepository.delete(stuBase);
         stuBase.setStuCode(stuInfoForm.getStuCode());
         stuBase.setStuName(stuInfoForm.getStuName());
         stuBase.setStuLevel(stuInfoForm.getStuLevel());
@@ -111,13 +112,13 @@ public class UserServiceImpl implements UserService {
 
         //1.判断teaOpenid是否已经注册过
         if(null == teaBaseRepository.findByTeaOpenid(teaOpenid)){
-            log.info("【教师注册】 teaOpenid，，请走'/wechat/authorize' 接口,teaOpenid = {}",teaOpenid);
+            log.info("【教师注册】 teaOpenid未注册，请走'/wechat/authorize' 接口,teaOpenid = {}",teaOpenid);
             throw new SdcException(UserEnum.teaOpenid_not_registered);
         }
 
         //2.根据教师提交的信息更新
         TeaBase teaBase = teaBaseRepository.findByTeaOpenid(teaOpenid);
-
+        teaBaseRepository.delete(teaBase);
         // 2.根据教师提交的信息更新
         teaBase.setTeaCode(teaInfoForm.getTeaCode());
         teaBase.setTeaName(teaInfoForm.getTeaName());

@@ -34,7 +34,7 @@ public class StuController {
      */
     @GetMapping(value = "/findAllCourse")
     @ResponseBody
-    public ResultVO findAllCourse(@RequestParam(value = "page", defaultValue = "0") Integer page,
+    public ResultVO findAllCourse(@RequestParam(value = "page", defaultValue = "1") Integer page,
                               @RequestParam(value = "size", defaultValue = "10") Integer size){
         /*去stuService中查找所有课程信息*/
         List<CourseDTO> allCourse = stuService.findAllCourse(page-1,size);
@@ -112,10 +112,10 @@ public class StuController {
      */
     @GetMapping(value = "/lookHistory")
     @ResponseBody
-    public ResultVO lookHistory(@RequestParam(value = "page", defaultValue = "0") Integer page,
+    public ResultVO lookHistory(@RequestParam(value = "page", defaultValue = "1") Integer page,
                                 @RequestParam(value = "size", defaultValue = "10") Integer size,
                                 @RequestParam(value = "stuOpenid") String stuOpenid){
-        List<SubDTO> courseDTOSs = stuService.lookHistory(page,size, stuOpenid);
+        List<SubDTO> courseDTOSs = stuService.lookHistory(page-1, size, stuOpenid);
         return ResultVOUtil.success(courseDTOSs);
     }
 }
