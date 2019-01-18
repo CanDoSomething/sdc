@@ -16,4 +16,13 @@ public interface StuBaseRepository extends JpaRepository<StuBase,String> {
      * @return 学生信息
      */
     public StuBase findByStuOpenid(String stuOpenid);
+
+    /**
+     *
+     * 通过学生编号查找学生
+     *
+     * @param stuCode 学生编号
+     * @return 学生信息
+     */
+    public StuBase findByStuCode(String stuCode);
 }

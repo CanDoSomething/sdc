@@ -2,10 +2,10 @@ package com.zgczx.controller;
 
 import com.zgczx.VO.ResultVO;
 import com.zgczx.dataobject.FeedBack;
-import com.zgczx.dataobject.StuBase;
 import com.zgczx.dataobject.SubCourse;
 import com.zgczx.dataobject.TeaCourse;
 import com.zgczx.dto.CourseDTO;
+import com.zgczx.dto.StuBaseDTO;
 import com.zgczx.enums.ResultEnum;
 import com.zgczx.exception.SdcException;
 import com.zgczx.form.TeaCourseForm;
@@ -33,6 +33,7 @@ import java.util.List;
 public class TeaController {
     @Autowired
     private TeaService teaService;
+    private String info;
 
     /**
      * 创建课程
@@ -47,14 +48,15 @@ public class TeaController {
                                             @RequestParam("teaOpenid") String teaOpenid){
         //后台进行表单验证，若参数不正确抛出异常
         if(bindingResult.hasErrors()){
-            log.error("【教师课程填写】 参数不正确 ，teaCourse={}",teaCourseForm);
-            throw new SdcException(ResultEnum.PARAM_EXCEPTION.getCode() ,bindingResult.getFieldError().getDefaultMessage());
+            info = "【教师课程填写】 参数不正确 ，"+ teaCourseForm;
+            log.error(info);
+            throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
         }
 
         if(StringUtils.isEmpty(teaOpenid)){
-            log.error("【创建课程】 教师openid为空");
-            throw new SdcException(ResultEnum.PARAM_EXCEPTION.getCode(),
-                    ResultEnum.PARAM_EXCEPTION.getMessage());
+            info = "【创建课程】 教师openid为空";
+            log.error(info);
+            throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
         }
 
 
@@ -72,11 +74,11 @@ public class TeaController {
      * @return 当前所有候选人
      */
     @GetMapping("/findCandidatesByCourseId")
-    public ResultVO<List<StuBase>> findCandidatesByCourseId(@RequestParam(value = "courseId") Integer courserId,
+    public ResultVO<List<StuBaseDTO>> findCandidatesByCourseId(@RequestParam(value = "courseId") Integer courserId,
                                                             @RequestParam(value = "teaOpenid") String teaOpenid,
                                                             @RequestParam(value = "page", defaultValue = "0") int page,
                                                             @RequestParam(value = "pageSize", defaultValue = "10") int pageSize){
-        List<StuBase> list = teaService.findCandidateByCourseId(courserId,teaOpenid, page, pageSize);
+        List<StuBaseDTO> list = teaService.findCandidateByCourseId(courserId,teaOpenid, page, pageSize);
         return ResultVOUtil.success(list);
     }
 
@@ -153,8 +155,9 @@ public class TeaController {
     public ResultVO<TeaCourse> saveUpdateTeaCourse(TeaCourse teaCourse ,BindingResult bindingResult){
         //后台进行表单验证，若参数不正确抛出异常
         if(bindingResult.hasErrors()){
-            log.error("【教师修改课程信息】 参数不正确 ，teaFeedBack={}",teaCourse);
-            throw new SdcException(ResultEnum.PARAM_EXCEPTION.getCode() ,bindingResult.getFieldError().getDefaultMessage());
+            info = "【教师修改课程信息】 参数不正确 ，"+teaCourse;
+            log.error(info);
+            throw new SdcException(ResultEnum.PARAM_EXCEPTION ,info);
         }
         TeaCourse teaCourse1 = teaService.saveUpdateTeaCourse(teaCourse);
         return ResultVOUtil.success(teaCourse1);

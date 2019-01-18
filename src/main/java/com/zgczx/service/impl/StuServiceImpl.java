@@ -175,6 +175,31 @@ public class StuServiceImpl implements StuService {
         }
         /*保存信息到预约表中*/
         SubCourse subCourse = subCourseRepository.save(byStuCodeAndCourseId);
+        //查询当前课程有没有其他学生预约。如果没有，则课程状态变为等待学生预约；否则，状态不变
+        List<SubCourse> byCourseId = subCourseRepository.findByCourseId(courserId);
+        boolean courseIsBusy = false;
+        for(SubCourse subCourseLook : byCourseId){
+
+            if (subCourseLook.getStuCode() != byStuOpenid.getStuCode() ){
+                //如果当前课程有人预约或预约成功，那么课程的状态就不能设置为等待预约
+                if(subCourseLook.getSubStatus().equals(SubCourseEnum.SUB_WAIT.getCode()) ||
+                        subCourseLook.getSubStatus().equals(SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode())){
+                    courseIsBusy = true; break;
+                }
+            }
+        }
+        //如果没有其他学生预约或预约成功当前课程，那么就需要把课程状态设置为等待预约
+        if(courseIsBusy == false){
+            TeaCourse one = teaCourseRepository.findOne(courserId);
+            one.setCourseStatus(CourseEnum.SUB_WAIT.getCode());
+            TeaCourse save = teaCourseRepository.save(one);
+            if(null == save){
+                info = "【学生发起取消预约课程请求】 更新课程表中课程状态失败";
+                log.error(info);
+                throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
+            }
+        }
+
         if (subCourse==null){
             info = "【学生发起取消预约课程请求】 报存到数据库中失败";
             log.error(info);

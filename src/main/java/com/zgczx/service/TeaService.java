@@ -1,10 +1,10 @@
 package com.zgczx.service;
 
 import com.zgczx.dataobject.FeedBack;
-import com.zgczx.dataobject.StuBase;
 import com.zgczx.dataobject.SubCourse;
 import com.zgczx.dataobject.TeaCourse;
 import com.zgczx.dto.CourseDTO;
+import com.zgczx.dto.StuBaseDTO;
 import com.zgczx.form.TeaCourseForm;
 
 import java.util.List;
@@ -58,7 +58,7 @@ public interface TeaService {
      * @param pageSize 当前分页大小
      * @return 当前课程所有预约候选人列表
      */
-    List<StuBase> findCandidateByCourseId(Integer courserId,String teaOpenid, int page, int pageSize);
+    List<StuBaseDTO> findCandidateByCourseId(Integer courserId, String teaOpenid, int page, int pageSize);
 
     /**
      *
