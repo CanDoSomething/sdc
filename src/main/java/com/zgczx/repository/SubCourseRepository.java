@@ -64,7 +64,7 @@ public interface SubCourseRepository extends JpaRepository<SubCourse,Integer> {
      * @param pageable 分页设置
      * @return 所有候选人列表
      */
-    @Query("select stuBase from com.zgczx.dataobject.StuBase stuBase,SubCourse subCourse where subCourse.courseId = ?1 and subCourse.stuCode = stuBase.stuCode and subCourse.subStatus = 400 order by stuBase.creditScore desc ")
+    @Query("select stuBase from com.zgczx.dataobject.StuBase stuBase,SubCourse subCourse where subCourse.courseId = ?1 and subCourse.stuCode = stuBase.stuCode order by stuBase.creditScore desc ")
     List<StuBase> getAllCandidate(Integer courseId, Pageable pageable);
 
 }

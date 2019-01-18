@@ -60,8 +60,8 @@ public class StuServiceImpl implements StuService {
      */
     @Override
     public List<CourseDTO> findAllCourse(Integer page,Integer size) {
-        //先按照课程开始日期升序排序
-        Sort sort =new Sort(Sort.Direction.ASC,"courseStartTime");
+        //先按照课程日期降序排序
+        Sort sort =new Sort(Sort.Direction.DESC,"courseDate");
         /*设置分页*/
         Pageable pageable = new PageRequest(page, size, sort);
         Page<TeaCourse> byCourseStatus = teaCourseRepository.findByCourseStatusAndCourseStartTimeIsAfter(CourseEnum.SUB_WAIT.getCode(), new Date(), pageable);

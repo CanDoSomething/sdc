@@ -265,7 +265,7 @@ public class TeaServiceImpl implements TeaService {
             //设置分页参数
             Pageable pageable = new PageRequest(page,pageSize);
             //设置查询条件
-            Page<TeaCourse> all =  teaCourseRepository.find(teaCode, pageable);
+            Page<TeaCourse> all = teaCourseRepository.find(teaCode, pageable);
             if(null == all){
                 info = "【教师查看历史课程】 没有找到教师课程";
                 log.error(info);
@@ -340,7 +340,8 @@ public class TeaServiceImpl implements TeaService {
         //设置分页参数
         Pageable pageable = new PageRequest(page,pageSize);
         //查找候选人的时候只将预约状态为提交预约的学生查找出来
-        List<StuBase> allCandidate = subCourseRepository.getAllCandidate(courserId,pageable);
+        List<StuBase> allCandidate1 = subCourseRepository.getAllCandidate(courserId, pageable);
+        List<StuBase> allCandidate = allCandidate1;
         return allCandidate;
     }
 
@@ -373,6 +374,30 @@ public class TeaServiceImpl implements TeaService {
             throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
         }
         String stuCode = byStuOpenid.getStuCode();
+
+        //教师再次选择预约候选人，会将之前成功预约的候选人代替，成功预约的转改会变成预约失败
+        List<SubCourse> subCourseSuccessUpdateList = subCourseRepository.findByCourseIdAndSubStatus(courseId,SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode());
+        //预约成功的候选人只可能有一个
+        if(null != subCourseSuccessUpdateList && subCourseSuccessUpdateList.size() > 0){
+            SubCourse subCourseSuccessUpdate = subCourseSuccessUpdateList.get(0);
+            String stuCode1 = subCourseSuccessUpdate.getStuCode();
+            //两次选择同一个成功预约候选人
+            if(stuCode.equals(stuCode1)){
+                return subCourseSuccessUpdate;
+            }
+
+            //修改原来预约成功候选人状态为失败
+            subCourseSuccessUpdate.setSubStatus(SubCourseEnum.SUB_CANDIDATE_FAILED.getCode());
+            SubCourse save = subCourseRepository.save(subCourseSuccessUpdate);
+            if(null == save){
+                info = "【教师选择候选预约学生】 替换原预约成功学生失败！";
+                log.error(info);
+                throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,info);
+            }
+            //给原成功预约候选人发送模板消息
+            //------------>pushMessageService.pushSubSuccessMessage(courseDTO);
+        }
+
         //修改预约表中被成功选择的学生的学号
         SubCourse subCourse = subCourseRepository.findByStuCodeAndCourseIdAndSubStatus(stuCode,courseId,SubCourseEnum.SUB_WAIT.getCode());
         subCourse.setSubStatus(SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode());
