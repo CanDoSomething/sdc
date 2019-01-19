@@ -1,11 +1,9 @@
 package com.zgczx.repository;
 
-import com.zgczx.dataobject.StuBase;
 import com.zgczx.dataobject.SubCourse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 public interface SubCourseRepository extends JpaRepository<SubCourse,Integer> {
@@ -64,7 +62,9 @@ public interface SubCourseRepository extends JpaRepository<SubCourse,Integer> {
      * @param pageable 分页设置
      * @return 所有候选人列表
      */
-    @Query("select stuBase from com.zgczx.dataobject.StuBase stuBase,SubCourse subCourse where subCourse.courseId = ?1 and subCourse.stuCode = stuBase.stuCode and subCourse.subStatus = 400 order by stuBase.creditScore desc ")
-    List<StuBase> getAllCandidate(Integer courseId, Pageable pageable);
+    //@Query("select stuBase from com.zgczx.dataobject.StuBase stuBase,SubCourse subCourse where subCourse.courseId = ?1 and subCourse.stuCode = stuBase.stuCode order by stuBase.creditScore desc ")
+    //List<SubCourse> getAllCandidate(Integer courseId, Pageable pageable);
+    List<SubCourse> findByCourseId(Integer courseId,Pageable pageable);
 
+    //StuBase findByCourseIdAndStuCodeAndAndSubStatusNot(Integer courseId,String stuCode,Integer subStatus);
 }

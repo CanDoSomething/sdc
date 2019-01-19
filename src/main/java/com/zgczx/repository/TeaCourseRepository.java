@@ -22,7 +22,7 @@ public interface TeaCourseRepository extends JpaRepository<TeaCourse,Integer> {
      * @param pageable 分页条件
      * @return 所有课程列表
      */
-    @Query("select teaCourse from TeaCourse teaCourse where teaCourse.teaCode = ?1 ORDER BY teaCourse.courseEndTime desc")
+    @Query("select teaCourse from TeaCourse teaCourse where teaCourse.teaCode = ?1 ORDER BY teaCourse.courseDate desc")
     Page<TeaCourse> find(String teaCode,Pageable pageable);
 
     /**
