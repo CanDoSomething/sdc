@@ -76,9 +76,17 @@ public class TeaController {
     @GetMapping("/findCandidatesByCourseId")
     public ResultVO<List<StuBaseDTO>> findCandidatesByCourseId(@RequestParam(value = "courseId") Integer courserId,
                                                             @RequestParam(value = "teaOpenid") String teaOpenid,
-                                                            @RequestParam(value = "page", defaultValue = "0") int page,
+                                                            @RequestParam(value = "page", defaultValue = "1") int page,
                                                             @RequestParam(value = "pageSize", defaultValue = "10") int pageSize){
-        List<StuBaseDTO> list = teaService.findCandidateByCourseId(courserId,teaOpenid, page, pageSize);
+
+        if(courserId == null){
+            info = "【教师查看预约候选人】 该课程编号为空";
+            log.error(info);
+            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
+        }
+
+
+        List<StuBaseDTO> list = teaService.findCandidateByCourseId(courserId,teaOpenid, page - 1, pageSize);
         return ResultVOUtil.success(list);
     }
 

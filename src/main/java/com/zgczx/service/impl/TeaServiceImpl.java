@@ -153,7 +153,7 @@ public class TeaServiceImpl implements TeaService {
         teaCourse.setCourseStatus(CourseEnum.SUB_WAIT.getCode());
         teaCourse.setCourseInteractive(teaCourseForm.getCourseInteractive());
         teaCourse.setCourseLocation(teaCourseForm.getCourseLocation());
-        teaCourse.setCourseSubject(teaCourseForm.getCourseSubject());
+        //teaCourse.setCourseSubject(teaCourseForm.getCourseSubject());
 
         TeaCourse save = teaCourseRepository.save(teaCourse);
         if(null == save){
@@ -324,43 +324,40 @@ public class TeaServiceImpl implements TeaService {
     @Override
     public List<StuBaseDTO> findCandidateByCourseId(Integer courserId, String teaOpenid, int page, int pageSize){
 
-        if(courserId == null){
-            info = "【教师查看预约候选人】 该课程编号为空";
-            log.error(info);
-            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
-        }
         //判断该课程是否为该老师的课程
-        TeaBase byteaOpenid = teaBaseRepository.findByTeaOpenid(teaOpenid);
-        if(byteaOpenid == null){
+        TeaBase teaBase = teaBaseRepository.findByTeaOpenid(teaOpenid);
+        if(teaBase == null){
             info = "【教师查看预约候选人】 该微信id没有找到对应教师";
             log.error(info);
             throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
         }
-        TeaCourse byTeaCodeAndCourseId = teaCourseRepository.findByTeaCodeAndCourseId(byteaOpenid.getTeaCode(),courserId);
-        if(null == byTeaCodeAndCourseId){
+
+        //判断该教师是否有该课程
+        TeaCourse teaCourse = teaCourseRepository.findByTeaCodeAndCourseId(teaBase.getTeaCode(),courserId);
+        if(null == teaCourse){
             info ="【教师查看预约候选人】 该课程和您当前身份不匹配，不能查看课程预约候选人";
             log.error(info);
             throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
         }
 
         //设置分页参数
-        Pageable pageable = new PageRequest(page,pageSize);
-        //查找候选人的时候只将预约状态为提交预约的学生查找出来
-        List<SubCourse> allCandidate1 = subCourseRepository.findByCourseId(courserId, pageable);
-        StuBase stuBase = null;
-        StuBaseDTO stuBaseDTO = null;
-        List<StuBaseDTO > rsStuBaseDTOList = new ArrayList<>();
+        Pageable pageable = new PageRequest(page, pageSize);
 
-        for(SubCourse subCourse : allCandidate1){
-            stuBase = stuBaseRepository.findByStuCode(subCourse.getStuCode());
-            System.out.println(stuBase.toString());
+        //查找候选人的时候,将所有提交过预约请求的候选人全部返回
+        List<SubCourse> allCandidate = subCourseRepository.findByCourseId(courserId, pageable);
+
+        List<StuBaseDTO > stuBaseDTOList = new ArrayList<>();
+
+        for(SubCourse candidate : allCandidate){
+            String stuCode = candidate.getStuCode();
+            Integer subStatus = candidate.getSubStatus();
+            StuBase stuBaseInfo = stuBaseRepository.findByStuCode(stuCode);
+
             //封装stuBaseDTO
-            stuBaseDTO = new StuBaseDTO();
-            stuBaseDTO.setStuBase(stuBase);
-            stuBaseDTO.setSubStatus(subCourse.getSubStatus());
-            rsStuBaseDTOList.add(stuBaseDTO);
+            StuBaseDTO stuBaseDTO = new StuBaseDTO(subStatus,stuBaseInfo);
+            stuBaseDTOList.add(stuBaseDTO);
         }
-        return rsStuBaseDTOList;
+        return stuBaseDTOList;
     }
 
     /**

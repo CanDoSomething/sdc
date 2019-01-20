@@ -1,6 +1,7 @@
 package com.zgczx.repository;
 
 import com.zgczx.dataobject.SubCourse;
+import org.apache.lucene.index.DocIDMerger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,7 +19,7 @@ public interface SubCourseRepository extends JpaRepository<SubCourse,Integer> {
      * @return
      **/
 
-    public List<SubCourse> findByStuCode(String stuCode);
+     List<SubCourse> findByStuCode(String stuCode);
     /**
      *查找到学生对应的所有课程信息
      *
@@ -29,6 +30,16 @@ public interface SubCourseRepository extends JpaRepository<SubCourse,Integer> {
      * @return
      **/
     Page<SubCourse> findByStuCode(String stuCode, Pageable pageable);
+
+
+    /**
+     * 找到学生对某节课的预约请求
+     *
+     * @param courseId 课程id
+     * @param stuCode 学生id
+     * @return 选课关系
+     */
+    SubCourse findByCourseIdAndStuCode(Integer courseId,String stuCode);
 
     /**
      *
@@ -56,15 +67,15 @@ public interface SubCourseRepository extends JpaRepository<SubCourse,Integer> {
 
     /**
      *
-     * 查找当前课程的所有候选人的预约状态为0（提交预约请求）的学生
+     * 查找当前课程的所有候选人(选课请求),包括提交预约请求 and 预约成功 and 预约失败
      *
      * @param courseId 课程编号
      * @param pageable 分页设置
-     * @return 所有候选人列表
+     * @return List<SubCourse>
      */
-    //@Query("select stuBase from com.zgczx.dataobject.StuBase stuBase,SubCourse subCourse where subCourse.courseId = ?1 and subCourse.stuCode = stuBase.stuCode order by stuBase.creditScore desc ")
-    //List<SubCourse> getAllCandidate(Integer courseId, Pageable pageable);
     List<SubCourse> findByCourseId(Integer courseId,Pageable pageable);
 
-    //StuBase findByCourseIdAndStuCodeAndAndSubStatusNot(Integer courseId,String stuCode,Integer subStatus);
+
+
+
 }
