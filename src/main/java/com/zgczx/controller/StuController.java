@@ -14,9 +14,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * @Author: 陈志恒
- * @Date: 2018/12/11 10:29
- * @Description: 学生控制器界面
+ * 学生控制器界面
+ *
+ * @author  陈志恒
+ * @date 2018/12/11 10:29
  */
 @RequestMapping("/stu")
 @Controller
