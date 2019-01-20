@@ -4,12 +4,14 @@ import com.zgczx.dataobject.FeedBack;
 import com.zgczx.dataobject.TeaCourse;
 import lombok.Data;
 import lombok.ToString;
+
 import java.util.Date;
 /**
- * @ClassName: Jason
+ * 选课关系DTO
+ *
  * @Author: 陈志恒
  * @Date: 2018/12/29 12:27
- * @Description:预约对象封装类
+ * @Description: 预约对象封装类
  */
 @Data
 @ToString
@@ -43,8 +45,13 @@ public class SubDTO {
      * 更新时间
      */
     private Date updateTime;
-    /*课程对象*/
+    /**
+     * 课程对象
+     */
     private TeaCourse teaCourse;
-    /*反馈对象*/
+    /**
+     * 反馈对象
+     */
     private FeedBack feedBack;
+
 }

@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * @Author: Common
  * @Date: 2018/12/15 15:10
- * @Description:教师课程repository接口
+ * @Description: 教师课程repository接口
  */
 public interface TeaCourseRepository extends JpaRepository<TeaCourse,Integer> {
     /**
@@ -34,9 +34,9 @@ public interface TeaCourseRepository extends JpaRepository<TeaCourse,Integer> {
 
     /**
      * 通过教师编号和课程编号查找对应课程
-     * @param teaCode
-     * @param courseId
-     * @return
+     * @param teaCode 教师工号
+     * @param courseId 课程主键id
+     * @return 课程信息
      */
     TeaCourse findByTeaCodeAndCourseId(String teaCode,Integer courseId);
 
@@ -47,7 +47,7 @@ public interface TeaCourseRepository extends JpaRepository<TeaCourse,Integer> {
      * @Date 11:15 2018/12/29
      * @param stuCode 学生编号
      * @param pageable 分页器
-     * @return
+     * @return 分页的课程信息
      **/
 
     @Query("select tea from TeaCourse tea,SubCourse sub  where sub.courseId=tea.courseId and (sub.courseId=1 or sub.courseId=0) and sub.stuCode=?1 ")
@@ -61,7 +61,7 @@ public interface TeaCourseRepository extends JpaRepository<TeaCourse,Integer> {
      * @param courseStatus 课程id
      * @param date 当前时间
      * @param pageable 分页器
-     * @return
+     * @return 分页的课程信息
      **/
 
     Page<TeaCourse> findByCourseStatusAndCourseStartTimeIsAfter(Integer courseStatus,Date date,Pageable pageable);

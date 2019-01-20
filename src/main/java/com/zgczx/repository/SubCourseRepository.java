@@ -1,7 +1,6 @@
 package com.zgczx.repository;
 
 import com.zgczx.dataobject.SubCourse;
-import org.apache.lucene.index.DocIDMerger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -50,7 +49,7 @@ public interface SubCourseRepository extends JpaRepository<SubCourse,Integer> {
      * @param subStatus 预约状态
      * @return 预约课程
      */
-    public SubCourse findByStuCodeAndCourseIdAndSubStatus(String stuCode,Integer courseId,Integer subStatus);
+     SubCourse findByStuCodeAndCourseIdAndSubStatus(String stuCode,Integer courseId,Integer subStatus);
     /**
      *找到预约等待或预约成功状态的预约信息
      *

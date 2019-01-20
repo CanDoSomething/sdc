@@ -3,6 +3,8 @@ package com.zgczx.enums;
 import lombok.Getter;
 
 /**
+ * 预约关系枚举类
+ *
  * @Author: Dqd
  * @Date: 2018/12/29 13:13
  * @Description: 学生预约状态

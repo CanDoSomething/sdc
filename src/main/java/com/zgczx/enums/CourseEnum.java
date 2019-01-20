@@ -3,9 +3,11 @@ package com.zgczx.enums;
 import lombok.Getter;
 
 /**
+ * 课程状态枚举类
+ *
  * @Author: Dqd
  * @Date: 2019/1/2 16:18
- * @Description:    课程状态
+ * @Description: 课程状态
  */
 @Getter
 public enum CourseEnum {

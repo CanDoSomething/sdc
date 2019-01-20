@@ -12,6 +12,8 @@ import java.util.Date;
 
 
 /**
+ * 课程信息表
+ *
  * @author  Jason
  */
 @Entity

@@ -66,6 +66,7 @@ public class TeaController {
     }
 
     /**
+     * 查找课程候选人
      *
      * @param courserId 课程编号
      * @param teaOpenid 教师微信编号
@@ -91,6 +92,7 @@ public class TeaController {
     }
 
     /**
+     * 查看教师历史
      *
      * @param teaOpenid 教师编号
      * @param page 当前页数
@@ -107,6 +109,7 @@ public class TeaController {
     }
 
     /**
+     * 教师取消课程
      *
      * @param courseId 课程编号
      * @return 取消的课程状态
@@ -123,6 +126,7 @@ public class TeaController {
     }
 
     /**
+     * 确认候选人
      *
      * @param courseId 课程编号
      * @param stuOpenid 学生微信编号
@@ -136,6 +140,7 @@ public class TeaController {
     }
 
     /**
+     * 教师创建反馈
      *
      * @param subId 预约课程编号
      * @param teaOpenid 教师微信编号
@@ -172,6 +177,7 @@ public class TeaController {
     }
 
     /**
+     * 查找单个课程
      *
      * @param courseId 课程编号
      * @return 通过课程编号查找到的课程
@@ -183,6 +189,7 @@ public class TeaController {
     }
 
     /**
+     * 结束课程
      *
      * @param courseId 课程编号
      * @return 课程状态为结束的课程

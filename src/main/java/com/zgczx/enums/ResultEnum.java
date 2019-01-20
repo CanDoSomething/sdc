@@ -3,6 +3,8 @@ package com.zgczx.enums;
 import lombok.Getter;
 
 /**
+ * 结果枚举类
+ *
  * @author Jason
  * @date 2019-01-03
  */

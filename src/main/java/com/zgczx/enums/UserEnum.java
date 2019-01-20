@@ -3,6 +3,8 @@ package com.zgczx.enums;
 import lombok.Getter;
 
 /**
+ * 用户状态枚举类
+ *
  * @author jason
  */
 @Getter
@@ -14,14 +16,14 @@ public enum UserEnum {
     DB_ERROR(600,"数据库执行错误，请检查数据库操作"),
 
     /**
-     * 该stuOpenid已经被注册
+     * 该stuOpenid没有被注册
      */
-    stuOpenid_not_registered(601,"该stuOpenid已经被注册"),
+    stuOpenid_not_registered(601,"该stuOpenid没有被注册"),
 
     /**
-     * 该teaOpenid已经被注册
+     * 该teaOpenid没有被注册
      */
-    teaOpenid_not_registered(602,"该teaOpenid已经被注册"),
+    teaOpenid_not_registered(602,"该teaOpenid没有被注册"),
 
     /**
      * 该stuOpenid已经被创建
