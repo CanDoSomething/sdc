@@ -48,7 +48,7 @@ public class TeaController {
                                             @RequestParam("teaOpenid") String teaOpenid){
         //后台进行表单验证，若参数不正确抛出异常
         if(bindingResult.hasErrors()){
-            info = "【教师课程填写】 参数不正确 ，"+ teaCourseForm;
+            info = "【教师课程填写】 参数不正确 ，"+ bindingResult.getFieldError().getDefaultMessage();
             log.error(info);
             throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
         }
@@ -58,7 +58,6 @@ public class TeaController {
             log.error(info);
             throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
         }
-
 
         //前台传递过来的参数封装之后插入课程中
         TeaCourse course = teaService.createCourse(teaCourseForm,teaOpenid);

@@ -153,7 +153,7 @@ public class TeaServiceImpl implements TeaService {
         teaCourse.setCourseStatus(CourseEnum.SUB_WAIT.getCode());
         teaCourse.setCourseInteractive(teaCourseForm.getCourseInteractive());
         teaCourse.setCourseLocation(teaCourseForm.getCourseLocation());
-        //teaCourse.setCourseSubject(teaCourseForm.getCourseSubject());
+        teaCourse.setCourseType(teaCourseForm.getCourseType());
 
         TeaCourse save = teaCourseRepository.save(teaCourse);
         if(null == save){

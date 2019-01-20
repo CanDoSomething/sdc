@@ -68,6 +68,7 @@ public class TeaCourse {
     /**
      * 更新时间
      */
+
     private Date updateTime;
     /**
      * 课程类型
