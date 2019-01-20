@@ -53,9 +53,9 @@ public class TeaCourseForm {
      */
     private String courseLocation;
 
-//    /**
-//     * 课程类型
-//     */
-//    @NotEmpty(message = "课程类型必填")
-//    private String courseSubject;
+    /**
+     * 课程类型
+     */
+    @NotEmpty(message = "课程类型必填")
+    private String courseType;
 }
