@@ -9,7 +9,9 @@ import com.zgczx.enums.ResultEnum;
 import com.zgczx.enums.SubCourseEnum;
 import com.zgczx.exception.SdcException;
 import com.zgczx.repository.*;
+import com.zgczx.service.CourseService;
 import com.zgczx.service.StuService;
+import com.zgczx.service.TeaService;
 import com.zgczx.utils.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -19,6 +21,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -46,6 +50,8 @@ public class StuServiceImpl implements StuService {
     private FeedBackRepository feedBackRepository;
     @Autowired
     private StuBaseRepository stuBaseRepository;
+    @Autowired
+    private TeaService teaService;
 
     private  String info = null;
     /**
@@ -378,8 +384,10 @@ public class StuServiceImpl implements StuService {
             log.error(info);
             throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
         }
+
         List<SubDTO> list = new ArrayList<>();
         for (SubCourse subCourse : byStuCode) {
+            teaService.finishCourse(subCourse.getCourseId());
             SubDTO map = modelMapper.map(subCourse, SubDTO.class);
             TeaCourse one = teaCourseRepository.findOne(subCourse.getCourseId());
             if (one==null){
@@ -433,4 +441,5 @@ public class StuServiceImpl implements StuService {
         }
         return list;
     }
+
 }

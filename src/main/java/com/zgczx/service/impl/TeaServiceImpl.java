@@ -279,6 +279,8 @@ public class TeaServiceImpl implements TeaService {
                 throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
             }
             for(TeaCourse course : all){
+                //判断是否结束课程
+                finishCourse(course.getCourseId());
                 rsList.add(modelMapper.map(course,CourseDTO.class));
             }
 
@@ -519,8 +521,8 @@ public class TeaServiceImpl implements TeaService {
             log.error(info);
             throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
         }
-        //修改课程表中课程状态为结束
-        finishCourse(one.getCourseId());
+//        //修改课程表中课程状态为结束
+//        finishCourse(one.getCourseId());
 
         FeedBack proFeedBack = feedBackRepository.findBySubId(subId);
         //限定反馈只能提交一次
