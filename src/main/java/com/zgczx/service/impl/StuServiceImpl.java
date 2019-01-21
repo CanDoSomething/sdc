@@ -64,7 +64,7 @@ public class StuServiceImpl implements StuService {
         Sort sort =new Sort(Sort.Direction.DESC,"courseDate");
         /*设置分页*/
         Pageable pageable = new PageRequest(page, size, sort);
-        Page<TeaCourse> byCourseStatus = teaCourseRepository.findByCourseStatusAndCourseStartTimeIsAfter(CourseEnum.SUB_WAIT.getCode(), new Date(), pageable);
+        Page<TeaCourse> byCourseStatus = teaCourseRepository.findAllCourse( new Date(), pageable);
         /*如果课程不存在，返回预约课程不存在*/
         if (byCourseStatus.getContent().isEmpty()){
             info = "【学生查看所有课程】 没有正在发布的课程";
