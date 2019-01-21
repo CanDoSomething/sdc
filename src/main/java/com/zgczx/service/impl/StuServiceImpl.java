@@ -176,7 +176,7 @@ public class StuServiceImpl implements StuService {
         // 若有，则保持已被预约,若没有，则改为待预约
         Integer subStatus = subCourse.getSubStatus();
         log.info("预约状态subStatus"+subStatus);
-        if(subStatus.equals(SubCourseEnum.SUB_WAIT)){
+        if(subStatus.equals(SubCourseEnum.SUB_WAIT.getCode())){
 
             if(!courseStatus .equals(CourseEnum.SUB_SUCCESS.getCode())){
                 log.info("【学生取消课程】【学生请求状态为预约等待】 课程状态不等于“已被预约”,错误!!!");
