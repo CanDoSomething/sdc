@@ -387,7 +387,24 @@ public class StuServiceImpl implements StuService {
 
         List<SubDTO> list = new ArrayList<>();
         for (SubCourse subCourse : byStuCode) {
-            teaService.finishCourse(subCourse.getCourseId());
+            //判断结束课程
+            TeaCourse teaCourse = teaService.finishCourse(subCourse.getCourseId());
+            if(teaCourse!=null){
+                int subId = subCourseRepository.findByCourseIdAndSubStatus(teaCourse.getCourseId(),
+                        SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode()).get(0).getSubId();
+                if(feedBackRepository.findBySubId(subId)!=null){
+                    continue;
+                }else{
+                    FeedBack feedBack = new FeedBack();
+                    feedBack.setSubId(subId);
+                    feedBackRepository.save(feedBack);
+                }
+
+
+            }
+
+
+
             SubDTO map = modelMapper.map(subCourse, SubDTO.class);
             TeaCourse one = teaCourseRepository.findOne(subCourse.getCourseId());
             if (one==null){

@@ -280,7 +280,20 @@ public class TeaServiceImpl implements TeaService {
             }
             for(TeaCourse course : all){
                 //判断是否结束课程
-                finishCourse(course.getCourseId());
+                TeaCourse teaCourse = finishCourse(course.getCourseId());
+                if(teaCourse != null){
+                    int subId = subCourseRepository.findByCourseIdAndSubStatus(teaCourse.getCourseId(),
+                            SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode()).get(0).getSubId();
+                    if(feedBackRepository.findBySubId(subId)!=null){
+                        continue;
+                    }else{
+                        FeedBack feedBack = new FeedBack();
+
+                        feedBack.setSubId(subId);
+                        feedBackRepository.save(feedBack);
+                    }
+
+                }
                 rsList.add(modelMapper.map(course,CourseDTO.class));
             }
 
