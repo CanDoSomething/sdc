@@ -9,6 +9,7 @@ import com.zgczx.enums.SubCourseEnum;
 import com.zgczx.exception.SdcException;
 import com.zgczx.form.TeaCourseForm;
 import com.zgczx.repository.*;
+import com.zgczx.service.CourseService;
 import com.zgczx.service.PushMessageService;
 import com.zgczx.service.TeaService;
 import lombok.extern.slf4j.Slf4j;
@@ -494,8 +495,8 @@ public class TeaServiceImpl implements TeaService {
             throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
         }
         //通过预约课程信息获取课程信息
-        SubCourse one1 = subCourseRepository.findOne(subId);
-        Integer courseId = one1.getCourseId();
+        SubCourse subCourse = subCourseRepository.findOne(subId);
+        Integer courseId = subCourse.getCourseId();
         TeaBase byteaOpenid = teaBaseRepository.findByTeaOpenid(teaOpenid);
         TeaCourse byTeaCodeAndCourseId = teaCourseRepository.findByTeaCodeAndCourseId(byteaOpenid.getTeaCode(), courseId);
         if(null == byTeaCodeAndCourseId){
@@ -504,9 +505,8 @@ public class TeaServiceImpl implements TeaService {
             throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
         }
 
-        List<SubCourse> list = subCourseRepository.findByCourseIdAndSubStatus(courseId,SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode());
-        SubCourse subCourse = list.get(0);
-        if(null == subCourse){
+        List<SubCourse> subCourseList = subCourseRepository.findByCourseIdAndSubStatus(courseId,SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode());
+        if(subCourseList.size()<1){
             info = "【教师给学生的反馈】 找不到对应的预约课程";
             log.error(info);
             throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
@@ -523,20 +523,26 @@ public class TeaServiceImpl implements TeaService {
         finishCourse(one.getCourseId());
 
         FeedBack proFeedBack = feedBackRepository.findBySubId(subId);
-        //若反馈没有被创建，则创建
-        if(null == proFeedBack){
-            proFeedBack = new FeedBack();
-        }
         //限定反馈只能提交一次
-        if(proFeedBack.getTeaScore() != null  && proFeedBack.getTeaFeedback() != null){
+        if(proFeedBack!=null && proFeedBack.getTeaScore() != null  && proFeedBack.getTeaFeedback() != null){
             info = "【教师给学生的反馈】 反馈只能提交一次";
             log.error(info);
             throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,info);
         }
-        proFeedBack.setSubId(subId);
-        proFeedBack.setTeaFeedback(feedBack);
-        proFeedBack.setTeaScore(score);
-        return feedBackRepository.save(proFeedBack);
+
+        //若反馈没有被创建，则创建
+        if(null == proFeedBack){
+            proFeedBack = new FeedBack();
+            proFeedBack.setSubId(subId);
+            proFeedBack.setTeaFeedback(feedBack);
+            proFeedBack.setTeaScore(score);
+            return feedBackRepository.save(proFeedBack);
+        }else{
+            proFeedBack.setTeaFeedback(feedBack);
+            proFeedBack.setTeaScore(score);
+            return feedBackRepository.save(proFeedBack);
+        }
+
     }
 
     /**
@@ -609,7 +615,7 @@ public class TeaServiceImpl implements TeaService {
         }
         Integer vis = one.getCourseStatus();
         //当前课程只有是处于互动状态或者线下互动才能使用此方式结束课程
-        if(vis.equals(CourseEnum.COURSE_INTERACT.getCode()) || one.getCourseInteractive().equals(0) ){
+        if(vis.equals(CourseEnum.COURSE_INTERACT.getCode()) || one.getCourseInteractive().equals(CourseService.COURSEINTERACTIVE_OFFLINE) ){
             one.setCourseStatus(CourseEnum.COURSE_FINISH.getCode());
             one.setUpdateTime(new Date());
             TeaCourse save = teaCourseRepository.save(one);
