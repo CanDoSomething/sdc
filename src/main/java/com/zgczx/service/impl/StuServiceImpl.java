@@ -64,7 +64,7 @@ public class StuServiceImpl implements StuService {
         Sort sort =new Sort(Sort.Direction.DESC,"courseDate");
         /*设置分页*/
         Pageable pageable = new PageRequest(page, size, sort);
-        Page<TeaCourse> byCourseStatus = teaCourseRepository.findByCourseStatusAndCourseStartTimeIsAfter(CourseEnum.SUB_WAIT.getCode(), new Date(), pageable);
+        Page<TeaCourse> byCourseStatus = teaCourseRepository.findAllCourse( new Date(), pageable);
         /*如果课程不存在，返回预约课程不存在*/
         if (byCourseStatus.getContent().isEmpty()){
             info = "【学生查看所有课程】 没有正在发布的课程";
@@ -175,9 +175,10 @@ public class StuServiceImpl implements StuService {
         // 2.若预约状态为提交预约请求，则将状态改为学生取消预约；检查是否包含其他提交预约请求，
         // 若有，则保持已被预约,若没有，则改为待预约
         Integer subStatus = subCourse.getSubStatus();
-        if(subStatus.equals(SubCourseEnum.SUB_WAIT)){
+        log.info("预约状态subStatus"+subStatus);
+        if(subStatus.equals(SubCourseEnum.SUB_WAIT.getCode())){
 
-            if(!courseStatus .equals(CourseEnum.SUB_SUCCESS)){
+            if(!courseStatus .equals(CourseEnum.SUB_SUCCESS.getCode())){
                 log.info("【学生取消课程】【学生请求状态为预约等待】 课程状态不等于“已被预约”,错误!!!");
                 teaCourse.setCourseStatus(CourseEnum.SUB_SUCCESS.getCode());
                 teaCourseRepository.save(teaCourse);
@@ -186,7 +187,7 @@ public class StuServiceImpl implements StuService {
             // 判断是否包含其他预约请求
             int numSUB_WAIT = 0;
             for(SubCourse subCourse1 : subCourseList){
-                if(subCourse1.getSubStatus().equals(SubCourseEnum.SUB_WAIT)){
+                if(subCourse1.getSubStatus().equals(SubCourseEnum.SUB_WAIT.getCode())){
                     numSUB_WAIT++;
                 }
             }
@@ -201,18 +202,18 @@ public class StuServiceImpl implements StuService {
             subCourse.setSubStatus(SubCourseEnum.STU_CANCEL_SUB.getCode());
             return subCourseRepository.save(subCourse);
 
-        }else if(subStatus.equals(SubCourseEnum.SUB_CANDIDATE_FAILED)){
+        }else if(subStatus.equals(SubCourseEnum.SUB_CANDIDATE_FAILED.getCode())){
             // 3.若预约状态为预约失败，则直接将状态修改为学生取消预约
             log.info("【学生取消课程】【学生请求状态为预约失败】");
             subCourse.setSubStatus(SubCourseEnum.STU_CANCEL_SUB.getCode());
             return subCourseRepository.save(subCourse);
 
-        }else if(subStatus.equals(SubCourseEnum.SUB_CANDIDATE_SUCCESS)){
+        }else if(subStatus.equals(SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode())){
             // 4.若预约状态为预约成功，则将状态改为学生取消预约;检查该课程是否包含其他预约失败请求，
             // 若有，则把其余预约失败的请求，修改为提交预约请求，课程改为已被预约;若没有，将课程改为待预约
             int numSUB_CANDIDATE_FAILED = 0;
             for(SubCourse subCourse1 : subCourseList){
-                if(subCourse1.getSubStatus().equals(SubCourseEnum.SUB_WAIT)){
+                if(subCourse1.getSubStatus().equals(SubCourseEnum.SUB_WAIT.getCode())){
                     numSUB_CANDIDATE_FAILED++;
                 }
             }
@@ -237,7 +238,7 @@ public class StuServiceImpl implements StuService {
             return subCourseRepository.save(subCourse);
         }else{
             log.info("【学生取消课程】【学生请求状态为非法】");
-            return null;
+            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION.getCode(),ResultEnum.INFO_NOTFOUND_EXCEPTION.getMessage());
         }
     }
 
@@ -329,7 +330,7 @@ public class StuServiceImpl implements StuService {
         }
         /*根据预约课程id来查找用户是否提交反馈*/
         FeedBack bySubId = feedBackRepository.findBySubId(subId);
-        if (bySubId!=null && !bySubId.getStuFeedback().isEmpty()){
+        if (bySubId!=null && bySubId.getStuFeedback() != null){
             info = "学生已经反馈成功，无需多次反馈";
             log.error(info);
             throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,info);
