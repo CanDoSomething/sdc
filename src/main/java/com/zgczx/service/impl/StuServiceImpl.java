@@ -419,7 +419,7 @@ public class StuServiceImpl implements StuService {
             }
             map.setTeaName(one1.getTeaName());
             map.setTeaCourse(one);
-            FeedBack feedBack = feedBackRepository.findOne(one.getCourseId());
+            FeedBack feedBack = feedBackRepository.findBySubId(subCourse.getSubId());
             map.setFeedBack(feedBack);
             list.add(map);
         }
