@@ -9,7 +9,6 @@ import com.zgczx.enums.ResultEnum;
 import com.zgczx.enums.SubCourseEnum;
 import com.zgczx.exception.SdcException;
 import com.zgczx.repository.*;
-import com.zgczx.service.CourseService;
 import com.zgczx.service.StuService;
 import com.zgczx.service.TeaService;
 import com.zgczx.utils.DateUtil;
@@ -21,7 +20,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -389,9 +387,19 @@ public class StuServiceImpl implements StuService {
         for (SubCourse subCourse : byStuCode) {
             //判断结束课程
             TeaCourse teaCourse = teaService.finishCourse(subCourse.getCourseId());
+
+            Integer courseStatus = teaCourse.getCourseStatus();
+            Date now = new Date();
+            // 判断是否变为正在进行时
+            if(courseStatus.equals(CourseEnum.SUB_SUCCESS.getCode()) && teaCourse.getCourseStartTime().before(now)){
+                teaCourse.setCourseStatus(CourseEnum.COURSE_INTERACT.getCode());
+                teaCourseRepository.save(teaCourse);
+            }
+
             if(teaCourse!=null){
                 int subId = subCourseRepository.findByCourseIdAndSubStatus(teaCourse.getCourseId(),
                         SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode()).get(0).getSubId();
+
                 if(feedBackRepository.findBySubId(subId)!=null){
                     continue;
                 }else{
