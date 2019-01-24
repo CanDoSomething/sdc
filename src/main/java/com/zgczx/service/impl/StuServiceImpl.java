@@ -237,8 +237,9 @@ public class StuServiceImpl implements StuService {
             subCourse.setSubStatus(SubCourseEnum.STU_CANCEL_SUB.getCode());
             return subCourseRepository.save(subCourse);
         }else{
-            log.info("【学生取消课程】【学生请求状态为非法】");
-            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION.getCode(),ResultEnum.INFO_NOTFOUND_EXCEPTION.getMessage());
+            info = "【学生取消课程】学生请求状态为非法";
+            log.info(info);
+            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
         }
     }
 
