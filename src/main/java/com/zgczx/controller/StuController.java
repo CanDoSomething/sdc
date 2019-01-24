@@ -8,7 +8,6 @@ import com.zgczx.dto.SubDTO;
 import com.zgczx.service.impl.StuServiceImpl;
 import com.zgczx.utils.ResultVOUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,7 +19,7 @@ import java.util.List;
  * @date 2018/12/11 10:29
  */
 @RequestMapping("/stu")
-@Controller
+@RestController
 public class StuController {
     @Autowired
     private StuServiceImpl stuService;
@@ -33,7 +32,6 @@ public class StuController {
      * @date 2018/12/16 18:41
      */
     @GetMapping(value = "/findAllCourse")
-    @ResponseBody
     public ResultVO findAllCourse(@RequestParam(value = "page", defaultValue = "1") Integer page,
                               @RequestParam(value = "size", defaultValue = "10") Integer size){
         /*去stuService中查找所有课程信息*/
@@ -49,7 +47,6 @@ public class StuController {
      * @return ResultVO
      */
     @GetMapping(value = "/order")
-    @ResponseBody
     public ResultVO getOrder(@RequestParam(value = "stuOpenid")String stuOpenid,
                           @RequestParam(value = "courserId")Integer courserId){
         SubCourse order = stuService.order(stuOpenid, courserId);
@@ -64,7 +61,6 @@ public class StuController {
      * @param stuOpenid 学生微信id
      */
     @PostMapping(value = "/cancelOrder")
-    @ResponseBody
     public ResultVO cancelOrder(@RequestParam(value = "cause")String cause,
                                  @RequestParam(value = "stuOpenid")String stuOpenid,
                                  @RequestParam(value = "courserId")Integer courserId){
@@ -81,7 +77,6 @@ public class StuController {
      * @param subId 预约课程id
      */
     @PostMapping(value = "/feedback")
-    @ResponseBody
     public ResultVO feedback(@RequestParam(value = "courserId")Integer courserId,
                              @RequestParam(value = "message")String message,
                              @RequestParam(value = "score")Integer score,
@@ -98,7 +93,6 @@ public class StuController {
      * @param stuOpenid 学生微信id
      */
     @GetMapping(value = "/lookHistory")
-    @ResponseBody
     public ResultVO lookHistory(@RequestParam(value = "page", defaultValue = "1") Integer page,
                                 @RequestParam(value = "size", defaultValue = "10") Integer size,
                                 @RequestParam(value = "stuOpenid") String stuOpenid){
