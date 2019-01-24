@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * @Author: Dqd
  * @Date: 2018/12/12 14:29
- * @Description:教师模块接口
+ * @Description: 教师模块接口
  */
 
 public interface TeaService {
@@ -27,7 +27,6 @@ public interface TeaService {
     TeaCourse createCourse(TeaCourseForm teaCourseForm,String teaOpenid);
 
     /**
-     *
      * 取消课程
      *
      * @param courseId 课程编号
@@ -38,7 +37,6 @@ public interface TeaService {
     TeaCourse cancelCourse(Integer courseId,String teaOpenid,String cancelReason);
 
     /**
-     *
      * 查看教师历史课程
      *
      * @param teaCode 教师编号
@@ -49,7 +47,6 @@ public interface TeaService {
     List<CourseDTO> findTeaHistoryCourse(String teaCode, int page, int pageSize);
 
     /**
-     *
      * 查看课程预约候选人
      *
      * @param courserId 课程编号
@@ -61,7 +58,6 @@ public interface TeaService {
     List<StuBaseDTO> findCandidateByCourseId(Integer courserId, String teaOpenid, int page, int pageSize);
 
     /**
-     *
      * 教师选择成功预约候选人
      *
      * @param stuCode 学生编号
@@ -82,7 +78,6 @@ public interface TeaService {
     FeedBack saveFeedBack(Integer subId,String teaOpenid,String teaFeedBack,Integer score);
 
     /**
-     *
      * 教师修改课程信息
      *
      * @param teaCourse 课程信息
@@ -98,7 +93,6 @@ public interface TeaService {
     TeaCourse findTeaCourseById(Integer courseId);
 
     /**
-     *
      * 教师结束课程
      *
      * @param courseId 课程编号

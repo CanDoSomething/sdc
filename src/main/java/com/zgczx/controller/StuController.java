@@ -14,9 +14,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * @Author: 陈志恒
- * @Date: 2018/12/11 10:29
- * @Description:学生控制器界面
+ * 学生控制器界面
+ *
+ * @author  陈志恒
+ * @date 2018/12/11 10:29
  */
 @RequestMapping("/stu")
 @Controller
@@ -24,13 +25,12 @@ public class StuController {
     @Autowired
     private StuServiceImpl stuService;
     /**
-     *
      * 功能描述: 查找所有课程信息
      *
-     * @param: page分页，size页面大小
-     * @return:
-     * @author: 陈志恒
-     * @date: 2018/12/16 18:41
+     * @param  page 分页，
+     * @param size 页面大小
+     * @author 陈志恒
+     * @date 2018/12/16 18:41
      */
     @GetMapping(value = "/findAllCourse")
     @ResponseBody
@@ -42,7 +42,6 @@ public class StuController {
         return ResultVOUtil.success(allCourse);
     }
     /**
-     *
      * 功能描述: 预约课程
      *
      * @param stuOpenid 学生微信id
@@ -58,15 +57,11 @@ public class StuController {
         return ResultVOUtil.success(order) ;
     }
     /**
-     *
      * 功能描述:取消预约课程
      *
      * @param cause 取消预约原因
      * @param courserId 课程id
      * @param stuOpenid 学生微信id
-     * @return:
-     * @author: 陈志恒
-     * @date: 2018/12/16 18:43
      */
     @PostMapping(value = "/cancelOrder")
     @ResponseBody
@@ -78,16 +73,12 @@ public class StuController {
 
     }
     /**
-     *
      * 功能描述:学生反馈接口
      *
      * @param courserId 课程id
      * @param message 反馈信息
      * @param score 学生向老师打分
      * @param subId 预约课程id
-     * @return:
-     * @author: 陈志恒
-     * @date: 2018/12/16 18:56
      */
     @PostMapping(value = "/feedback")
     @ResponseBody
@@ -100,15 +91,11 @@ public class StuController {
 
     }
     /**
-     *
      * 功能描述: 显示历史课程信息
      *
      * @param page 页面数
      * @param size 页面大小
      * @param stuOpenid 学生微信id
-     * @return:
-     * @author: 陈志恒
-     * @date: 2018/12/16 20:00
      */
     @GetMapping(value = "/lookHistory")
     @ResponseBody

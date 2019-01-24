@@ -56,6 +56,6 @@ public class TeaCourseForm {
     /**
      * 课程类型
      */
-    @NotEmpty(message = "课程类型必填")
-    private String courseSubject;
+    @NotEmpty(message = "课程类型必填，请在‘专业-心理-志愿-其他’中四选一")
+    private String courseType;
 }

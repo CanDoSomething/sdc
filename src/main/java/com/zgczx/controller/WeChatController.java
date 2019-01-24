@@ -18,14 +18,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.net.URLEncoder;
 
-@Controller
-@RequestMapping("/wechat")
-@Slf4j
+
 /**
  * 微信验证控制器
  *
  * @author Jason
  */
+@Controller
+@RequestMapping("/wechat")
+@Slf4j
 public class WeChatController {
 
 
@@ -116,6 +117,5 @@ public class WeChatController {
                 .concat("/"+returnUrl)
                 .concat("?openid="+openid)
                 .concat("&path="+path);
-
     }
 }

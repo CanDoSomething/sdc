@@ -10,6 +10,8 @@ import javax.persistence.Id;
 import java.util.Date;
 
 /**
+ * 预约关系表
+ *
  * @author jason
  */
 @Data

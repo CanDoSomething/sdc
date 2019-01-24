@@ -18,7 +18,7 @@ public interface SubCourseRepository extends JpaRepository<SubCourse,Integer> {
      * @return
      **/
 
-    public List<SubCourse> findByStuCode(String stuCode);
+     List<SubCourse> findByStuCode(String stuCode);
     /**
      *查找到学生对应的所有课程信息
      *
@@ -30,6 +30,16 @@ public interface SubCourseRepository extends JpaRepository<SubCourse,Integer> {
      **/
     Page<SubCourse> findByStuCode(String stuCode, Pageable pageable);
 
+
+    /**
+     * 找到学生对某节课的预约请求
+     *
+     * @param courseId 课程id
+     * @param stuCode 学生id
+     * @return 选课关系
+     */
+    SubCourse findByCourseIdAndStuCode(Integer courseId,String stuCode);
+
     /**
      *
      * 通过学生编号，课程编号，预约状态确定唯一课程记录
@@ -39,7 +49,7 @@ public interface SubCourseRepository extends JpaRepository<SubCourse,Integer> {
      * @param subStatus 预约状态
      * @return 预约课程
      */
-    public SubCourse findByStuCodeAndCourseIdAndSubStatus(String stuCode,Integer courseId,Integer subStatus);
+     SubCourse findByStuCodeAndCourseIdAndSubStatus(String stuCode,Integer courseId,Integer subStatus);
     /**
      *找到预约等待或预约成功状态的预约信息
      *
@@ -56,15 +66,15 @@ public interface SubCourseRepository extends JpaRepository<SubCourse,Integer> {
 
     /**
      *
-     * 查找当前课程的所有候选人的预约状态为0（提交预约请求）的学生
+     * 查找当前课程的所有候选人(选课请求),包括提交预约请求 and 预约成功 and 预约失败
      *
      * @param courseId 课程编号
      * @param pageable 分页设置
-     * @return 所有候选人列表
+     * @return List<SubCourse>
      */
-    //@Query("select stuBase from com.zgczx.dataobject.StuBase stuBase,SubCourse subCourse where subCourse.courseId = ?1 and subCourse.stuCode = stuBase.stuCode order by stuBase.creditScore desc ")
-    //List<SubCourse> getAllCandidate(Integer courseId, Pageable pageable);
     List<SubCourse> findByCourseId(Integer courseId,Pageable pageable);
 
-    //StuBase findByCourseIdAndStuCodeAndAndSubStatusNot(Integer courseId,String stuCode,Integer subStatus);
+
+
+
 }

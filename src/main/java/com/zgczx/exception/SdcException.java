@@ -3,7 +3,7 @@ package com.zgczx.exception;
 
 import com.zgczx.enums.ResultEnum;
 import com.zgczx.enums.UserEnum;
-import lombok.Data;
+import lombok.Getter;
 
 
 /**
@@ -11,7 +11,7 @@ import lombok.Data;
  *
  * @author Dqd
  */
-@Data
+@Getter
 public class SdcException extends RuntimeException {
 
     public Integer code;

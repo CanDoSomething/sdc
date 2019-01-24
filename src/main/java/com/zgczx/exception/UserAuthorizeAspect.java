@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
  * @ClassName: Jason
  * @Author: Administrator
  * @Date: 2018/12/13 14:13
- * @Description:
+ * @Description: 用户登录拦截
  */
 @Aspect
 @Component

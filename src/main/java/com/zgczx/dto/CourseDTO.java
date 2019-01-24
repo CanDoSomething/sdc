@@ -7,9 +7,10 @@ import lombok.Data;
 import lombok.ToString;
 
 /**
- * @Auther: 陈志恒
+ * 课程信息DTO
+ *
+ * @Author: 陈志恒
  * @Date: 2018/12/10 23:42
- * @Description:课程信息
  */
 @Data
 @ToString

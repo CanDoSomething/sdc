@@ -48,7 +48,7 @@ public class TeaController {
                                             @RequestParam("teaOpenid") String teaOpenid){
         //后台进行表单验证，若参数不正确抛出异常
         if(bindingResult.hasErrors()){
-            info = "【教师课程填写】 参数不正确 ，"+ teaCourseForm;
+            info = "【教师课程填写】 参数不正确 ，"+ bindingResult.getFieldError().getDefaultMessage();
             log.error(info);
             throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
         }
@@ -59,13 +59,13 @@ public class TeaController {
             throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
         }
 
-
         //前台传递过来的参数封装之后插入课程中
         TeaCourse course = teaService.createCourse(teaCourseForm,teaOpenid);
         return ResultVOUtil.success(course);
     }
 
     /**
+     * 查找课程候选人
      *
      * @param courserId 课程编号
      * @param teaOpenid 教师微信编号
@@ -76,13 +76,22 @@ public class TeaController {
     @GetMapping("/findCandidatesByCourseId")
     public ResultVO<List<StuBaseDTO>> findCandidatesByCourseId(@RequestParam(value = "courseId") Integer courserId,
                                                             @RequestParam(value = "teaOpenid") String teaOpenid,
-                                                            @RequestParam(value = "page", defaultValue = "0") int page,
+                                                            @RequestParam(value = "page", defaultValue = "1") int page,
                                                             @RequestParam(value = "pageSize", defaultValue = "10") int pageSize){
-        List<StuBaseDTO> list = teaService.findCandidateByCourseId(courserId,teaOpenid, page, pageSize);
+
+        if(courserId == null){
+            info = "【教师查看预约候选人】 该课程编号为空";
+            log.error(info);
+            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
+        }
+
+
+        List<StuBaseDTO> list = teaService.findCandidateByCourseId(courserId,teaOpenid, page - 1, pageSize);
         return ResultVOUtil.success(list);
     }
 
     /**
+     * 查看教师历史
      *
      * @param teaOpenid 教师编号
      * @param page 当前页数
@@ -99,6 +108,7 @@ public class TeaController {
     }
 
     /**
+     * 教师取消课程
      *
      * @param courseId 课程编号
      * @return 取消的课程状态
@@ -115,6 +125,7 @@ public class TeaController {
     }
 
     /**
+     * 确认候选人
      *
      * @param courseId 课程编号
      * @param stuOpenid 学生微信编号
@@ -128,6 +139,7 @@ public class TeaController {
     }
 
     /**
+     * 教师创建反馈
      *
      * @param subId 预约课程编号
      * @param teaOpenid 教师微信编号
@@ -164,6 +176,7 @@ public class TeaController {
     }
 
     /**
+     * 查找单个课程
      *
      * @param courseId 课程编号
      * @return 通过课程编号查找到的课程
@@ -175,6 +188,7 @@ public class TeaController {
     }
 
     /**
+     * 结束课程
      *
      * @param courseId 课程编号
      * @return 课程状态为结束的课程

@@ -12,6 +12,8 @@ import java.util.Date;
 
 
 /**
+ * 课程信息表
+ *
  * @author  Jason
  */
 @Entity
@@ -66,10 +68,11 @@ public class TeaCourse {
     /**
      * 更新时间
      */
+
     private Date updateTime;
     /**
      * 课程类型
      */
-    private String courseSubject;
+    private String courseType;
 
 }

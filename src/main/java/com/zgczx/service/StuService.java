@@ -9,6 +9,8 @@ import java.util.List;
 
 
 /**
+ *  学生接口
+ *
  * @author 陈志恒
  */
 public interface StuService {
@@ -18,22 +20,16 @@ public interface StuService {
      *
      * @param page 页面数
      * @param size size页面大小
-     * @return:
-     * @auther: 陈志恒
-     * @date: 2018/12/16 17:54
      */
-    public List<CourseDTO> findAllCourse(Integer page,Integer size);
+     List<CourseDTO> findAllCourse(Integer page,Integer size);
     /**
      *
      * 功能描述: 提交预约请求
      *
      * @param stuOpenid 学生微信id
      * @param courserId  课程id
-     * @return:
-     * @auther: 陈志恒
-     * @date: 2018/12/16 17:57
      */
-    public SubCourse order(String stuOpenid, Integer courserId);
+     SubCourse order(String stuOpenid, Integer courserId);
     /**
      *
      * 功能描述:取消预约请求
@@ -41,11 +37,8 @@ public interface StuService {
      * @param cause 取消原因
      * @param courserId 课程id
      * @param stuOpenid 学生微信id
-     * @return:
-     * @auther: 陈志恒
-     * @date: 2018/12/16 18:06
      */
-    public SubCourse cancelOrder(String cause,String stuOpenid, Integer courserId);
+     SubCourse cancelOrder(String cause,String stuOpenid, Integer courserId);
     /**
      *
      * 功能描述: 提交反馈
@@ -54,11 +47,9 @@ public interface StuService {
      * @param message 代表反馈内容
      * @param score 代表反馈评分
      * @param subId 预约课程id
-     * @return:
-     * @auther: 陈志恒
-     * @date: 2018/12/16 19:24
      */
-    public FeedBack feedBack(Integer courseId, String message, Integer score,Integer subId);
+     FeedBack feedBack(Integer courseId, String message, Integer score,Integer subId);
+
     /**
      *查询历史记录课程
      *
@@ -69,7 +60,7 @@ public interface StuService {
      * @param stuOpenid 学生微信id
      * @return List<CourseDTO> 课程封装对象的集合
      **/
-    public List<SubDTO> lookHistory(Integer page, Integer size, String stuOpenid);
+     List<SubDTO> lookHistory(Integer page, Integer size, String stuOpenid);
 
 
 

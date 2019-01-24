@@ -8,6 +8,8 @@ import javax.persistence.Id;
 import java.util.Date;
 
 /**
+ * 教师基本信息表
+ *
  * @author  jason
  */
 

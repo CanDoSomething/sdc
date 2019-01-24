@@ -6,6 +6,7 @@ import com.zgczx.form.StuInfoForm;
 import com.zgczx.form.TeaInfoForm;
 
 /**
+ * 用户接口
  * @author Jason
  */
 public interface UserService {
@@ -57,7 +58,7 @@ public interface UserService {
      *
      * @param stuOpenid    唯一微信凭证
      * @param stuInfoForm   学生注册表单
-     * @return
+     * @return 学生基本信息
      */
     StuBase registerStuBaseByOpenid(String stuOpenid, StuInfoForm stuInfoForm);
 

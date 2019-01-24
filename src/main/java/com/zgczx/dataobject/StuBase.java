@@ -8,6 +8,8 @@ import javax.persistence.Id;
 import java.util.Date;
 
 /**
+ * 学生基本信息表
+ *
  * @author jason
  */
 @Entity
@@ -43,7 +45,6 @@ public class StuBase {
     /**
      * 学生密码
      */
-
     private String stuPasswd;
     /**
      * 信用评分
