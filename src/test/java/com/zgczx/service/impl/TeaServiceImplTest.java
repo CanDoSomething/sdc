@@ -1,10 +1,10 @@
 package com.zgczx.service.impl;
 
 import com.zgczx.dataobject.FeedBack;
-import com.zgczx.dataobject.StuBase;
 import com.zgczx.dataobject.SubCourse;
 import com.zgczx.dataobject.TeaCourse;
 import com.zgczx.dto.CourseDTO;
+import com.zgczx.dto.StuBaseDTO;
 import com.zgczx.form.TeaCourseForm;
 import org.junit.Assert;
 import org.junit.Test;
@@ -60,7 +60,7 @@ public class TeaServiceImplTest{
     public void findCandidateByCourseId(){
         Integer courseId = new Integer(17);
         //Integer courseId = new Integer(115);
-        List<StuBase> list =  teaService.findCandidateByCourseId(courseId,"openidjiaoshi",0,10);
+        List<StuBaseDTO> list =  teaService.findCandidateByCourseId(courseId,"openidjiaoshi",0,10);
         System.out.println("所有预约的学生"+list);
         Assert.assertNotNull(list);
     }
