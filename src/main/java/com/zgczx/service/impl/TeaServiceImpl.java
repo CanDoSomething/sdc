@@ -279,6 +279,21 @@ public class TeaServiceImpl implements TeaService {
                 throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
             }
             for(TeaCourse course : all){
+                //判断是否结束课程
+                TeaCourse teaCourse = finishCourse(course.getCourseId());
+                if(teaCourse != null){
+                    int subId = subCourseRepository.findByCourseIdAndSubStatus(teaCourse.getCourseId(),
+                            SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode()).get(0).getSubId();
+                    if(feedBackRepository.findBySubId(subId)!=null){
+                        continue;
+                    }else{
+                        FeedBack feedBack = new FeedBack();
+
+                        feedBack.setSubId(subId);
+                        feedBackRepository.save(feedBack);
+                    }
+
+                }
                 rsList.add(modelMapper.map(course,CourseDTO.class));
             }
 
@@ -519,8 +534,8 @@ public class TeaServiceImpl implements TeaService {
             log.error(info);
             throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
         }
-        //修改课程表中课程状态为结束
-        finishCourse(one.getCourseId());
+//        //修改课程表中课程状态为结束
+//        finishCourse(one.getCourseId());
 
         FeedBack proFeedBack = feedBackRepository.findBySubId(subId);
         //限定反馈只能提交一次
@@ -614,6 +629,14 @@ public class TeaServiceImpl implements TeaService {
             throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
         }
         Integer vis = one.getCourseStatus();
+
+        Date now = new Date();
+        // 判断是否变为正在进行时
+        if(vis.equals(CourseEnum.SUB_SUCCESS.getCode()) && one.getCourseStartTime().before(now)){
+            one.setCourseStatus(CourseEnum.COURSE_INTERACT.getCode());
+            teaCourseRepository.save(one);
+        }
+
         //当前课程只有是处于互动状态或者线下互动才能使用此方式结束课程
         if(vis.equals(CourseEnum.COURSE_INTERACT.getCode()) || one.getCourseInteractive().equals(CourseService.COURSEINTERACTIVE_OFFLINE) ){
             one.setCourseStatus(CourseEnum.COURSE_FINISH.getCode());
@@ -625,10 +648,8 @@ public class TeaServiceImpl implements TeaService {
                 throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,info);
             }
             return save;
-        } else {
-            info = "【结束课程】 课程状态不正确";
-            log.error(info);
-            throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,info);
+        }else{
+            return null;
         }
     }
 }

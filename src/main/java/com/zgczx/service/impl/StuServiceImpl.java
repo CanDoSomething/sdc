@@ -10,6 +10,7 @@ import com.zgczx.enums.SubCourseEnum;
 import com.zgczx.exception.SdcException;
 import com.zgczx.repository.*;
 import com.zgczx.service.StuService;
+import com.zgczx.service.TeaService;
 import com.zgczx.utils.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -46,6 +48,8 @@ public class StuServiceImpl implements StuService {
     private FeedBackRepository feedBackRepository;
     @Autowired
     private StuBaseRepository stuBaseRepository;
+    @Autowired
+    private TeaService teaService;
 
     private  String info = null;
     /**
@@ -64,7 +68,7 @@ public class StuServiceImpl implements StuService {
         Sort sort =new Sort(Sort.Direction.DESC,"courseDate");
         /*设置分页*/
         Pageable pageable = new PageRequest(page, size, sort);
-        Page<TeaCourse> byCourseStatus = teaCourseRepository.findByCourseStatusAndCourseStartTimeIsAfter(CourseEnum.SUB_WAIT.getCode(), new Date(), pageable);
+        Page<TeaCourse> byCourseStatus = teaCourseRepository.findAllCourse( new Date(), pageable);
         /*如果课程不存在，返回预约课程不存在*/
         if (byCourseStatus.getContent().isEmpty()){
             info = "【学生查看所有课程】 没有正在发布的课程";
@@ -176,7 +180,7 @@ public class StuServiceImpl implements StuService {
         // 若有，则保持已被预约,若没有，则改为待预约
         Integer subStatus = subCourse.getSubStatus();
         log.info("预约状态subStatus"+subStatus);
-        if(subStatus.equals(SubCourseEnum.SUB_WAIT)){
+        if(subStatus.equals(SubCourseEnum.SUB_WAIT.getCode())){
 
             if(!courseStatus .equals(CourseEnum.SUB_SUCCESS.getCode())){
                 log.info("【学生取消课程】【学生请求状态为预约等待】 课程状态不等于“已被预约”,错误!!!");
@@ -379,8 +383,28 @@ public class StuServiceImpl implements StuService {
             log.error(info);
             throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
         }
+
         List<SubDTO> list = new ArrayList<>();
         for (SubCourse subCourse : byStuCode) {
+            TeaCourse teaCourse = teaService.finishCourse(subCourse.getCourseId());
+
+            if(teaCourse!=null){
+                int subId = subCourseRepository.findByCourseIdAndSubStatus(teaCourse.getCourseId(),
+                        SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode()).get(0).getSubId();
+
+                if(feedBackRepository.findBySubId(subId)!=null){
+                    continue;
+                }else{
+                    FeedBack feedBack = new FeedBack();
+                    feedBack.setSubId(subId);
+                    feedBackRepository.save(feedBack);
+                }
+
+
+            }
+
+
+
             SubDTO map = modelMapper.map(subCourse, SubDTO.class);
             TeaCourse one = teaCourseRepository.findOne(subCourse.getCourseId());
             if (one==null){
@@ -396,7 +420,7 @@ public class StuServiceImpl implements StuService {
             }
             map.setTeaName(one1.getTeaName());
             map.setTeaCourse(one);
-            FeedBack feedBack = feedBackRepository.findOne(one.getCourseId());
+            FeedBack feedBack = feedBackRepository.findBySubId(subCourse.getSubId());
             map.setFeedBack(feedBack);
             list.add(map);
         }
@@ -434,4 +458,5 @@ public class StuServiceImpl implements StuService {
         }
         return list;
     }
+
 }
