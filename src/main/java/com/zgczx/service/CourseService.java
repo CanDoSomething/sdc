@@ -25,14 +25,27 @@ public interface CourseService {
     OnlineCourse getOnlineCourseGroupId(Integer courseId);
 
     /**
-     * 判断useropenid是否是课程的参与者
-     * @param useropenid 用户的唯一凭证
+     * 判断openid是否是课程的参与者
+     * @param openid 用户的唯一凭证
      * @param courseId 课程编号
      * @return 是否
      */
-    Boolean onCourse(String useropenid,Integer courseId);
+    Boolean onCourse(String openid,Integer courseId);
 
 
+    /**
+     * 返回课程结束的倒计时，单位为秒
+     * @param courseId  课程编号
+     * @return 距离课程结束的倒计时
+     */
+    String getCountDown(Integer courseId);
+
+    /**
+     * 判断课程是否结束
+     * @param courseId 课程编号
+     * @return 是否
+     */
+    Boolean onCourseEnd(Integer courseId);
 
 
 }

@@ -24,11 +24,11 @@ public class CourseController {
     private CourseService courseService;
 
     @GetMapping("getOnlineCourseGroupId")
-    public ResultVO getOnlineCourseGroupId(@RequestParam(value = "useropenid")String useropenid,
+    public ResultVO getOnlineCourseGroupId(@RequestParam(value = "openid")String openid,
                                            @RequestParam(value = "courseId")Integer courseId){
 
-        //1.判断该useropenid是否为该课程的参与者
-        Boolean onCourse = courseService.onCourse(useropenid,courseId);
+        //1.判断该openid是否为该课程的参与者
+        Boolean onCourse = courseService.onCourse(openid,courseId);
 
         if(onCourse.equals(false)){
             throw new SdcException(ResultEnum.PARAM_EXCEPTION,"该user不是该课程的参与者");
@@ -40,5 +40,21 @@ public class CourseController {
         return ResultVOUtil.success(onlineCourse.getGroupId());
     }
 
+    @GetMapping("getCountDown")
+    public ResultVO getCountDown(@RequestParam(value = "courseId")Integer courseId){
 
+        //1.返回课程结束的倒计时
+        String countDown = courseService.getCountDown(courseId);
+
+        return  ResultVOUtil.success(countDown);
+    }
+
+    @GetMapping("onCourseEnd")
+    public ResultVO onCourseEnd(@RequestParam(value = "courseId")Integer courseId){
+
+        //2.返回课程结束的倒计时
+        Boolean onCourseEnd = courseService.onCourseEnd(courseId);
+
+        return  ResultVOUtil.success(onCourseEnd);
+    }
 }
