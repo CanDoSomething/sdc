@@ -638,7 +638,8 @@ public class TeaServiceImpl implements TeaService {
         }
 
         //当前课程只有是处于互动状态或者线下互动才能使用此方式结束课程
-        if(vis.equals(CourseEnum.COURSE_INTERACT.getCode()) || one.getCourseInteractive().equals(CourseService.COURSEINTERACTIVE_OFFLINE) ){
+        if(vis.equals(CourseEnum.COURSE_INTERACT.getCode()) || one.getCourseInteractive().equals(CourseService.
+                COURSEINTERACTIVE_OFFLINE) ){
             one.setCourseStatus(CourseEnum.COURSE_FINISH.getCode());
             one.setUpdateTime(new Date());
             TeaCourse save = teaCourseRepository.save(one);

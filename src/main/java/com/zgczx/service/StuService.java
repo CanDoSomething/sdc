@@ -47,6 +47,7 @@ public interface StuService {
      * @param message 代表反馈内容
      * @param score 代表反馈评分
      * @param subId 预约课程id
+     * @return 提交的反馈信息
      */
      FeedBack feedBack(Integer courseId, String message, Integer score,Integer subId);
 
