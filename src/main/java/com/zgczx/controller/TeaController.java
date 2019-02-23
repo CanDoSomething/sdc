@@ -43,7 +43,7 @@ public class TeaController {
      * @return  创建新创建课程的courseId
      */
     @PostMapping("/createCourse")
-    public ResultVO<TeaCourse> createCourse(@Valid TeaCourseForm teaCourseForm,
+    public ResultVO createCourse(@Valid TeaCourseForm teaCourseForm,
                                             BindingResult bindingResult,
                                             @RequestParam("teaOpenid") String teaOpenid){
         //后台进行表单验证，若参数不正确抛出异常
@@ -148,7 +148,7 @@ public class TeaController {
      * @return 反馈课程信息
      */
     @PostMapping("/createFeedBack")
-    public ResultVO<FeedBack> createFeedBack(@RequestParam("subId") Integer subId,
+    public ResultVO createFeedBack(@RequestParam("subId") Integer subId,
                                              @RequestParam("teaOpenid") String teaOpenid,
                                              @RequestParam("teaFeedBack") String teaFeedBack,
                                              @RequestParam("score")Integer score){
