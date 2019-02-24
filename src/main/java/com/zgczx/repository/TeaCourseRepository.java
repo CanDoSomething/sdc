@@ -74,4 +74,8 @@ public interface TeaCourseRepository extends JpaRepository<TeaCourse,Integer> {
      **/
 
     Page<TeaCourse> findByCourseStatusAndCourseStartTimeIsAfter(Integer courseStatus,Date date,Pageable pageable);
+
+
+
+    List<TeaCourse> findByTeaCodeAndCourseStatusNot(String teaCode,Integer courseStatus);
 }

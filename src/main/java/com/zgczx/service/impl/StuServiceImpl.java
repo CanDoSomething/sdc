@@ -401,9 +401,6 @@ public class StuServiceImpl implements StuService {
 
 
             }
-
-
-
             SubDTO map = modelMapper.map(subCourse, SubDTO.class);
             TeaCourse one = teaCourseRepository.findOne(subCourse.getCourseId());
             if (one==null){
@@ -413,7 +410,7 @@ public class StuServiceImpl implements StuService {
             }
             TeaBase one1 = teaBaseRepository.findOne(one.getTeaCode());
             if (one1==null){
-                info =  "教师信息未发现" + one1.toString();
+                info =  "教师信息未发现";
                 log.error(info);
                 throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
             }
@@ -432,8 +429,6 @@ public class StuServiceImpl implements StuService {
      *
      * @param:
      * @return:
-     * @auther: 陈志恒
-     * @date: 2018/12/16 19:39
      */
     public List<CourseDTO> getCourse(Page<TeaCourse> byCourseStatus){
         /*创建一个CourseDTO对象用来封装查找到的信息*/

@@ -116,7 +116,8 @@ public class TeaServiceImpl implements TeaService {
          * 2.再新建课程
          */
         TeaBase byteaOpenid = teaBaseRepository.findByTeaOpenid(teaOpenid);
-        List<TeaCourse> byTeaCode = teaCourseRepository.findByTeaCode(byteaOpenid.getTeaCode());
+        List<TeaCourse> byTeaCode = teaCourseRepository.findByTeaCodeAndCourseStatusNot(byteaOpenid.getTeaCode(),
+                CourseEnum.COURSE_CANCELED.getCode());
         //比较当前教师的所有未结束和未取消的课程的交互时间
 
         //s1,s2分别表示新创建课程的开始时间和当前查找的课程开始和结束时间的比较值
