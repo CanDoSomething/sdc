@@ -86,9 +86,7 @@ public class StuServiceImpl implements StuService {
      *
      * @param stuOpenid 学生微信Id
      * @param courserId  课程id
-     * @return:
-     * @auther: 陈志恒
-     * @date: 2018/12/16 17:57
+     * @return 预约课程信息
      */
     @Override
     public SubCourse order(String stuOpenid, Integer courserId) {

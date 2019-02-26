@@ -52,6 +52,7 @@ public class StuController {
     @ResponseBody
     public ResultVO getOrder(@RequestParam(value = "stuOpenid")String stuOpenid,
                           @RequestParam(value = "courserId")Integer courserId){
+        System.out.println("courserId"+courserId);
         SubCourse order = stuService.order(stuOpenid, courserId);
         /*返回结果集*/
         return ResultVOUtil.success(order) ;
