@@ -59,7 +59,8 @@ public interface TeaCourseRepository extends JpaRepository<TeaCourse,Integer> {
      * @param pageable 分页
      * @return 课程列表
      */
-    @Query("select tea from TeaCourse tea where courseEndTime >= ?1 and courseStatus = 300 or courseStatus = 301")
+    @Query("select tea from TeaCourse tea where courseEndTime >= ?1 and courseStatus = 300 or courseStatus = 301 or " +
+            "courseStatus = 302")
     Page<TeaCourse> findAllCourse(Date date,Pageable pageable);
 
     /**

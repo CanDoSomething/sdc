@@ -67,7 +67,7 @@ public class StuServiceImpl implements StuService {
         /*设置分页*/
         Pageable pageable = new PageRequest(page, size, sort);
 
-        // 找到课程状态为300或301的课程，并且结束时间大于当前时间
+        // 找到课程状态为300或301或302的课程，并且结束时间大于当前时间
         Page<TeaCourse> byCourseStatus = teaCourseRepository.findAllCourse( new Date(), pageable);
 
         /*如果课程不存在，返回预约课程不存在*/
