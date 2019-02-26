@@ -59,14 +59,12 @@ public interface TeaCourseRepository extends JpaRepository<TeaCourse,Integer> {
      * @param pageable 分页
      * @return 课程列表
      */
-    @Query("select tea from TeaCourse tea where courseDate >= ?1 and courseStatus = 300 or courseStatus = 301")
+    @Query("select tea from TeaCourse tea where courseEndTime >= ?1 and courseStatus = 300 or courseStatus = 301")
     Page<TeaCourse> findAllCourse(Date date,Pageable pageable);
 
     /**
      *功能描述：开始时间在当前时间之后的所有的未预约成功的课程
      *
-     * @Author chen
-     * @Date 10:40 2018/12/21
      * @param courseStatus 课程id
      * @param date 当前时间
      * @param pageable 分页器

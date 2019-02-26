@@ -58,9 +58,7 @@ public class StuServiceImpl implements StuService {
      *
      * @param page 页面数
      * @param size 页面大小
-     * @return:
-     * @auther: 陈志恒
-     * @date: 2018/12/16 17:54
+     * @return 课程信息列表
      */
     @Override
     public List<CourseDTO> findAllCourse(Integer page,Integer size) {
@@ -68,7 +66,10 @@ public class StuServiceImpl implements StuService {
         Sort sort =new Sort(Sort.Direction.DESC,"courseDate");
         /*设置分页*/
         Pageable pageable = new PageRequest(page, size, sort);
+
+        // 找到课程状态为300或301的课程，并且结束时间大于当前时间
         Page<TeaCourse> byCourseStatus = teaCourseRepository.findAllCourse( new Date(), pageable);
+
         /*如果课程不存在，返回预约课程不存在*/
         if (byCourseStatus.getContent().isEmpty()){
             info = "【学生查看所有课程】 没有正在发布的课程";
@@ -76,8 +77,8 @@ public class StuServiceImpl implements StuService {
             throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
         }
         /*封装课程信息到消息中间类*/
-        List<CourseDTO> course = getCourse(byCourseStatus);
-        return course;
+        List<CourseDTO> courseDTOList = getCourse(byCourseStatus);
+        return courseDTOList;
     }
     /**
      *
