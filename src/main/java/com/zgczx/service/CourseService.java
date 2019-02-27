@@ -47,5 +47,12 @@ public interface CourseService {
      */
     Boolean onCourseEnd(Integer courseId);
 
+    /**
+     * 判断课程courserId是否合法
+     * @param courserId 课程id
+     * @return Boolean
+     */
+    Boolean legalCourse(Integer courserId);
+
 
 }

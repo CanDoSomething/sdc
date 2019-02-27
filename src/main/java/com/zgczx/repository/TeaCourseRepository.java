@@ -15,6 +15,7 @@ import java.util.List;
  * @Description: 教师课程repository接口
  */
 public interface TeaCourseRepository extends JpaRepository<TeaCourse,Integer> {
+
     /**
      * 查找教师所有的历史课程
      *
@@ -23,7 +24,7 @@ public interface TeaCourseRepository extends JpaRepository<TeaCourse,Integer> {
      * @return 所有课程列表
      */
     @Query("select teaCourse from TeaCourse teaCourse where teaCourse.teaCode = ?1 ORDER BY teaCourse.courseDate desc")
-    Page<TeaCourse> find(String teaCode,Pageable pageable);
+    Page<TeaCourse> findAllTeaCourse(String teaCode,Pageable pageable);
 
     /**
      * 查看教师的所有课程（不分页）
@@ -59,14 +60,13 @@ public interface TeaCourseRepository extends JpaRepository<TeaCourse,Integer> {
      * @param pageable 分页
      * @return 课程列表
      */
-    @Query("select tea from TeaCourse tea where courseDate >= ?1 and courseStatus = 300 or courseStatus = 301")
+    @Query("select tea from TeaCourse tea where courseEndTime >= ?1 and courseStatus = 300 or courseStatus = 301 or " +
+            "courseStatus = 302")
     Page<TeaCourse> findAllCourse(Date date,Pageable pageable);
 
     /**
      *功能描述：开始时间在当前时间之后的所有的未预约成功的课程
      *
-     * @Author chen
-     * @Date 10:40 2018/12/21
      * @param courseStatus 课程id
      * @param date 当前时间
      * @param pageable 分页器

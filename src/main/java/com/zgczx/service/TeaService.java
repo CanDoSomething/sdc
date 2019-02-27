@@ -99,4 +99,11 @@ public interface TeaService {
      * @return 课程状态为结束的课程
      */
     TeaCourse finishCourse(Integer courseId);
+
+    /**
+     * 判断teaOpenid是否合法存在
+     * @param teaOpenid 教师openid
+     * @return Boolean
+     */
+    Boolean legalTeacher(String teaOpenid);
 }
