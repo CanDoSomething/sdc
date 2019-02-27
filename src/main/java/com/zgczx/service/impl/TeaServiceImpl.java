@@ -550,7 +550,7 @@ public class TeaServiceImpl implements TeaService {
         // 判断是否变为正在进行时
         if(courseStatus.equals(CourseEnum.SUB_SUCCESS.getCode()) && teaCourse.getCourseStartTime().before(now)){
             teaCourse.setCourseStatus(CourseEnum.COURSE_INTERACT.getCode());
-            return teaCourseRepository.save(teaCourse);
+            teaCourseRepository.save(teaCourse);
         }
 
         //当前课程只有是处于进行状态或者线下互动才能使用此方式结束课程
