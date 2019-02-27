@@ -424,6 +424,8 @@ public class StuServiceImpl implements StuService {
                 log.error(info);
                 throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
             }
+            teaService.finishCourse(teaCourse.getCourseId());
+
             /*将CourseStatus中的属性映射到一个封装对象中*/
             CourseDTO courseDTO = modelMapper.map(teaCourse, CourseDTO.class);
             /*将教师信息放入到封装对象中*/

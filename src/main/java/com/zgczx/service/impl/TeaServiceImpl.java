@@ -538,27 +538,28 @@ public class TeaServiceImpl implements TeaService {
             log.error("【结束课程】 该课程编号id={}为空",courseId);
             throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
         }
-        TeaCourse one = teaCourseRepository.findOne(courseId);
-        if(null == one){
+        TeaCourse teaCourse = teaCourseRepository.findOne(courseId);
+        if(null == teaCourse){
             info  = "【结束课程】 课程没有找到";
             log.error(info);
             throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
         }
-        Integer vis = one.getCourseStatus();
+        Integer courseStatus = teaCourse.getCourseStatus();
 
         Date now = new Date();
         // 判断是否变为正在进行时
-        if(vis.equals(CourseEnum.SUB_SUCCESS.getCode()) && one.getCourseStartTime().before(now)){
-            one.setCourseStatus(CourseEnum.COURSE_INTERACT.getCode());
-            teaCourseRepository.save(one);
+        if(courseStatus.equals(CourseEnum.SUB_SUCCESS.getCode()) && teaCourse.getCourseStartTime().before(now)){
+            teaCourse.setCourseStatus(CourseEnum.COURSE_INTERACT.getCode());
+            return teaCourseRepository.save(teaCourse);
         }
 
-        //当前课程只有是处于互动状态或者线下互动才能使用此方式结束课程
-        if(vis.equals(CourseEnum.COURSE_INTERACT.getCode()) || one.getCourseInteractive().equals(CourseService.
+        //当前课程只有是处于进行状态或者线下互动才能使用此方式结束课程
+        if(courseStatus.equals(CourseEnum.COURSE_INTERACT.getCode()) || teaCourse.getCourseInteractive().equals(CourseService.
                 COURSEINTERACTIVE_OFFLINE) ){
-            one.setCourseStatus(CourseEnum.COURSE_FINISH.getCode());
-            one.setUpdateTime(new Date());
-            TeaCourse save = teaCourseRepository.save(one);
+
+            teaCourse.setCourseStatus(CourseEnum.COURSE_FINISH.getCode());
+            teaCourse.setUpdateTime(new Date());
+            TeaCourse save = teaCourseRepository.save(teaCourse);
             if(null == save ){
                 info = "【结束课程】 修改课程状态异常";
                 log.error(info);
