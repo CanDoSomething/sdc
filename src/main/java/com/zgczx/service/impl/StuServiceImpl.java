@@ -63,7 +63,7 @@ public class StuServiceImpl implements StuService {
     @Override
     public List<CourseDTO> findAllCourse(Integer page,Integer size) {
         //先按照课程日期降序排序
-        Sort sort =new Sort(Sort.Direction.DESC,"courseDate");
+        Sort sort = new Sort(Sort.Direction.DESC,"courseDate");
         /*设置分页*/
         Pageable pageable = new PageRequest(page, size, sort);
 
@@ -78,10 +78,16 @@ public class StuServiceImpl implements StuService {
         }
         /*封装课程信息到消息中间类*/
         List<CourseDTO> courseDTOList = getCourse(byCourseStatus);
+
+        if (courseDTOList.size()==0){
+            info = "【学生查看所有课程】 没有正在发布的课程";
+            log.error(info);
+            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
+        }
         return courseDTOList;
     }
+
     /**
-     *
      * 功能描述: 提交预约请求
      *
      * @param stuOpenid 学生微信Id
@@ -90,65 +96,56 @@ public class StuServiceImpl implements StuService {
      */
     @Override
     public SubCourse order(String stuOpenid, Integer courserId) {
-        /*查找学生预约的课程信息*/
+
+
+
+        //1.比较学生的历史预约信息与目标课程的时间是否冲突
         TeaCourse teaCourse = teaCourseRepository.findOne(courserId);
-        /*如果预约课程不存在，抛出异常*/
-        if (teaCourse==null){
-            info = "【学生发起预约课程请求】 预约课程信息不存在";
-            log.error(info);
-            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
-        }
-        StuBase byStuOpenid = stuBaseRepository.findByStuOpenid(stuOpenid);
-        if (byStuOpenid==null){
-            info = "学生信息不存在";
-            log.error(info);
-            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
-        }
+        StuBase stuBase = stuBaseRepository.findByStuOpenid(stuOpenid);
+
         /*查询该学生的预约列表*/
-        List<SubCourse> subCourses = subCourseRepository.findByStuCode(byStuOpenid.getStuCode());
-        for (SubCourse subCourse : subCourses) {
-            /*找到等待预约和预约成功的所有预约信息*/
-            if (subCourse.getSubStatus().equals(SubCourseEnum.SUB_WAIT.getCode()) || subCourse.getSubStatus().equals(SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode())){
+        List<SubCourse> subCourseList = subCourseRepository.findByStuCode(stuBase.getStuCode());
+        for (SubCourse subCourse : subCourseList) {
+            /*找到提交预约请求和预约成功的所有预约信息*/
+            if (subCourse.getSubStatus().equals(SubCourseEnum.SUB_WAIT.getCode()) ||
+                    subCourse.getSubStatus().equals(SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode())){
                 /*根据课程id查找到课程信息*/
-                TeaCourse one = teaCourseRepository.findOne(subCourse.getCourseId());
-                if (one==null){
-                    info = "【学生已经存在的预约课程请求】 预约课程对应的老师信息不存在";
-                    log.error(info);
-                    throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
-                }
-                /*判断预约时间是否冲突*/
-                if(DateUtil.compareTime(teaCourse.getCourseStartTime(),one.getCourseEndTime()) || DateUtil.compareTime(one.getCourseStartTime(),teaCourse.getCourseEndTime())){
-                }else {
+                TeaCourse teaCourseRepositoryOne = teaCourseRepository.findOne(subCourse.getCourseId());
+
+                /*
+                 * 判断预约时间是否冲突
+                 * 目标课程的开始时间晚于历史预约课程的结束时间或者历史预约课程的开始时间晚于目标课程的结束时间
+                 */
+                if(!DateUtil.compareTime(teaCourse.getCourseStartTime(),teaCourseRepositoryOne.getCourseEndTime()) &&
+                        !DateUtil.compareTime(teaCourseRepositoryOne.getCourseStartTime(),teaCourse.getCourseEndTime())){
                     /*抛出预约冲突异常*/
-                    info = "【学生发起预约课程请求】 预约课程信息冲突";
+                    info = "【学生发起预约课程请求】 与历史预约课程的时间冲突";
                     log.error(info);
                     throw new SdcException(ResultEnum.SUB_FAIL,info);
                 }
             }
         }
-        /*如果运行到这里证明预约时间不冲突可以建立预约对象*/
-        SubCourse subCourse=new SubCourse();
-        subCourse.setStuCode(byStuOpenid.getStuCode());
+
+        //2.保存预约请求
+        SubCourse subCourse = new SubCourse();
+        subCourse.setStuCode(stuBase.getStuCode());
         subCourse.setCourseId(courserId);
         /*设置新的预约对象为等待预约状态*/
         subCourse.setSubStatus(SubCourseEnum.SUB_WAIT.getCode());
-        /*保存到数据库*/
         SubCourse save = subCourseRepository.save(subCourse);
         if (save==null){
             info = "【学生发起预约课程请求】 预约信息没有保存到数据库，预约课程失败";
             log.error(info);
             throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,info);
         }
-        /**
-         * 课程状态改为已被预约
-         */
+
+        //3.课程状态改为已被学生预约
         teaCourse.setCourseStatus(CourseEnum.SUB_SUCCESS.getCode());
         teaCourseRepository.save(teaCourse);
         return save;
     }
 
     /**
-     *
      * 功能描述:取消预约请求
      *
      * @author Jason
@@ -159,12 +156,6 @@ public class StuServiceImpl implements StuService {
      */
     @Override
     public SubCourse cancelOrder(String cause,String stuOpenid,Integer courserId) {
-        StuBase byStuOpenid = stuBaseRepository.findByStuOpenid(stuOpenid);
-        if (byStuOpenid==null){
-            info = "找不到该微信id对应的学生";
-            log.error(info);
-            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
-        }
 
         //查找到该学生的学籍号
         String stuCode = stuBaseRepository.findByStuOpenid(stuOpenid).getStuCode();
@@ -312,8 +303,6 @@ public class StuServiceImpl implements StuService {
      * @param score 代表反馈评分
      * @param subId 预约课程id
      * @return:
-     * @auther: 陈志恒
-     * @date: 2018/12/16 19:24
      */
     @Override
     public FeedBack feedBack(Integer courseId, String message, Integer score,Integer subId) {
@@ -358,8 +347,6 @@ public class StuServiceImpl implements StuService {
     /**
      *查询历史记录课程
      *
-     * @Author chen
-     * @Date 21:02 2018/12/20
      * @param page 页数
      * @param size 页面大小
      * @param stuOpenid 学生微信id
@@ -368,88 +355,83 @@ public class StuServiceImpl implements StuService {
     @Override
     public List<SubDTO> lookHistory(Integer page, Integer size, String stuOpenid) {
         StuBase byStuOpenid = stuBaseRepository.findByStuOpenid(stuOpenid);
-        if (byStuOpenid==null){
-            info = "学生信息不存在";
-            log.error(info);
-            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
-        }
+
         Sort sort =new Sort(Sort.Direction.DESC,"createTime");
         Pageable pageable = new PageRequest(page, size, sort);
-        Page<SubCourse> byStuCode = subCourseRepository.findByStuCode(byStuOpenid.getStuCode(), pageable);
-        if (byStuCode.getContent().isEmpty()){
+        Page<SubCourse> subCoursePage = subCourseRepository.findByStuCode(byStuOpenid.getStuCode(), pageable);
+        if (subCoursePage.getContent().isEmpty()){
             info = "【学生查看历史记录】 没有预约的课程";
             log.error(info);
             throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
         }
 
-        List<SubDTO> list = new ArrayList<>();
-        for (SubCourse subCourse : byStuCode) {
-            TeaCourse teaCourse = teaService.finishCourse(subCourse.getCourseId());
+        List<SubDTO> subDTOList = new ArrayList<>();
+        for (SubCourse subCourse : subCoursePage) {
 
-            if(teaCourse!=null){
-                int subId = subCourseRepository.findByCourseIdAndSubStatus(teaCourse.getCourseId(),
-                        SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode()).get(0).getSubId();
-
-                if(feedBackRepository.findBySubId(subId)!=null){
-                    continue;
-                }else{
-                    FeedBack feedBack = new FeedBack();
-                    feedBack.setSubId(subId);
-                    feedBackRepository.save(feedBack);
-                }
-
-
-            }
-            SubDTO map = modelMapper.map(subCourse, SubDTO.class);
-            TeaCourse one = teaCourseRepository.findOne(subCourse.getCourseId());
-            if (one==null){
+            SubDTO subDTO = modelMapper.map(subCourse, SubDTO.class);
+            TeaCourse teaCourse = teaCourseRepository.findOne(subCourse.getCourseId());
+            if (teaCourse==null){
                 info =  "预约表中的课程信息未发现";
                 log.error(info);
                 throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
             }
-            TeaBase one1 = teaBaseRepository.findOne(one.getTeaCode());
-            if (one1==null){
+            TeaBase teaBase = teaBaseRepository.findOne(teaCourse.getTeaCode());
+            if (teaBase==null){
                 info =  "教师信息未发现";
                 log.error(info);
                 throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
             }
-            map.setTeaName(one1.getTeaName());
-            map.setTeaCourse(one);
+
+            subDTO.setTeaName(teaBase.getTeaName());
+            subDTO.setTeaCourse(teaCourse);
             FeedBack feedBack = feedBackRepository.findBySubId(subCourse.getSubId());
-            map.setFeedBack(feedBack);
-            list.add(map);
+            if(null != feedBack){
+                subDTO.setFeedBack(feedBack);
+            }
+
+            subDTOList.add(subDTO);
         }
-        return list;
+        return subDTOList;
     }
 
     /**
-     *
-     * 功能描述: 封装信息到CourseDTO中
-     *
-     * @param:
-     * @return:
+     * 判断学生openid是否合法存在
+     * @param stuOpenid 学生openid
+     * @return Boolean
      */
-    public List<CourseDTO> getCourse(Page<TeaCourse> byCourseStatus){
+    @Override
+    public Boolean legalStudent(String stuOpenid) {
+        StuBase byStuOpenid = stuBaseRepository.findByStuOpenid(stuOpenid);
+        return byStuOpenid != null;
+    }
+
+    /**
+     * 功能描述: 封装课程信息
+     *
+     * @param teaCoursePage 分页的课程
+     * @return List<CourseDTO>
+     */
+    private List<CourseDTO> getCourse(Page<TeaCourse> teaCoursePage){
         /*创建一个CourseDTO对象用来封装查找到的信息*/
-        List<CourseDTO> list=new ArrayList<>();
+        List<CourseDTO> courseDTOList = new ArrayList<>();
         /*遍历查找到的信息*/
-        for (TeaCourse courseStatus : byCourseStatus) {
+        for (TeaCourse teaCourse : teaCoursePage) {
             /*根据教师编号查找到教师完整信息*/
-            TeaBase one = teaBaseRepository.findOne(courseStatus.getTeaCode());
+            TeaBase teaBase = teaBaseRepository.findOne(teaCourse.getTeaCode());
             /*如果教师不存在，抛出教师不存在异常*/
-            if (one==null){
+            if (teaBase==null){
                 info = "预约课程对应的老师信息不存在";
                 log.error(info);
                 throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
             }
             /*将CourseStatus中的属性映射到一个封装对象中*/
-            CourseDTO courseDTO = modelMapper.map(courseStatus, CourseDTO.class);
+            CourseDTO courseDTO = modelMapper.map(teaCourse, CourseDTO.class);
             /*将教师信息放入到封装对象中*/
-            courseDTO.setTeaBase(one);
+            courseDTO.setTeaBase(teaBase);
             /*添加封装对象到list中*/
-            list.add(courseDTO);
+            courseDTOList.add(courseDTO);
         }
-        return list;
+        return courseDTOList;
     }
 
 }

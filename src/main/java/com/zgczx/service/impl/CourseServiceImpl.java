@@ -8,6 +8,7 @@ import com.zgczx.exception.SdcException;
 import com.zgczx.repository.*;
 import com.zgczx.service.CourseService;
 import com.zgczx.service.TeaService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,7 @@ import java.util.List;
  * @date 2019/2/20 13:24
  */
 @Service
+@Slf4j
 public class CourseServiceImpl  implements CourseService {
 
     @Autowired
@@ -121,5 +123,18 @@ public class CourseServiceImpl  implements CourseService {
 
         // 判断课程状态是否为已结束
         return teaCourseRepository.findOne(courseId).getCourseStatus().equals(CourseEnum.COURSE_FINISH.getCode());
+    }
+
+    /**
+     * 判断课程courserId是否合法
+     * @param courserId 课程id
+     * @return Boolean
+     */
+    @Override
+    public Boolean legalCourse(Integer courserId) {
+        /*查找学生预约的课程信息*/
+        TeaCourse teaCourse = teaCourseRepository.findOne(courserId);
+        /*如果预约课程不存在，抛出异常*/
+        return teaCourse != null;
     }
 }

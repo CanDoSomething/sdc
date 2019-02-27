@@ -26,7 +26,7 @@ public interface SubCourseRepository extends JpaRepository<SubCourse,Integer> {
      * @Date 11:11 2018/12/29
      * @param stuCode 学生编号
      * @param pageable 分页器
-     * @return
+     * @return Page<SubCourse>
      **/
     Page<SubCourse> findByStuCode(String stuCode, Pageable pageable);
 
