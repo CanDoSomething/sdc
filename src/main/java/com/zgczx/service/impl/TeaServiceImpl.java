@@ -556,19 +556,19 @@ public class TeaServiceImpl implements TeaService {
         //当前课程只有是处于进行状态或者线下互动才能使用此方式结束课程
         if(courseStatus.equals(CourseEnum.COURSE_INTERACT.getCode()) || teaCourse.getCourseInteractive().equals(CourseService.
                 COURSEINTERACTIVE_OFFLINE) ){
-
-            teaCourse.setCourseStatus(CourseEnum.COURSE_FINISH.getCode());
-            teaCourse.setUpdateTime(new Date());
-            TeaCourse save = teaCourseRepository.save(teaCourse);
-            if(null == save ){
-                info = "【结束课程】 修改课程状态异常";
-                log.error(info);
-                throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,info);
+            if(teaCourse.getCourseEndTime().before(now)){
+                teaCourse.setCourseStatus(CourseEnum.COURSE_FINISH.getCode());
+                teaCourse.setUpdateTime(new Date());
+                TeaCourse save = teaCourseRepository.save(teaCourse);
+                if(null == save ){
+                    info = "【结束课程】 修改课程状态异常";
+                    log.error(info);
+                    throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,info);
+                }
+                return teaCourse;
             }
-            return save;
-        }else{
-            return null;
         }
+        return null;
     }
 
     /**
