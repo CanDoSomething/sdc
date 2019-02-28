@@ -103,6 +103,16 @@ public class StuServiceImpl implements StuService {
         TeaCourse teaCourse = teaCourseRepository.findOne(courserId);
         StuBase stuBase = stuBaseRepository.findByStuOpenid(stuOpenid);
 
+        //2.查询学生是否提交过该课程的预约请求，若有，则不能新建
+        SubCourse subCourseHistory = subCourseRepository.findByCourseIdAndStuCode(courserId,stuBase.getStuCode());
+
+        if(null != subCourseHistory){
+            info = "【学生发起预约课程请求】已经预约过该课程，不能再次预约";
+            log.error(info);
+            throw new SdcException(ResultEnum.SUB_FAIL,info);
+        }
+
+
         /*查询该学生的预约列表*/
         List<SubCourse> subCourseList = subCourseRepository.findByStuCode(stuBase.getStuCode());
         for (SubCourse subCourse : subCourseList) {
@@ -126,7 +136,7 @@ public class StuServiceImpl implements StuService {
             }
         }
 
-        //2.保存预约请求
+        //3.保存预约请求
         SubCourse subCourse = new SubCourse();
         subCourse.setStuCode(stuBase.getStuCode());
         subCourse.setCourseId(courserId);
