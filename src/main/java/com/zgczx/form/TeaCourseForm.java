@@ -30,7 +30,7 @@ public class TeaCourseForm {
      * 课程日期
      */
     @NotNull(message = "课程日期必填")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date courseDate;
 
     /**
