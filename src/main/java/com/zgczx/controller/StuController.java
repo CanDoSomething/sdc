@@ -91,9 +91,10 @@ public class StuController {
      */
     @PostMapping(value = "/cancelOrder")
     @ResponseBody
-    public ResultVO cancelOrder(@RequestParam(value = "cause")String cause,
-                                 @RequestParam(value = "stuOpenid")String stuOpenid,
-                                 @RequestParam(value = "courserId")Integer courserId){
+    public ResultVO cancelOrder(@RequestParam(value = "cause") String cause,
+                                @RequestParam(value = "stuOpenid") String stuOpenid,
+                                @RequestParam(value = "courserId") Integer courserId,
+                                @RequestParam(value = "subId") Integer subId){
 
         //1.根据stuOpenid和courserId判断是否合法
         if(!stuService.legalStudent(stuOpenid)){
@@ -108,7 +109,7 @@ public class StuController {
         }
 
 
-        SubCourse subCourse = stuService.cancelOrder(cause, stuOpenid, courserId);
+        SubCourse subCourse = stuService.cancelOrder(cause, stuOpenid, courserId,subId);
         return ResultVOUtil.success(subCourse);
 
     }

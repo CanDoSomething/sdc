@@ -261,12 +261,17 @@ public class TeaServiceImpl implements TeaService {
             courseDTO.setTeaCourse(teaCourse);
             courseDTO.setTeaBase(teaBaseRepository.findOne(teaCourse.getTeaCode()));
 
-            int subId = subCourseRepository.findByCourseIdAndSubStatus(teaCourse.getCourseId(),
-                    SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode()).get(0).getSubId();
-            FeedBack feedBack = feedBackRepository.findBySubId(subId);
-            if(null != feedBack){
-                courseDTO.setFeedBack(feedBack);
+
+            List<SubCourse> subCourseList = subCourseRepository.findByCourseIdAndSubStatus(teaCourse.getCourseId(),
+                    SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode());
+            if(subCourseList.size()>0){
+                int subId = subCourseList.get(0).getSubId();
+                FeedBack feedBack = feedBackRepository.findBySubId(subId);
+                if(null != feedBack){
+                    courseDTO.setFeedBack(feedBack);
+                }
             }
+
             courseDTOList.add(courseDTO);
         }
         return courseDTOList;

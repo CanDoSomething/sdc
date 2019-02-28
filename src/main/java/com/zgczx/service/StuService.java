@@ -41,7 +41,7 @@ public interface StuService {
      * @param stuOpenid 学生微信id
      * @return SubCourse
      */
-     SubCourse cancelOrder(String cause,String stuOpenid, Integer courserId);
+     SubCourse cancelOrder(String cause,String stuOpenid, Integer courserId, Integer subId);
     /**
      *
      * 功能描述: 提交反馈
