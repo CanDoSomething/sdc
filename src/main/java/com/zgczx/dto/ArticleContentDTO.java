@@ -1,10 +1,7 @@
 package com.zgczx.dto;
 
-import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
 import lombok.ToString;
-
-import java.util.List;
 
 /**
  * @author Jason
@@ -33,5 +30,5 @@ public class ArticleContentDTO {
     /**
      * 文章内容
      */
-    private List<JSONObject> articleContent;
+    private String articleContent;
 }

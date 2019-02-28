@@ -1,6 +1,5 @@
 package com.zgczx.service.impl;
 
-import com.alibaba.fastjson.JSONObject;
 import com.zgczx.dataobject.Article;
 import com.zgczx.dataobject.ArticleScore;
 import com.zgczx.dto.ArticleContentDTO;
@@ -17,8 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
-import static com.zgczx.utils.ArticleUtil.getArticlePara;
 
 /**
  * @author Jason
@@ -68,8 +65,14 @@ public class ArticleServiceImpl implements ArticleService {
         articleContentDTO.setArticleDate(article.getArticleDate());
         articleContentDTO.setArticleSource(article.getArticleSource());
         articleContentDTO.setArticleUrl(article.getArticleUrl());
-        List<JSONObject> para = getArticlePara(article);
-        articleContentDTO.setArticleContent(para);
+        articleContentDTO.setArticleContent("<p>　　2月18日，教育部与辽宁省、山东省、重庆市、宁波市在京签署《推进共建" +
+                "“一带一路”教育行动国际合作备忘录》，以推动相关省市积极对接“一带一路”倡议，发挥自身区位优势，着力" +
+                "提高教育对外开放水平，写好教育“奋进之笔”，全面推进共建“一带一路”教育行动。教育部党组书记、部长陈" +
+                "宝生出席签约仪式并讲话。教育部党组成员、副部长田学军主持签约座谈会并与辽宁省副省长李金科，山东省副省" +
+                "长于杰，重庆市副市长屈谦，宁波市委副书记、市长裘东耀签署备忘录。</p>");
+
+        //List<JSONObject> para = getArticlePara(article);
+        //articleContentDTO.setArticleContent(para);
 
         return articleContentDTO;
     }
