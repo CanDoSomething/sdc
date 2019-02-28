@@ -2,7 +2,6 @@ package com.zgczx.controller;
 
 import com.zgczx.VO.ResultVO;
 import com.zgczx.dataobject.Article;
-import com.zgczx.dto.ArticleContentDTO;
 import com.zgczx.service.ArticleService;
 import com.zgczx.utils.ResultVOUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +33,9 @@ public class ArticleController {
     @PostMapping("getArticleContent")
     public ResultVO getArticleContent(@RequestParam(value = "artId")Integer artId){
 
-        ArticleContentDTO articleContentDTO = articleService.getArticleContent(artId);
+        Article article = articleService.getArticleContent(artId);
 
-        return ResultVOUtil.success(articleContentDTO);
+        return ResultVOUtil.success(article);
     }
 
     @GetMapping("getArticleScore")

@@ -2,7 +2,6 @@ package com.zgczx.service;
 
 import com.zgczx.dataobject.Article;
 import com.zgczx.dataobject.ArticleScore;
-import com.zgczx.dto.ArticleContentDTO;
 
 import java.util.List;
 
@@ -22,7 +21,7 @@ public interface ArticleService {
      * @param artId 文章编号
      * @return 文章内容
      */
-    ArticleContentDTO getArticleContent(Integer artId);
+    Article getArticleContent(Integer artId);
 
     /**
      * 获取文章评分
