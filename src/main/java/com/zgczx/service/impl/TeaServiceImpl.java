@@ -21,10 +21,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -62,93 +60,80 @@ public class TeaServiceImpl implements TeaService {
     @Override
     @Transactional(rollbackFor=Exception.class)
     public TeaCourse createCourse(TeaCourseForm teaCourseForm,String teaOpenid) {
-
         // 判断课程上课日期，开始时间，结束时间是否合法？通过String来接收参数，格式转换后是否合法？
-        //1.上课时间不得早于当前时间
-        String strCourseStartTime = teaCourseForm.getCourseStartTime();
-        String strCourseEndTime = teaCourseForm.getCourseEndTime();
-        String strCourseTime = teaCourseForm.getCourseDate();
-        Date courseStartDate = null;
-        Date courseEndDate = null;
-        Date courseDate = null;
-        //字符串类型的时间要转化为Date类型
-        DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        DateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
-        try {
-            courseStartDate = sdf.parse(strCourseStartTime);
-            courseEndDate = sdf.parse(strCourseEndTime);
-            courseDate = sdf2.parse(strCourseTime);
-        } catch (Exception e) {
-            log.error("【教师创建课程】 日期格式转化错误");
-            e.printStackTrace();
-        }
+        Date strCourseStartTime = teaCourseForm.getCourseStartTime();
+        Date strCourseEndTime = teaCourseForm.getCourseEndTime();
+        Date strCourseDate = teaCourseForm.getCourseDate();
+        Date strToday = new Date();
 
-        int startDateRs = courseStartDate.compareTo(new Date());
-        int endDateRs = courseStartDate.compareTo(courseEndDate);
-        int courseDateRs = 0;
-        try {
-            courseDateRs = courseDate.compareTo(sdf2.parse(new Date().toLocaleString()) );
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        if(startDateRs != 1 ){
+        //转化为Calendar类型比较日期
+        Calendar courseStartTime = Calendar.getInstance();
+        courseStartTime.setTime(strCourseStartTime);
+        Calendar courseEndTime = Calendar.getInstance();
+        courseEndTime.setTime(strCourseEndTime);
+        Calendar courseDate = Calendar.getInstance();
+        courseDate.setTime(strCourseDate);
+        Calendar today = Calendar.getInstance();
+        today.setTime(strToday);
+
+        //1.上课开始时间不得早于或等于当前时间
+        if(courseStartTime.before(today)){
             info = "【教师创建课程】 上课开始时间不得早于或等于当前时间";
             log.error(info);
             throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
         }
-
         //2.结束时间不得早于开始时间
-        if(endDateRs != -1 ){
+        if(courseEndTime.before(courseStartTime)){
             info = "【教师创建课程】 上课结束时间不得早于或等于上课开始时间";
             log.error(info);
             throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
         }
         //3.上课日期不能小于当前日期
-        if(courseDateRs == -1){
+        Calendar yesterday = Calendar.getInstance();
+        yesterday.setTime(new Date());
+        yesterday.add(Calendar.DAY_OF_MONTH,-1);
+        log.info("yesterday="+yesterday.getTime());
+
+        if(courseDate.before(yesterday)){
             info = "【教师创建课程】 上课日期不得早于当前时间";
             log.error(info);
             throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
         }
-        /**
-         *  逻辑过程
-         * 1.判断该老师当前时间是否有课程
-         * 2.再新建课程
-         */
-        TeaBase byteaOpenid = teaBaseRepository.findByTeaOpenid(teaOpenid);
-        List<TeaCourse> byTeaCode = teaCourseRepository.findByTeaCodeAndCourseStatusNot(byteaOpenid.getTeaCode(),
+        TeaBase teaBase = teaBaseRepository.findByTeaOpenid(teaOpenid);
+        List<TeaCourse> byTeaCode = teaCourseRepository.findByTeaCodeAndCourseStatusNot(teaBase.getTeaCode(),
                 CourseEnum.COURSE_CANCELED.getCode());
-        //比较当前教师的所有未结束和未取消的课程的交互时间
-
-        //s1,s2分别表示新创建课程的开始时间和当前查找的课程开始和结束时间的比较值
-        //e1,e2分别表示新创建课程的结束时间和当前查找的课程开始和结束时间的比较值
-        int s1,s2,e1,e2;
         for(TeaCourse teaCourse : byTeaCode){
-            if( !(teaCourse.getCourseStatus().equals(CourseEnum.COURSE_CANCELED)) ||
-                    !(teaCourse.getCourseStatus().equals(CourseEnum.COURSE_FINISH))){
-                s1 = courseStartDate.compareTo(teaCourse.getCourseStartTime());
-                s2 = courseStartDate.compareTo(teaCourse.getCourseEndTime());
-                if( (s1 == 1|| s1 == 0) && (s2 == -1 || s2 == 0)  ){
-                    info = "【教师创建课程】 新创建的课程和原有课程时间冲突";
-                    log.error(info);
-                    throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
-                }
-                e1 = courseEndDate.compareTo(teaCourse.getCourseStartTime());
-                e2 = courseEndDate.compareTo(teaCourse.getCourseEndTime());
 
-                if( (e1 == 1|| e1 == 0) && (e2 == -1 || e2 == 0) ){
-                    info = "【教师创建课程】 新创建的课程和原有课程时间冲突";
-                    log.error(info);
-                    throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
-                }
+            if (courseStartTime.getTime().before(teaCourse.getCourseStartTime()) &&
+                    courseStartTime.getTime().before(teaCourse.getCourseEndTime()) &&
+                    courseEndTime.getTime().after(teaCourse.getCourseStartTime())){
+                info = "【教师创建课程】 新课程开始时间早于已有课程的开始时间且" +
+                        "新课程的结束时间早于课程的结束时间且新课程的结束时间晚于已有课程的开始时间，" +
+                        "即新课程与已有课程前部交叉";
+                log.error(info);
+                throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
+            }
+            if(courseStartTime.getTime().after(teaCourse.getCourseStartTime()) &&
+                    courseEndTime.getTime().before(teaCourse.getCourseEndTime())){
+                info = "【教师创建课程】 新课程开始时间晚于已有课程的开始时间且新课程的结束时间早于已有课程的结束时间";
+                log.error(info);
+                throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
+            }
+            if(courseStartTime.getTime().after(teaCourse.getCourseStartTime())
+                    && courseEndTime.getTime().after(teaCourse.getCourseEndTime())
+                    && courseStartTime.getTime().before(teaCourse.getCourseEndTime())){
+                info = "【教师创建课程】 新课程开始时间晚于已有课程的开始时间且新课程的结束时间晚于已有课程的结束时间" +
+                        "新课程的开始时间早于已有课程的结束时间";
+                log.error(info);
+                throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
             }
         }
-
         TeaCourse teaCourse = new TeaCourse();
         //由于前台时间传递的是String不能直接使用modelMapper转化
         teaCourse.setTeaCode(teaCourseForm.getTeaCode());
-        teaCourse.setCourseDate(courseDate);
-        teaCourse.setCourseStartTime(courseStartDate);
-        teaCourse.setCourseEndTime(courseEndDate);
+        teaCourse.setCourseDate(strCourseDate);
+        teaCourse.setCourseStartTime(strCourseStartTime);
+        teaCourse.setCourseEndTime(strCourseEndTime);
         teaCourse.setCourseLocation(teaCourseForm.getCourseLocation());
         teaCourse.setCourseName(teaCourseForm.getCourseName());
         teaCourse.setCourseStatus(CourseEnum.SUB_WAIT.getCode());
