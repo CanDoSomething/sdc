@@ -103,6 +103,16 @@ public class StuServiceImpl implements StuService {
         TeaCourse teaCourse = teaCourseRepository.findOne(courserId);
         StuBase stuBase = stuBaseRepository.findByStuOpenid(stuOpenid);
 
+        //2.查询学生是否提交过该课程的预约请求，若有，则不能新建
+        SubCourse subCourseHistory = subCourseRepository.findByCourseIdAndStuCode(courserId,stuBase.getStuCode());
+
+        if(null != subCourseHistory){
+            info = "【学生发起预约课程请求】已经预约过该课程，不能再次预约";
+            log.error(info);
+            throw new SdcException(ResultEnum.SUB_FAIL,info);
+        }
+
+
         /*查询该学生的预约列表*/
         List<SubCourse> subCourseList = subCourseRepository.findByStuCode(stuBase.getStuCode());
         for (SubCourse subCourse : subCourseList) {
@@ -126,7 +136,7 @@ public class StuServiceImpl implements StuService {
             }
         }
 
-        //2.保存预约请求
+        //3.保存预约请求
         SubCourse subCourse = new SubCourse();
         subCourse.setStuCode(stuBase.getStuCode());
         subCourse.setCourseId(courserId);
@@ -155,86 +165,120 @@ public class StuServiceImpl implements StuService {
      * @return SubCourse 取消后的课程内容
      */
     @Override
-    public SubCourse cancelOrder(String cause,String stuOpenid,Integer courserId) {
+    public SubCourse cancelOrder(String cause,String stuOpenid,Integer courserId,Integer subId) {
 
-        //查找到该学生的学籍号
-        String stuCode = stuBaseRepository.findByStuOpenid(stuOpenid).getStuCode();
-        TeaCourse teaCourse = teaCourseRepository.findOne(courserId);
-        Integer courseStatus = teaCourse.getCourseStatus();
-
-        // 1.查到该条取消预约请求的当前状态，查到该课程所有的预约请求
-        SubCourse subCourse = subCourseRepository.findByCourseIdAndStuCode(courserId,stuCode);
-        List<SubCourse> subCourseList = subCourseRepository.findByCourseId(courserId);
-
-        // 2.若预约状态为提交预约请求，则将状态改为学生取消预约；检查是否包含其他提交预约请求，
-        // 若有，则保持已被预约,若没有，则改为待预约
-        Integer subStatus = subCourse.getSubStatus();
-        log.info("预约状态subStatus"+subStatus);
-        if(subStatus.equals(SubCourseEnum.SUB_WAIT.getCode())){
-
-            if(!courseStatus .equals(CourseEnum.SUB_SUCCESS.getCode())){
-                log.info("【学生取消课程】【学生请求状态为预约等待】 课程状态不等于“已被预约”,错误!!!");
-                teaCourse.setCourseStatus(CourseEnum.SUB_SUCCESS.getCode());
-                teaCourseRepository.save(teaCourse);
-            }
-
-            // 判断是否包含其他预约请求
-            int numSUB_WAIT = 0;
-            for(SubCourse subCourse1 : subCourseList){
-                if(subCourse1.getSubStatus().equals(SubCourseEnum.SUB_WAIT.getCode())){
-                    numSUB_WAIT++;
-                }
-            }
-            if(numSUB_WAIT >1){
-                log.info("【学生取消课程】【提交预约请求个数,取消后仍存在预约请求】");
-            }else {
-                log.info("【学生取消课程】【提交预约请求个数,取消后不存在其他预约请求】");
-                teaCourse.setCourseStatus(CourseEnum.SUB_WAIT.getCode());
-                teaCourseRepository.save(teaCourse);
-                log.info("【学生取消课程】【提交预约请求个数,取消后不存在其他预约请求】 课程状态改为“待预约”");
-            }
+        /*
+         *  只有该预约状态为预约等待和预约成功时才会发起取消预约。
+         *  若预约状态为预约等待，则直接修改为预约取消，并加上原因
+         *  若预约状态为预约成功，则修改为预约取消，并加上原因的同时，需要把其他预约失败的学生状态改为预约等待，
+         *  不然没有办法再次选择新的学生作为候选人
+         */
+        SubCourse subCourse = subCourseRepository.findOne(subId);
+        if(subCourse.getSubStatus().equals(SubCourseEnum.SUB_WAIT.getCode())){
             subCourse.setSubStatus(SubCourseEnum.STU_CANCEL_SUB.getCode());
+            subCourse.setStuCause(cause);
             return subCourseRepository.save(subCourse);
-
-        }else if(subStatus.equals(SubCourseEnum.SUB_CANDIDATE_FAILED.getCode())){
-            // 3.若预约状态为预约失败，则直接将状态修改为学生取消预约
-            log.info("【学生取消课程】【学生请求状态为预约失败】");
+        }else if(subCourse.getSubStatus().equals(SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode())){
             subCourse.setSubStatus(SubCourseEnum.STU_CANCEL_SUB.getCode());
-            return subCourseRepository.save(subCourse);
+            subCourse.setStuCause(cause);
 
-        }else if(subStatus.equals(SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode())){
-            // 4.若预约状态为预约成功，则将状态改为学生取消预约;检查该课程是否包含其他预约失败请求，
-            // 若有，则把其余预约失败的请求，修改为提交预约请求，课程改为已被预约;若没有，将课程改为待预约
-            int numSUB_CANDIDATE_FAILED = 0;
-            for(SubCourse subCourse1 : subCourseList){
-                if(subCourse1.getSubStatus().equals(SubCourseEnum.SUB_WAIT.getCode())){
-                    numSUB_CANDIDATE_FAILED++;
-                }
+            List<SubCourse> subCourseListFailed = subCourseRepository.findByCourseIdAndSubStatus(courserId,
+                    SubCourseEnum.SUB_CANDIDATE_FAILED.getCode());
+            for(SubCourse subCourseFailed:subCourseListFailed){
+                subCourseFailed.setSubStatus(SubCourseEnum.SUB_WAIT.getCode());
+                subCourseRepository.save(subCourseFailed);
             }
-
-            if(numSUB_CANDIDATE_FAILED > 0){
-                //存在其他预约失败请求
-                log.info("【学生取消课程】【学生请求状态为预约成功】存在其他预约请求");
-                for(SubCourse subCourse1: subCourseList){
-                    if(subCourse1.getSubStatus().equals(SubCourseEnum.SUB_CANDIDATE_FAILED.getCode())){
-                        subCourse1.setSubStatus(SubCourseEnum.SUB_WAIT.getCode());
-                        subCourseRepository.save(subCourse1);
-                    }
-                }
-                teaCourse.setCourseStatus(CourseEnum.SUB_SUCCESS.getCode());
-                log.info("【学生取消课程】【学生请求状态为预约失成功】课程状态变为已被预约");
-            }else{
-                //不存在其他预约失败请求
-                teaCourse.setCourseStatus(CourseEnum.SUB_WAIT.getCode());
-                teaCourseRepository.save(teaCourse);
-            }
-            subCourse.setSubStatus(SubCourseEnum.STU_CANCEL_SUB.getCode());
             return subCourseRepository.save(subCourse);
-        }else{
-            log.info("【学生取消课程】【学生请求状态为非法】");
-            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION.getCode(),ResultEnum.INFO_NOTFOUND_EXCEPTION.getMessage());
+        } else {
+            info = "【学生取消预约】 预约状态非法，不是预约等待和预约成功，subId="+subId;
+            log.error(info);
+            throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
         }
     }
+
+
+
+
+
+
+
+//        //查找到该学生的学籍号
+//        String stuCode = stuBaseRepository.findByStuOpenid(stuOpenid).getStuCode();
+//        TeaCourse teaCourse = teaCourseRepository.findOne(courserId);
+//        Integer courseStatus = teaCourse.getCourseStatus();
+//
+//        // 1.查到该条取消预约请求的当前状态，查到该课程所有的预约请求
+//        SubCourse subCourse = subCourseRepository.findByCourseIdAndStuCode(courserId,stuCode);
+//        List<SubCourse> subCourseList = subCourseRepository.findByCourseId(courserId);
+//
+//        // 2.若预约状态为提交预约请求，则将状态改为学生取消预约；检查是否包含其他提交预约请求，
+//        // 若有，则保持已被预约,若没有，则改为待预约
+//        Integer subStatus = subCourse.getSubStatus();
+//        log.info("预约状态subStatus"+subStatus);
+//        if(subStatus.equals(SubCourseEnum.SUB_WAIT.getCode())){
+//
+//            if(!courseStatus .equals(CourseEnum.SUB_SUCCESS.getCode())){
+//                log.info("【学生取消课程】【学生请求状态为预约等待】 课程状态不等于“已被预约”,错误!!!");
+//                teaCourse.setCourseStatus(CourseEnum.SUB_SUCCESS.getCode());
+//                teaCourseRepository.save(teaCourse);
+//            }
+//
+//            // 判断是否包含其他预约请求
+//            int numSUB_WAIT = 0;
+//            for(SubCourse subCourse1 : subCourseList){
+//                if(subCourse1.getSubStatus().equals(SubCourseEnum.SUB_WAIT.getCode())){
+//                    numSUB_WAIT++;
+//                }
+//            }
+//            if(numSUB_WAIT >1){
+//                log.info("【学生取消课程】【提交预约请求个数,取消后仍存在预约请求】");
+//            }else {
+//                log.info("【学生取消课程】【提交预约请求个数,取消后不存在其他预约请求】");
+//                teaCourse.setCourseStatus(CourseEnum.SUB_WAIT.getCode());
+//                teaCourseRepository.save(teaCourse);
+//                log.info("【学生取消课程】【提交预约请求个数,取消后不存在其他预约请求】 课程状态改为“待预约”");
+//            }
+//            subCourse.setSubStatus(SubCourseEnum.STU_CANCEL_SUB.getCode());
+//            return subCourseRepository.save(subCourse);
+//
+//        }else if(subStatus.equals(SubCourseEnum.SUB_CANDIDATE_FAILED.getCode())){
+//            // 3.若预约状态为预约失败，则直接将状态修改为学生取消预约
+//            log.info("【学生取消课程】【学生请求状态为预约失败】");
+//            subCourse.setSubStatus(SubCourseEnum.STU_CANCEL_SUB.getCode());
+//            return subCourseRepository.save(subCourse);
+//
+//        }else if(subStatus.equals(SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode())){
+//            // 4.若预约状态为预约成功，则将状态改为学生取消预约;检查该课程是否包含其他预约失败请求，
+//            // 若有，则把其余预约失败的请求，修改为提交预约请求，课程改为已被预约;若没有，将课程改为待预约
+//            int numSUB_CANDIDATE_FAILED = 0;
+//            for(SubCourse subCourse1 : subCourseList){
+//                if(subCourse1.getSubStatus().equals(SubCourseEnum.SUB_WAIT.getCode())){
+//                    numSUB_CANDIDATE_FAILED++;
+//                }
+//            }
+//
+//            if(numSUB_CANDIDATE_FAILED > 0){
+//                //存在其他预约失败请求
+//                log.info("【学生取消课程】【学生请求状态为预约成功】存在其他预约请求");
+//                for(SubCourse subCourse1: subCourseList){
+//                    if(subCourse1.getSubStatus().equals(SubCourseEnum.SUB_CANDIDATE_FAILED.getCode())){
+//                        subCourse1.setSubStatus(SubCourseEnum.SUB_WAIT.getCode());
+//                        subCourseRepository.save(subCourse1);
+//                    }
+//                }
+//                teaCourse.setCourseStatus(CourseEnum.SUB_SUCCESS.getCode());
+//                log.info("【学生取消课程】【学生请求状态为预约失成功】课程状态变为已被预约");
+//            }else{
+//                //不存在其他预约失败请求
+//                teaCourse.setCourseStatus(CourseEnum.SUB_WAIT.getCode());
+//                teaCourseRepository.save(teaCourse);
+//            }
+//            subCourse.setSubStatus(SubCourseEnum.STU_CANCEL_SUB.getCode());
+//            return subCourseRepository.save(subCourse);
+//        }else{
+//            log.info("【学生取消课程】【学生请求状态为非法】");
+//            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION.getCode(),ResultEnum.INFO_NOTFOUND_EXCEPTION.getMessage());
+//        }
 
 
 

@@ -39,27 +39,22 @@ public class Article {
      * 文章链接
      */
     private String articleUrl;
-
-    private String para1;
-    private String para2;
-    private String para3;
-    private String para4;
-    private String para5;
-    private String para6;
-    private String para7;
-    private String para8;
-    private String para9;
-    private String para10;
-    private String para11;
-    private String para12;
-    private String para13;
-    private String para14;
-    private String para15;
-    private String para16;
-    private String para17;
-    private String para18;
-    private String para19;
-    private String para20;
+    /**
+     * 一级标签
+     */
+    private String articleLabel1;
+    /**
+     * 二级标签
+     */
+    private String articleLabel2;
+    /**
+     * 图片地址
+     */
+    private String articleImg;
+    /**
+     * 文章内容
+     */
+    private String articleContent;
 
 
 }
