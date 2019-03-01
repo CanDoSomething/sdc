@@ -40,6 +40,14 @@ public class Article {
      */
     private String articleUrl;
     /**
+     * 一级标签
+     */
+    private String articleLabel1;
+    /**
+     * 二级标签
+     */
+    private String articleLabel2;
+    /**
      * 图片地址
      */
     private String articleImg;
