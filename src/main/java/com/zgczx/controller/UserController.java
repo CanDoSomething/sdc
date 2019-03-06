@@ -52,12 +52,17 @@ public class UserController {
     @ResponseBody
     public ResultVO<?> queryUserInfo(@RequestParam("openid") String openid){
 
+        //1. openid是否存在数据库
         StuBase stuBase = userService.findStuBaseByOpenid(openid);
         TeaBase teaBase = userService.findTeaBaseByOpenid(openid);
 
+        //2.判断是否为第一次注册的用户
+        StuBase stuBase1 = userService.findStuBaseByStuCode(openid);
+        TeaBase teaBase1 = userService.findTeaBaseByTeaCode(openid);
 
-        //1. openid是否存在数据库
-        if(null == stuBase && null ==teaBase){
+        //3.若都不存在，即为未注册
+        if(null == stuBase1 && null ==teaBase1 &&
+                null == stuBase && null ==teaBase){
             info = "【该openid没有注册】 "+openid;
             log.info(info);
             throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
