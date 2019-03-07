@@ -2,6 +2,7 @@ package com.zgczx.service.impl;
 
 import com.zgczx.dataobject.*;
 import com.zgczx.dto.CourseDTO;
+import com.zgczx.dto.PushMessageDTO;
 import com.zgczx.dto.StuBaseDTO;
 import com.zgczx.enums.CourseEnum;
 import com.zgczx.enums.ResultEnum;
@@ -21,7 +22,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -199,12 +199,14 @@ public class TeaServiceImpl implements TeaService {
         TeaCourse teaCourse = teaCourseRepository.findOne(courseId);
         //只有当前课程为等待预约和已被预约的情况下才能取消，课程进行时的取消应当属于提前结束课程
         Integer status = teaCourse.getCourseStatus();
-        if(status.intValue() == CourseEnum.SUB_WAIT.getCode() || status.intValue() == CourseEnum.SUB_SUCCESS.getCode() ){
+
+        if(status.intValue() == CourseEnum.SUB_WAIT.getCode()
+                || status.intValue() == CourseEnum.SUB_SUCCESS.getCode() ){
             teaCourse.setCourseCause(cancelReason);
             //如果当前已经有学生预约成功则给该学生发送消息通知
-            if(status.intValue() == SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode()){
-                //---------->pushMessageService.pushCancelCourseMessageToStu(teaCourse);
-            }
+           /* if(status.intValue() == SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode()){
+                pushMessageService.pushCancelCourseMessageToStu();
+            }*/
             teaCourse.setCourseStatus(CourseEnum.COURSE_CANCELED.getCode());
         } else {
             info = "【教师取消课程】 课程状态不正确";
@@ -213,6 +215,11 @@ public class TeaServiceImpl implements TeaService {
             throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
         }
         List<SubCourse> list  = subCourseRepository.findByCourseId(courseId);
+
+        PushMessageDTO pushMessageDTO = new PushMessageDTO();
+        pushMessageDTO.setTeaCourse(teaCourse);
+        pushMessageDTO.setTeaBase(byteaOpenid);
+
         for(SubCourse subCourseByID : list ){
             //修改预约成功学生的预约状态为教师取消课程，预约失败的学生状态依然是预约失败
             //对于处于预约等待的学生我们需要设置其状态为教师取消课程
@@ -226,7 +233,10 @@ public class TeaServiceImpl implements TeaService {
                     throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,info);
                 }
                 //给学生推送微信消息
-                //---------->pushMessageService.pushCancelCourseMessageToStu(teaCourse);
+                //仅仅是对等待和预约成功的学生进行消息推送
+                StuBase byStuCode = stuBaseRepository.findByStuCode(subCourseByID.getStuCode());
+                pushMessageDTO.setStuBase(byStuCode);
+                pushMessageService.pushCancelCourseMessageToStu(pushMessageDTO);
             }
         }
         TeaCourse save = teaCourseRepository.save(teaCourse);
@@ -235,6 +245,7 @@ public class TeaServiceImpl implements TeaService {
             log.error(info);
             throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,info);
         }
+
         return save;
     }
 
@@ -386,7 +397,6 @@ public class TeaServiceImpl implements TeaService {
     @Override
     @Transactional(rollbackFor=Exception.class)
     public SubCourse saveSelectedStu(String stuOpenId,Integer courseId) {
-
         if(stuOpenId == null || "".equals(stuOpenId)){
             info = "【教师选择候选预约学生】 学生编号为空";
             log.error(info);
@@ -405,7 +415,6 @@ public class TeaServiceImpl implements TeaService {
             throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
         }
         String stuCode = byStuOpenid.getStuCode();
-
         //教师再次选择预约候选人，会将之前成功预约的候选人代替，成功预约的转改会变成预约失败
         List<SubCourse> subCourseSuccessUpdateList = subCourseRepository.findByCourseIdAndSubStatus(courseId,SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode());
         //预约成功的候选人只可能有一个
@@ -425,8 +434,16 @@ public class TeaServiceImpl implements TeaService {
                 log.error(info);
                 throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,info);
             }
-            //给原成功预约候选人发送模板消息
-            //------------>pushMessageService.pushSubSuccessMessage(courseDTO);
+            //给原成功预约候选人发送预约被替代的模板消息
+            TeaCourse tmpTeaCourse  = teaCourseRepository.findOne(courseId);
+            String teaCode = tmpTeaCourse.getTeaCode();
+            TeaBase useTeaBase = teaBaseRepository.findOne(teaCode);
+            PushMessageDTO tmpCourseDTO = new PushMessageDTO();
+            tmpCourseDTO.setTeaCourse(tmpTeaCourse);
+            tmpCourseDTO.setTeaBase(useTeaBase);
+            tmpCourseDTO.setStuBase(stuBaseRepository.findByStuCode(stuCode1));
+            //tmpCourseDTO.setStudentCode(stuCode1);
+            pushMessageService.pushSubFailMessage(tmpCourseDTO);
         }
 
         //修改预约表中被成功选择的学生的学号
@@ -452,12 +469,13 @@ public class TeaServiceImpl implements TeaService {
             log.error(info);
             throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,info);
         }
-        //给学生推送预约成功的模板消息
-        CourseDTO courseDTO  = modelMapper.map(one,CourseDTO.class);
-        //courseDTO.setStudentCode(stuCode);
+        //给学生推送预约成功的模板消息(这部分消息的填充可以与预约被替代者中的CourseDTO中的数据共享)
+        PushMessageDTO pushMessageDTO = new PushMessageDTO();
+        pushMessageDTO.setTeaCourse(one);
+        pushMessageDTO.setStuBase(stuBaseRepository.findByStuCode(stuCode));
         TeaBase one1 = teaBaseRepository.findOne(one.getTeaCode());
-        courseDTO.setTeaBase(one1);
-        //------------>pushMessageService.pushSubSuccessMessage(courseDTO);
+        pushMessageDTO.setTeaBase(one1);
+        pushMessageService.pushSubSuccessMessage(pushMessageDTO);
 
         //选择之后候选人之后 ，发送消息给没有入选的候选人提示预约失败
         List<SubCourse> byCourseIdAndSubStatus = subCourseRepository.findByCourseIdAndSubStatus(courseId, SubCourseEnum.SUB_WAIT.getCode());
@@ -472,8 +490,9 @@ public class TeaServiceImpl implements TeaService {
                     throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,info);
                 }
                 //推送预约失败的模板消息
-                //courseDTO.setStudentCode(subCourse1.getStuCode());
-                //------------>pushMessageService.pushSubFailMessage(courseDTO);
+                String rsStuCode = subCourse1.getStuCode();
+                pushMessageDTO.setStuBase(stuBaseRepository.findByStuCode(rsStuCode));
+                pushMessageService.pushSubFailMessage(pushMessageDTO);
             }
         }
         return subCourse;
@@ -551,7 +570,18 @@ public class TeaServiceImpl implements TeaService {
             proFeedBack.setSubId(subId);
             proFeedBack.setTeaFeedback(feedBack);
             proFeedBack.setTeaScore(score);
-            return feedBackRepository.save(proFeedBack);
+
+            FeedBack rsFeedBack = feedBackRepository.save(proFeedBack);
+            //推送反馈给学生
+            PushMessageDTO pushMessageDTO= new PushMessageDTO();
+            pushMessageDTO.setTeaCourse(one);
+            pushMessageDTO.setFeedBack(proFeedBack);
+            pushMessageDTO.setTeaBase(byteaOpenid);
+            StuBase byStuCode = stuBaseRepository.findByStuCode(subCourseList.get(0).getStuCode());
+            pushMessageDTO.setStuBase(byStuCode);
+            //教师给学生发送反馈
+            pushMessageService.pushFeedBackMessageToStu(pushMessageDTO);
+            return rsFeedBack;
         }else{
             proFeedBack.setTeaFeedback(feedBack);
             proFeedBack.setTeaScore(score);

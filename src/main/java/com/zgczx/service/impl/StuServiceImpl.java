@@ -3,12 +3,14 @@ package com.zgczx.service.impl;
 
 import com.zgczx.dataobject.*;
 import com.zgczx.dto.CourseDTO;
+import com.zgczx.dto.PushMessageDTO;
 import com.zgczx.dto.SubDTO;
 import com.zgczx.enums.CourseEnum;
 import com.zgczx.enums.ResultEnum;
 import com.zgczx.enums.SubCourseEnum;
 import com.zgczx.exception.SdcException;
 import com.zgczx.repository.*;
+import com.zgczx.service.PushMessageService;
 import com.zgczx.service.StuService;
 import com.zgczx.service.TeaService;
 import com.zgczx.utils.DateUtil;
@@ -50,6 +52,8 @@ public class StuServiceImpl implements StuService {
     private StuBaseRepository stuBaseRepository;
     @Autowired
     private TeaService teaService;
+    @Autowired
+    private PushMessageService pushMessageService;
 
     private  String info = null;
     /**
@@ -239,7 +243,19 @@ public class StuServiceImpl implements StuService {
                 teaCourseRepository.save(teaCourse);
             }
             subCourse.setSubStatus(SubCourseEnum.STU_CANCEL_SUB.getCode());
-            return subCourseRepository.save(subCourse);
+            SubCourse rsSubCourse = subCourseRepository.save(subCourse);
+            //给教师推送模板消息，学生取消了课程
+
+            TeaBase teaBase = teaBaseRepository.findOne(teaCourse.getTeaCode());
+            PushMessageDTO pushMessageDTO = new PushMessageDTO();
+            teaCourse.setCourseCause(cause);
+            pushMessageDTO.setTeaCourse(teaCourse);
+            pushMessageDTO.setTeaBase(teaBase);
+            StuBase byStuCode = stuBaseRepository.findByStuCode(stuCode);
+            pushMessageDTO.setStuBase(byStuCode);
+
+            pushMessageService.pushCancelCourseMessageToTea(pushMessageDTO);
+            return rsSubCourse;
         }else{
             info = "【学生取消课程】学生请求状态为非法";
             log.info(info);
@@ -354,7 +370,16 @@ public class StuServiceImpl implements StuService {
             log.error(info);
             throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,info);
         }
+        //模板消息的封装
+        PushMessageDTO pushMessageDTO = new PushMessageDTO();
+        TeaBase rsTeaBase = teaBaseRepository.findOne(one.getTeaCode());
+        pushMessageDTO.setTeaBase(rsTeaBase);
+        SubCourse rsSubCourse = subCourseRepository.findOne(subId);
+        pushMessageDTO.setStuBase(stuBaseRepository.findByStuCode(rsSubCourse.getStuCode()));
+        pushMessageDTO.setFeedBack(save);
+        pushMessageDTO.setTeaCourse(teaCourseRepository.findByTeaCodeAndCourseId(rsTeaBase.getTeaCode(),courseId));
         FeedBack one1 = feedBackRepository.findOne(save.getFeedbackId());
+        pushMessageService.pushFeedBackMessageToTea(pushMessageDTO);
         return one1;
     }
     /**
