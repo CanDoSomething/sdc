@@ -20,6 +20,7 @@ public interface StuService {
      *
      * @param page 页面数
      * @param size size页面大小
+     * @return List<CourseDTO>
      */
      List<CourseDTO> findAllCourse(Integer page,Integer size);
     /**
@@ -28,6 +29,7 @@ public interface StuService {
      *
      * @param stuOpenid 学生微信id
      * @param courserId  课程id
+     * @return SubCourse
      */
      SubCourse order(String stuOpenid, Integer courserId);
     /**
@@ -37,8 +39,9 @@ public interface StuService {
      * @param cause 取消原因
      * @param courserId 课程id
      * @param stuOpenid 学生微信id
+     * @return SubCourse
      */
-     SubCourse cancelOrder(String cause,String stuOpenid, Integer courserId);
+     SubCourse cancelOrder(String cause,String stuOpenid, Integer courserId, Integer subId);
     /**
      *
      * 功能描述: 提交反馈
@@ -47,6 +50,7 @@ public interface StuService {
      * @param message 代表反馈内容
      * @param score 代表反馈评分
      * @param subId 预约课程id
+     * @return FeedBack 提交的反馈信息
      */
      FeedBack feedBack(Integer courseId, String message, Integer score,Integer subId);
 
@@ -61,6 +65,13 @@ public interface StuService {
      * @return List<CourseDTO> 课程封装对象的集合
      **/
      List<SubDTO> lookHistory(Integer page, Integer size, String stuOpenid);
+
+    /**
+     * 判断学生Openid是否存在
+     * @param stuOpenid 学生openid
+     * @return Boolean 是否合法
+     */
+     Boolean legalStudent(String stuOpenid);
 
 
 

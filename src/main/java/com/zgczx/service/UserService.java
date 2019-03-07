@@ -90,6 +90,20 @@ public interface UserService {
      */
     String deleteStuByOpenid(String stuOpenid);
 
+    /**
+     * 根据学籍号获取学生信息
+     * @param stuCode 学籍号
+     * @return 学生信息
+     */
+    StuBase findStuBaseByStuCode(String stuCode);
+
+    /**
+     * 根据教师工号获取教师信息
+     * @param teaCode 教师工号
+     * @return 教师信息
+     */
+    TeaBase findTeaBaseByTeaCode(String teaCode);
+
 
 
 }

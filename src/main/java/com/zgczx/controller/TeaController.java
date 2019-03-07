@@ -9,6 +9,8 @@ import com.zgczx.dto.StuBaseDTO;
 import com.zgczx.enums.ResultEnum;
 import com.zgczx.exception.SdcException;
 import com.zgczx.form.TeaCourseForm;
+import com.zgczx.service.CourseService;
+import com.zgczx.service.StuService;
 import com.zgczx.service.TeaService;
 import com.zgczx.utils.ResultVOUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +35,12 @@ import java.util.List;
 public class TeaController {
     @Autowired
     private TeaService teaService;
+
+    @Autowired
+    private StuService stuService;
+
+    @Autowired
+    private CourseService courseService;
     private String info;
 
     /**
@@ -43,7 +51,7 @@ public class TeaController {
      * @return  创建新创建课程的courseId
      */
     @PostMapping("/createCourse")
-    public ResultVO<TeaCourse> createCourse(@Valid TeaCourseForm teaCourseForm,
+    public ResultVO createCourse(@Valid TeaCourseForm teaCourseForm,
                                             BindingResult bindingResult,
                                             @RequestParam("teaOpenid") String teaOpenid){
         //后台进行表单验证，若参数不正确抛出异常
@@ -74,18 +82,29 @@ public class TeaController {
      * @return 当前所有候选人
      */
     @GetMapping("/findCandidatesByCourseId")
-    public ResultVO<List<StuBaseDTO>> findCandidatesByCourseId(@RequestParam(value = "courseId") Integer courserId,
-                                                            @RequestParam(value = "teaOpenid") String teaOpenid,
-                                                            @RequestParam(value = "page", defaultValue = "1") int page,
-                                                            @RequestParam(value = "pageSize", defaultValue = "10") int pageSize){
+    public ResultVO findCandidatesByCourseId(@RequestParam(value = "courseId") Integer courserId,
+                                             @RequestParam(value = "teaOpenid") String teaOpenid,
+                                             @RequestParam(value = "page", defaultValue = "1") Integer page,
+                                             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize){
 
-        if(courserId == null){
-            info = "【教师查看预约候选人】 该课程编号为空";
-            log.error(info);
-            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
+        /*
+         * 根据courseId和teaOpenid判断是否合法
+         * 返回该课程的所有预约请求
+         */
+
+        //1.根据courseId和teaOpenid判断是否合法
+        if(!teaService.legalTeacher(teaOpenid)){
+            info = "【教师查看预约候选人】 【数据检验】teaOpenid 对应的教师非法存在，teaOpenid="+teaOpenid;
+            log.info(info);
+            throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
+        }
+        if(!courseService.legalCourse(courserId)){
+            String logInfo = "【预约课程】 【数据检验】courserId 非法，courserId="+courserId;
+            log.info(logInfo);
+            throw new SdcException(ResultEnum.PARAM_EXCEPTION,logInfo);
         }
 
-
+        //2.返回该课程的所有预约请求
         List<StuBaseDTO> list = teaService.findCandidateByCourseId(courserId,teaOpenid, page - 1, pageSize);
         return ResultVOUtil.success(list);
     }
@@ -99,9 +118,23 @@ public class TeaController {
      * @return 展示当前老师的历史课程
      */
     @GetMapping("/findTeaHistoryCourse")
-    public ResultVO<List<CourseDTO>> findTeaHistoryCourse(@RequestParam(value = "teaOpenid") String teaOpenid,
+    public ResultVO findTeaHistoryCourse(@RequestParam(value = "teaOpenid") String teaOpenid,
                                                           @RequestParam(value = "page", defaultValue = "1") int page,
                                                           @RequestParam(value = "pageSize", defaultValue = "10") int pageSize){
+        /* 根据teaOpenid判断是否合法存在
+         * 找到老师的所有课程，如果存在反馈，加上反馈信息
+         */
+        if(StringUtils.isEmpty(teaOpenid)){
+            info = "【教师查看历史课程】 教师微信编号为空";
+            log.error(info);
+            throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
+        }
+        if(!teaService.legalTeacher(teaOpenid)){
+            info = "【教师查看预约候选人】 【数据检验】teaOpenid 对应的教师非法存在，teaOpenid="+teaOpenid;
+            log.info(info);
+            throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
+        }
+
         List<CourseDTO> list = teaService.findTeaHistoryCourse(teaOpenid, page-1, pageSize);
         return ResultVOUtil.success(list);
 
@@ -114,7 +147,7 @@ public class TeaController {
      * @return 取消的课程状态
      */
     @PostMapping("/cancelCourse")
-    public ResultVO<TeaCourse> cancelCourse(@RequestParam(value = "courseId")Integer courseId,
+    public ResultVO cancelCourse(@RequestParam(value = "courseId")Integer courseId,
                                             @RequestParam(value = "teaOpenid") String teaOpenid,
                                             @RequestParam(value = "cancelReason") String cancelReason){
         TeaCourse teaCourse = teaService.cancelCourse(courseId,teaOpenid,cancelReason);
@@ -132,8 +165,35 @@ public class TeaController {
      * @return 预定课程的信息
      */
     @PostMapping("/saveSelectedStu")
-    public ResultVO<SubCourse> saveSelectedStu(@RequestParam(value = "courseId")Integer courseId,
+    public ResultVO saveSelectedStu(@RequestParam(value = "courseId") Integer courseId,
                                                @RequestParam(value = "stuOpenid") String stuOpenid){
+
+        /*
+         * 判断courseId和stuOpenid是否合法
+         * 根据课程找到是否已经存在预约成功的学生
+         * 若存在，改为预约失败；若不存在，则该学生的预约状态改为预约成功，其他提交预约请求的学生都改为预约失败
+         * 注意：假如有的请求改为预约失败，就不能再预约拉。此时来了新的预约请求，请求状态为提交请求，可以选择新的
+         * 请求而替代原来的请求
+         */
+
+        //1.根据courseId和stuOpenid判断是否合法
+        if(stuOpenid == null || "".equals(stuOpenid)){
+            info = "【教师选择候选预约学生】 学生编号为空";
+            log.error(info);
+            throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
+        }
+        if(courseId == null ){
+            info = "【教师选择候选预约学生】 课程编号为空";
+            log.error(info);
+            throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
+        }
+        if(!stuService.legalStudent(stuOpenid)){
+            String logInfo = "【预约课程】 【数据检验】stuOpenid 非法，stuOpenid="+stuOpenid;
+            log.info(logInfo);
+            throw new SdcException(ResultEnum.PARAM_EXCEPTION,logInfo);
+        }
+
+        // 2.确认候选人
         SubCourse subCourse = teaService.saveSelectedStu(stuOpenid, courseId);
         return ResultVOUtil.success(subCourse);
     }
@@ -148,7 +208,7 @@ public class TeaController {
      * @return 反馈课程信息
      */
     @PostMapping("/createFeedBack")
-    public ResultVO<FeedBack> createFeedBack(@RequestParam("subId") Integer subId,
+    public ResultVO createFeedBack(@RequestParam("subId") Integer subId,
                                              @RequestParam("teaOpenid") String teaOpenid,
                                              @RequestParam("teaFeedBack") String teaFeedBack,
                                              @RequestParam("score")Integer score){
