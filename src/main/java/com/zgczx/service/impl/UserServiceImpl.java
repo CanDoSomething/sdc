@@ -159,4 +159,14 @@ public class UserServiceImpl implements UserService {
             return "没有找到，删除失败";
         }
     }
+
+    @Override
+    public StuBase findStuBaseByStuCode(String stuCode) {
+        return stuBaseRepository.findByStuCode(stuCode);
+    }
+
+    @Override
+    public TeaBase findTeaBaseByTeaCode(String teaCode) {
+        return teaBaseRepository.findOne(teaCode);
+    }
 }

@@ -2,8 +2,10 @@ package com.zgczx.form;
 
 import lombok.Data;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 
 /**
  * 教师课程表单信息
@@ -27,20 +29,23 @@ public class TeaCourseForm {
     /**
      * 课程日期
      */
-    @NotEmpty(message = "课程日期必填")
-    private String courseDate;
+    @NotNull(message = "课程日期必填")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date courseDate;
 
     /**
      * 课程开始时间
      */
-    @NotEmpty(message = "课程开始时间必填")
-    private String courseStartTime;
+    @NotNull(message = "课程开始时间必填")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date courseStartTime;
 
     /**
      * 课程结束时间
      */
-    @NotEmpty(message = "课程结束时间必填")
-    private String courseEndTime;
+    @NotNull(message = "课程结束时间必填")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date courseEndTime;
 
     /**
      * 课程上课方式，上课方式(0表示线上，1表示线下)

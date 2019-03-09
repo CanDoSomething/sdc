@@ -35,7 +35,7 @@ public class StuServiceImplTest extends SellApplicationTests {
     /*取消预约测试*/
     @Test
     public void cancel(){
-        SubCourse subCourse = stuService.cancelOrder("有事", "openid1", 6);
+        SubCourse subCourse = stuService.cancelOrder("有事", "openid1", 6,1);
         System.out.println(subCourse);
     }
     /*查询历史记录*/

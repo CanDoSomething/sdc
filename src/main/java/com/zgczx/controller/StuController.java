@@ -5,9 +5,14 @@ import com.zgczx.dataobject.FeedBack;
 import com.zgczx.dataobject.SubCourse;
 import com.zgczx.dto.CourseDTO;
 import com.zgczx.dto.SubDTO;
+import com.zgczx.enums.ResultEnum;
+import com.zgczx.exception.SdcException;
+import com.zgczx.service.CourseService;
 import com.zgczx.service.impl.StuServiceImpl;
 import com.zgczx.utils.ResultVOUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,24 +24,27 @@ import java.util.List;
  * @date 2018/12/11 10:29
  */
 @RequestMapping("/stu")
-@RestController
+@Controller
+@Slf4j
 public class StuController {
     @Autowired
     private StuServiceImpl stuService;
+    @Autowired
+    private CourseService courseService;
     /**
      * 功能描述: 查找所有课程信息
      *
      * @param  page 分页，
      * @param size 页面大小
-     * @author 陈志恒
-     * @date 2018/12/16 18:41
+     * @return 展示可预约和进行中的课程
      */
     @GetMapping(value = "/findAllCourse")
+    @ResponseBody
     public ResultVO findAllCourse(@RequestParam(value = "page", defaultValue = "1") Integer page,
                               @RequestParam(value = "size", defaultValue = "10") Integer size){
-        /*去stuService中查找所有课程信息*/
-        List<CourseDTO> allCourse = stuService.findAllCourse(page-1,size);
-        /*返回结果集*/
+
+        List<CourseDTO> allCourse = stuService.findAllCourse(page - 1,size);
+
         return ResultVOUtil.success(allCourse);
     }
     /**
@@ -47,10 +55,31 @@ public class StuController {
      * @return ResultVO
      */
     @GetMapping(value = "/order")
+    @ResponseBody
     public ResultVO getOrder(@RequestParam(value = "stuOpenid")String stuOpenid,
                           @RequestParam(value = "courserId")Integer courserId){
+
+        /*
+         * 根据stuOpenid和courserId判断是否合法
+         * 比较学生的历史预约信息与目标课程的时间是否冲突
+         * 保存预约请求，课程状态改为已被学生预约
+         */
+
+        //1.根据stuOpenid和courserId判断是否合法
+        if(!stuService.legalStudent(stuOpenid)){
+            String logInfo = "【预约课程】 【数据检验】stuOpenid 非法，stuOpenid="+stuOpenid;
+            log.info(logInfo);
+            throw new SdcException(ResultEnum.PARAM_EXCEPTION,logInfo);
+        }
+        if(!courseService.legalCourse(courserId)){
+            String logInfo = "【预约课程】 【数据检验】courserId 非法，courserId="+courserId;
+            log.info(logInfo);
+            throw new SdcException(ResultEnum.PARAM_EXCEPTION,logInfo);
+        }
+
+        //2.提交预约请求
         SubCourse order = stuService.order(stuOpenid, courserId);
-        /*返回结果集*/
+
         return ResultVOUtil.success(order) ;
     }
     /**
@@ -61,10 +90,26 @@ public class StuController {
      * @param stuOpenid 学生微信id
      */
     @PostMapping(value = "/cancelOrder")
-    public ResultVO cancelOrder(@RequestParam(value = "cause")String cause,
-                                 @RequestParam(value = "stuOpenid")String stuOpenid,
-                                 @RequestParam(value = "courserId")Integer courserId){
-        SubCourse subCourse = stuService.cancelOrder(cause, stuOpenid, courserId);
+    @ResponseBody
+    public ResultVO cancelOrder(@RequestParam(value = "cause") String cause,
+                                @RequestParam(value = "stuOpenid") String stuOpenid,
+                                @RequestParam(value = "courserId") Integer courserId,
+                                @RequestParam(value = "subId") Integer subId){
+
+        //1.根据stuOpenid和courserId判断是否合法
+        if(!stuService.legalStudent(stuOpenid)){
+            String logInfo = "【预约课程】 【数据检验】stuOpenid 非法，stuOpenid="+stuOpenid;
+            log.info(logInfo);
+            throw new SdcException(ResultEnum.PARAM_EXCEPTION,logInfo);
+        }
+        if(!courseService.legalCourse(courserId)){
+            String logInfo = "【预约课程】 【数据检验】courserId 非法，courserId="+courserId;
+            log.info(logInfo);
+            throw new SdcException(ResultEnum.PARAM_EXCEPTION,logInfo);
+        }
+
+
+        SubCourse subCourse = stuService.cancelOrder(cause, stuOpenid, courserId,subId);
         return ResultVOUtil.success(subCourse);
 
     }
@@ -77,6 +122,7 @@ public class StuController {
      * @param subId 预约课程id
      */
     @PostMapping(value = "/feedback")
+    @ResponseBody
     public ResultVO feedback(@RequestParam(value = "courserId")Integer courserId,
                              @RequestParam(value = "message")String message,
                              @RequestParam(value = "score")Integer score,
@@ -93,9 +139,22 @@ public class StuController {
      * @param stuOpenid 学生微信id
      */
     @GetMapping(value = "/lookHistory")
+    @ResponseBody
     public ResultVO lookHistory(@RequestParam(value = "page", defaultValue = "1") Integer page,
                                 @RequestParam(value = "size", defaultValue = "10") Integer size,
                                 @RequestParam(value = "stuOpenid") String stuOpenid){
+
+        /*
+         * 根据 stuOpenid 检查是否合法存在
+         * 查找该学生的所有预约请求，打包返回
+         */
+
+        if(!stuService.legalStudent(stuOpenid)){
+            String logInfo = "【预约课程】 【数据检验】stuOpenid 非法，stuOpenid="+stuOpenid;
+            log.info(logInfo);
+            throw new SdcException(ResultEnum.PARAM_EXCEPTION,logInfo);
+        }
+
         List<SubDTO> courseDTOSs = stuService.lookHistory(page-1, size, stuOpenid);
         return ResultVOUtil.success(courseDTOSs);
     }

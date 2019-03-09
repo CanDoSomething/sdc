@@ -30,3 +30,5 @@ projectUrl:
   weChatOpenAuthorize: http://zhiheyikaoqin.cn
   sdc: http://zhiheyikaoqin.cn
   homeAddress: /user/home
+logging:
+  config: classpath:logback-spring.xml
