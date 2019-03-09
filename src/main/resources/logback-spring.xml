@@ -23,7 +23,7 @@
         <!-- 滚动策略-->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!--路径-->
-            <fileNamePattern>../logs/info.%d.log</fileNamePattern>
+            <fileNamePattern>logs/info.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>90</maxHistory>
             <totalSizeCap>1GB</totalSizeCap>
         </rollingPolicy>
@@ -34,6 +34,7 @@
             <level>ERROR</level>
         </filter>
         <encoder>
+            <charset>UTF-8</charset>
             <pattern>
                 %msg%n
             </pattern>
@@ -41,14 +42,16 @@
         <!-- 滚动策略-->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!--路径-->
-            <fileNamePattern>../logs/error.%d.log</fileNamePattern>
+            <fileNamePattern>logs/error.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>90</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
         </rollingPolicy>
     </appender>
 
     <root level="info">
         <appender-ref ref="consoleLog"/>
         <appender-ref ref="fileInfoLog"/>
-        <!--<appender-ref ref="fileErrorLog"/>-->
+        <appender-ref ref="fileErrorLog"/>
     </root>
 
 

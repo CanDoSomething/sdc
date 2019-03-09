@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.zgczx.utils.DateUtil.getNowTime;
+
 /**
  * @author Jason
  * @date 2019/2/22 20:41
@@ -40,16 +42,19 @@ public class ArticleServiceImpl implements ArticleService {
         Pageable pageable = new PageRequest(page, pageSize);
         Page<Article> articleList =  articleRepository.findAll(pageable);
 
+
         if (articleList.getContent().isEmpty()){
             String info = "没有该页的文章";
             log.error(info);
             throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
         }
+        log.info("getArticleList--->"+"openid:"+openid+"  "+"pageSize:"+pageSize+"  "+"time:"+getNowTime());
+
         return articleList.getContent();
     }
 
     @Override
-    public Article getArticleContent(Integer artId) {
+    public Article getArticleContent(Integer artId,String openid) {
 
         Article article = articleRepository.findOne(artId);
 
@@ -58,6 +63,7 @@ public class ArticleServiceImpl implements ArticleService {
             log.info(info);
             throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
         }
+        log.info("getArticleContent--->"+"openid:"+openid+"  "+"artId:"+artId+"  "+"time:"+getNowTime());
 
         return article;
     }
@@ -80,7 +86,15 @@ public class ArticleServiceImpl implements ArticleService {
         articleScore.setArtId(artId);
         articleScore.setScore(score);
 
-        return articleScoreRepository.save(articleScore);
+        ArticleScore savedArticleScore = articleScoreRepository.save(articleScore);
+        if(savedArticleScore  == null){
+            throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,"新评分没有保存成功，openid="+"openid"+
+                    "artId="+artId+"score="+score);
+        }
+
+        log.info("putScore--->"+"openid:"+openid+"  "+"artId:"+artId+"  "+"score:"+score+"  "+"time:"+getNowTime());
+
+        return savedArticleScore;
 
     }
 }
