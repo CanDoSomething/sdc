@@ -39,6 +39,7 @@ public interface StuService {
      * @param cause 取消原因
      * @param courserId 课程id
      * @param stuOpenid 学生微信id
+     * @param subId 选课id
      * @return SubCourse
      */
      SubCourse cancelOrder(String cause,String stuOpenid, Integer courserId, Integer subId);
