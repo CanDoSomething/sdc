@@ -33,9 +33,6 @@ import java.util.List;
 @Service
 @Slf4j
 public class StuServiceImpl implements StuService {
-
-
-
     @Autowired
     private TeaCourseRepository teaCourseRepository;
     @Autowired

@@ -15,6 +15,7 @@
             <!--<OnMisMatch>ACCEPT</OnMisMatch>-->
         </filter>
         <encoder>
+            <charset>UTF-8</charset>
             <pattern>
                 %msg%n
             </pattern>
@@ -23,6 +24,8 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!--路径-->
             <fileNamePattern>../logs/info.%d.log</fileNamePattern>
+            <maxHistory>90</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
         </rollingPolicy>
     </appender>
 
@@ -44,7 +47,7 @@
 
     <root level="info">
         <appender-ref ref="consoleLog"/>
-        <!--<appender-ref ref="fileInfoLog"/>-->
+        <appender-ref ref="fileInfoLog"/>
         <!--<appender-ref ref="fileErrorLog"/>-->
     </root>
 
