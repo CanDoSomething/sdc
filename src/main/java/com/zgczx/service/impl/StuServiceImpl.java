@@ -396,11 +396,32 @@ public class StuServiceImpl implements StuService {
         }
         /*查找课程信息*/
         TeaCourse one = teaCourseRepository.findOne(courseId);
-        /*判断课程信息是否正常结束,如果不是抛出异常*/
-        if (one==null || !one.getCourseStatus().equals(CourseEnum.COURSE_FINISH.getCode())){
-            info = "课程没有正常结束,不能提交反馈信息";
+        /*
+            提交反馈需要判断课程信息是否正常结束：
+            1.课程状态为结束
+            2.课程状态为正在进行并且状态课程的结束时间早于当前时间
+        */
+        //课程状态为正在进行并且状态课程的结束时间早于当前时间那么需要将课程状态修改为结束
+        if(one != null ){
+            if( one.getCourseStatus().equals(CourseEnum.COURSE_INTERACT.getCode())
+                    &&  one.getCourseEndTime().before(new Date()) ){
+                one.setCourseStatus(CourseEnum.COURSE_FINISH.getCode());
+                TeaCourse updateCourseStatus = teaCourseRepository.save(one);
+                if(null == updateCourseStatus ){
+                    info = "【学生提交课程反馈】 更新数据库异常！";
+                    log.error(info);
+                    throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,info);
+                }
+            }
+            if( !one.getCourseStatus().equals(CourseEnum.COURSE_FINISH.getCode())){
+                info = "【学生提交课程反馈】 当前课程状态不正确，不能提交反馈！";
+                log.error(info);
+                throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
+            }
+        } else {
+            info = "课程信息为空！";
             log.error(info);
-            throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
+            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
         }
         /*根据预约课程id来查找用户是否提交反馈*/
         FeedBack bySubId = feedBackRepository.findBySubId(subId);
@@ -419,7 +440,7 @@ public class StuServiceImpl implements StuService {
         /*保存数据到反馈表*/
         FeedBack save=feedBackRepository.saveAndFlush(bySubId);
         if (save==null){
-            info = "【学生发起反馈】 报存到数据库中失败";
+            info = "【学生发起反馈】 数据库操作失败";
             log.error(info);
             throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,info);
         }

@@ -47,7 +47,7 @@ public class PushMessageServiceImpl implements PushMessageService {
         templateMessage.setTemplateId(PushMessageConfig.SUBCOURSE_CHANGE_MESSAGE_ID);
 
         if(pushMessageDTO == null ){
-            info = "【模板消息推送】课程或学生信息为空";
+            info = "【预约课程状态模板消息】课程或学生信息为空";
             log.error(info);
             throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
         }
@@ -89,7 +89,7 @@ public class PushMessageServiceImpl implements PushMessageService {
         templateMessage.setTemplateId(PushMessageConfig.SUBCOURSE_CHANGE_MESSAGE_ID);
 
         if(pushMessageDTO == null ){
-            info = "【模板消息推送】课程或学生信息为空";
+            info = "【预约课程状态模板消息】课程或学生信息为空";
             log.error(info);
             throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
         }
@@ -131,7 +131,7 @@ public class PushMessageServiceImpl implements PushMessageService {
         templateMessage.setTemplateId(PushMessageConfig.SUBCOURSE_CHANGE_MESSAGE_ID);
 
         if(pushMessageDTO == null ){
-            info = "【模板消息推送】课程信息为空";
+            info = "【取消课程模板消息】课程信息为空";
             log.error(info);
             throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
         }
@@ -156,7 +156,7 @@ public class PushMessageServiceImpl implements PushMessageService {
             wxMpService.getTemplateMsgService()
                     .sendTemplateMsg(templateMessage);
         } catch (WxErrorException e){
-            info = "【预约课程状态模板消息】 发送消息失败";
+            info = "【取消课程模板消息】 发送消息失败";
             log.error(info);
             throw new SdcException(ResultEnum.WECHAT_MP_ERROR,info);
         }
@@ -170,7 +170,7 @@ public class PushMessageServiceImpl implements PushMessageService {
         templateMessage.setTemplateId(PushMessageConfig.FEEDBACK_MESSAGE_ID);
 
         if(pushMessageDTO == null ){
-            info = "【模板消息推送】课程信息为空";
+            info = "【教师给学生反馈模板消息】课程信息为空";
             log.error(info);
             throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
         }
@@ -190,7 +190,7 @@ public class PushMessageServiceImpl implements PushMessageService {
             wxMpService.getTemplateMsgService()
                     .sendTemplateMsg(templateMessage);
         } catch (WxErrorException e){
-            info = "【预约课程状态模板消息】 发送消息失败";
+            info = "【教师给学生反馈模板消息】 发送消息失败";
             log.error(info);
             throw new SdcException(ResultEnum.WECHAT_MP_ERROR,info);
         }
@@ -204,7 +204,7 @@ public class PushMessageServiceImpl implements PushMessageService {
         templateMessage.setTemplateId(PushMessageConfig.SUBCOURSE_CHANGE_MESSAGE_ID);
 
         if(pushMessageDTO == null ){
-            info = "【模板消息推送】课程信息为空";
+            info = "【学生取消教师课程模板消息】课程信息为空";
             log.error(info);
             throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
         }
@@ -229,7 +229,7 @@ public class PushMessageServiceImpl implements PushMessageService {
             wxMpService.getTemplateMsgService()
                     .sendTemplateMsg(templateMessage);
         } catch (WxErrorException e){
-            info = "【预约课程状态模板消息】 发送消息失败";
+            info = "【学生取消教师课程模板消息】 发送消息失败";
             log.error(info);
             throw new SdcException(ResultEnum.WECHAT_MP_ERROR,info);
         }
@@ -243,7 +243,7 @@ public class PushMessageServiceImpl implements PushMessageService {
         templateMessage.setTemplateId(PushMessageConfig.FEEDBACK_MESSAGE_ID);
 
         if(pushMessageDTO == null ){
-            info = "【模板消息推送】课程信息为空";
+            info = "【学生给教师课程反馈模板消息】课程信息为空";
             log.error(info);
             throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
         }
@@ -263,7 +263,7 @@ public class PushMessageServiceImpl implements PushMessageService {
             wxMpService.getTemplateMsgService()
                     .sendTemplateMsg(templateMessage);
         } catch (WxErrorException e){
-            info = "【预约课程状态模板消息】 发送消息失败";
+            info = "【学生给教师课程反馈模板消息】 发送消息失败";
             log.error(info);
             throw new SdcException(ResultEnum.WECHAT_MP_ERROR,info);
         }
