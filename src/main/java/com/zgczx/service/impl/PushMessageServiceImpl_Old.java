@@ -1,3 +1,4 @@
+/*
 package com.zgczx.service.impl;
 
 import com.zgczx.config.PushMessageConfig;
@@ -14,21 +15,21 @@ import me.chanjar.weixin.mp.bean.template.WxMpTemplateData;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplateMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
+*/
 /**
  * @Author: Dqd
  * @Date: 2018/12/18 18:05
  * @Description:
- */
+ *//*
+
 @Service
 @Slf4j
-public class PushMessageServiceImpl implements PushMessageService {
+public class PushMessageServiceImpl_Old implements PushMessageService {
 
     @Autowired
     private WxMpService wxMpService;
@@ -36,18 +37,19 @@ public class PushMessageServiceImpl implements PushMessageService {
     private StuBaseRepository stuBaseRepository;
     private String info = null;
 
-    /**
+    */
+/**
      * 推送给学生的预约课程模板状态消息
      *
      * @param pushMessageDTO 封装的课程消息对象
-     */
+     *//*
+
     @Override
-    @Transactional(rollbackFor=Exception.class)
     public void pushSubSuccessMessage(PushMessageDTO pushMessageDTO) {
         WxMpTemplateMessage templateMessage
                 = new WxMpTemplateMessage();
         //设置模板消息id
-        templateMessage.setTemplateId(PushMessageConfig.SUBCOURSE_SUCCESS_MESSAGE_ID);
+        templateMessage.setTemplateId(PushMessageConfig.SUBCOURSE_CHANGE_MESSAGE_ID);
 
         if(pushMessageDTO == null ){
             info = "【预约课程状态模板消息】课程或学生信息为空";
@@ -60,14 +62,15 @@ public class PushMessageServiceImpl implements PushMessageService {
         boolean empty = StringUtils.isEmpty(pushMessageDTO.getTeaCourse().getCourseLocation());
         String tmp =( empty == true ?"在线互动平台":pushMessageDTO.getTeaCourse().getCourseLocation());
         List<WxMpTemplateData> data = Arrays.asList(
-                new WxMpTemplateData("first","课程名称为: "+ pushMessageDTO.getTeaCourse().getCourseName()),
-                new WxMpTemplateData("keyword1",pushMessageDTO.getTeaBase().getTeaName()),
-                //new WxMpTemplateData("keyword2","行了嘛"),
-                new WxMpTemplateData("keyword3",tmp),
-                new WxMpTemplateData("keyword4",pushMessageDTO.getTeaCourse().getCourseEndTime().toString()+"至"+pushMessageDTO.getTeaCourse().getCourseEndTime().toString()),
-                //new WxMpTemplateData("keyword5", SubCourseEnum.SUB_CANDIDATE_SUCCESS.getMessage()),
-                //new WxMpTemplateData("keyword6",tmp),
-                new WxMpTemplateData("remark",pushMessageDTO.getTeaCourse().getCourseCause())
+                new WxMpTemplateData("first","预约课程成功！"),
+                new WxMpTemplateData("keyword1",pushMessageDTO.getTeaCourse().getCourseName()),
+                new WxMpTemplateData("keyword2",pushMessageDTO.getTeaBase().getTeaName()),
+                new WxMpTemplateData("keyword3",pushMessageDTO.getTeaCourse().getCourseStartTime().toString()),
+                new WxMpTemplateData("keyword4",pushMessageDTO.getTeaCourse().getCourseEndTime().toString()),
+                new WxMpTemplateData("keyword5", SubCourseEnum.SUB_CANDIDATE_SUCCESS.getMessage()),
+                new WxMpTemplateData("keyword6",tmp),
+                new WxMpTemplateData("keyword7",pushMessageDTO.getTeaCourse().getCourseCause()),
+                new WxMpTemplateData("remark","同学们上门不要迟到哦")
         );
         templateMessage.setData(data);
         try {
@@ -78,17 +81,19 @@ public class PushMessageServiceImpl implements PushMessageService {
         }
     }
 
-    /**
+    */
+/**
      * 给预约失败的候选人发送消息
      *
      * @param pushMessageDTO
-     */
+     *//*
+
     @Override
     public void pushSubFailMessage(PushMessageDTO pushMessageDTO) {
         WxMpTemplateMessage templateMessage
                 = new WxMpTemplateMessage();
         //设置模板消息id
-        templateMessage.setTemplateId(PushMessageConfig.SUBCOURSE_FAIL_OR_CANCEL_MESSAGE_ID);
+        templateMessage.setTemplateId(PushMessageConfig.SUBCOURSE_CHANGE_MESSAGE_ID);
 
         if(pushMessageDTO == null ){
             info = "【预约课程状态模板消息】课程或学生信息为空";
@@ -101,15 +106,15 @@ public class PushMessageServiceImpl implements PushMessageService {
         boolean empty = StringUtils.isEmpty(pushMessageDTO.getTeaCourse().getCourseLocation());
         String tmp =( empty == true ?"在线互动平台":pushMessageDTO.getTeaCourse().getCourseLocation());
         List<WxMpTemplateData> data = Arrays.asList(
-                new WxMpTemplateData("first","课程名称为: "+ pushMessageDTO.getTeaCourse().getCourseName()),
-                //new WxMpTemplateData("keyword1",pushMessageDTO.getTeaCourse().getCourseName()),
-                //new WxMpTemplateData("keyword2",pushMessageDTO.getTeaBase().getTeaName()),
-                //new WxMpTemplateData("keyword3",pushMessageDTO.getTeaCourse().getCourseStartTime().toString()),
-                //new WxMpTemplateData("keyword4",pushMessageDTO.getTeaCourse().getCourseEndTime().toString()),
-                new WxMpTemplateData("keyword2",SubCourseEnum.SUB_CANDIDATE_FAILED.getMessage()),
-                //new WxMpTemplateData("keyword6",tmp),
-                new WxMpTemplateData("keyword3",pushMessageDTO.getTeaCourse().getCourseCause()),
-                new WxMpTemplateData("remark","时间:" + pushMessageDTO.getTeaCourse().getCourseEndTime().toString()+"至"+pushMessageDTO.getTeaCourse().getCourseEndTime().toString())
+                new WxMpTemplateData("first","预约课程失败"),
+                new WxMpTemplateData("keyword1",pushMessageDTO.getTeaCourse().getCourseName()),
+                new WxMpTemplateData("keyword2",pushMessageDTO.getTeaBase().getTeaName()),
+                new WxMpTemplateData("keyword3",pushMessageDTO.getTeaCourse().getCourseStartTime().toString()),
+                new WxMpTemplateData("keyword4",pushMessageDTO.getTeaCourse().getCourseEndTime().toString()),
+                new WxMpTemplateData("keyword5",SubCourseEnum.SUB_CANDIDATE_FAILED.getMessage()),
+                new WxMpTemplateData("keyword6",tmp),
+                new WxMpTemplateData("keyword7",pushMessageDTO.getTeaCourse().getCourseCause()),
+                new WxMpTemplateData("remark","祝下次好运")
         );
         templateMessage.setData(data);
         try {
@@ -120,17 +125,19 @@ public class PushMessageServiceImpl implements PushMessageService {
         }
     }
 
-    /**
+    */
+/**
      * 给学生发送教师取消其预约成功的课程通知
      *
      * @param pushMessageDTO 课程信息
-     */
+     *//*
+
     @Override
     public void pushCancelCourseMessageToStu(PushMessageDTO pushMessageDTO) {
         WxMpTemplateMessage templateMessage
                 = new WxMpTemplateMessage();
         //设置模板消息id
-        templateMessage.setTemplateId(PushMessageConfig.SUBCOURSE_FAIL_OR_CANCEL_MESSAGE_ID);
+        templateMessage.setTemplateId(PushMessageConfig.SUBCOURSE_CHANGE_MESSAGE_ID);
 
         if(pushMessageDTO == null ){
             info = "【取消课程模板消息】课程信息为空";
@@ -143,7 +150,7 @@ public class PushMessageServiceImpl implements PushMessageService {
         boolean empty = StringUtils.isEmpty(pushMessageDTO.getTeaCourse().getCourseLocation());
         String tmp =( empty == true ?"在线互动平台":pushMessageDTO.getTeaCourse().getCourseLocation());
         List<WxMpTemplateData> data = Arrays.asList(
-               /* new WxMpTemplateData("first","您预约成功的课程被老师取消"),
+                new WxMpTemplateData("first","您预约成功的课程被老师取消"),
                 new WxMpTemplateData("keyword1",pushMessageDTO.getTeaCourse().getCourseName()),
                 new WxMpTemplateData("keyword2",pushMessageDTO.getTeaBase().getTeaName()),
                 new WxMpTemplateData("keyword3",pushMessageDTO.getTeaCourse().getCourseStartTime().toString()),
@@ -151,17 +158,7 @@ public class PushMessageServiceImpl implements PushMessageService {
                 new WxMpTemplateData("keyword5",SubCourseEnum.TEA_CANCEL_SUB.getMessage()),
                 new WxMpTemplateData("keyword6",tmp),
                 new WxMpTemplateData("keyword7",pushMessageDTO.getTeaCourse().getCourseCause()),
-                new WxMpTemplateData("remark","")*/
-
-                new WxMpTemplateData("first","课程名称为: "+ pushMessageDTO.getTeaCourse().getCourseName()),
-                //new WxMpTemplateData("keyword1",pushMessageDTO.getTeaCourse().getCourseName()),
-                //new WxMpTemplateData("keyword2",pushMessageDTO.getTeaBase().getTeaName()),
-                //new WxMpTemplateData("keyword3",pushMessageDTO.getTeaCourse().getCourseStartTime().toString()),
-                //new WxMpTemplateData("keyword4",pushMessageDTO.getTeaCourse().getCourseEndTime().toString()),
-                new WxMpTemplateData("keyword2",SubCourseEnum.STU_CANCEL_SUB.getMessage()),
-                //new WxMpTemplateData("keyword6",tmp),
-                new WxMpTemplateData("keyword3",pushMessageDTO.getTeaCourse().getCourseCause()),
-                new WxMpTemplateData("remark","时间:" + pushMessageDTO.getTeaCourse().getCourseEndTime().toString()+"至"+pushMessageDTO.getTeaCourse().getCourseEndTime().toString())
+                new WxMpTemplateData("remark","")
         );
         templateMessage.setData(data);
         try {
@@ -190,12 +187,12 @@ public class PushMessageServiceImpl implements PushMessageService {
         templateMessage.setToUser(pushMessageDTO.getStuBase().getStuOpenid());
         //设置返回数据
         List<WxMpTemplateData> data = Arrays.asList(
-                new WxMpTemplateData("first",pushMessageDTO.getTeaCourse().getCourseName()),
-                new WxMpTemplateData("keyword1",pushMessageDTO.getFeedBack().getTeaFeedback()),
-                new WxMpTemplateData("keyword3",new Date().toString()),
-                //new WxMpTemplateData("keyword3",pushMessageDTO.getTeaCourse().getCourseEndTime().toString()),
-                //new WxMpTemplateData("keyword4",pushMessageDTO.getTeaBase().getTeaName()),
-                new WxMpTemplateData("remark","教师:"+pushMessageDTO.getTeaBase().getTeaName())
+                new WxMpTemplateData("first","教师的反馈内容"),
+                new WxMpTemplateData("keyword1",pushMessageDTO.getTeaCourse().getCourseName()),
+                new WxMpTemplateData("keyword2",pushMessageDTO.getTeaCourse().getCourseStartTime().toString()),
+                new WxMpTemplateData("keyword3",pushMessageDTO.getTeaCourse().getCourseEndTime().toString()),
+                new WxMpTemplateData("keyword4",pushMessageDTO.getTeaBase().getTeaName()),
+                new WxMpTemplateData("keyword5",pushMessageDTO.getFeedBack().getTeaFeedback())
         );
         templateMessage.setData(data);
         try {
@@ -213,7 +210,8 @@ public class PushMessageServiceImpl implements PushMessageService {
         WxMpTemplateMessage templateMessage
                 = new WxMpTemplateMessage();
         //设置模板消息id
-        templateMessage.setTemplateId(PushMessageConfig.SUBCOURSE_FAIL_OR_CANCEL_MESSAGE_ID);
+        templateMessage.setTemplateId(PushMessageConfig.SUBCOURSE_CHANGE_MESSAGE_ID);
+
         if(pushMessageDTO == null ){
             info = "【学生取消教师课程模板消息】课程信息为空";
             log.error(info);
@@ -224,7 +222,7 @@ public class PushMessageServiceImpl implements PushMessageService {
         boolean empty = StringUtils.isEmpty(pushMessageDTO.getTeaCourse().getCourseLocation());
         String tmp =( empty == true ?"在线互动平台":pushMessageDTO.getTeaCourse().getCourseLocation());
         List<WxMpTemplateData> data = Arrays.asList(
-                /*new WxMpTemplateData("first","成功预约候选人取消参与当前课程"),
+                new WxMpTemplateData("first","成功预约候选人取消参与当前课程"),
                 new WxMpTemplateData("keyword1",pushMessageDTO.getTeaCourse().getCourseName()),
                 new WxMpTemplateData("keyword2",pushMessageDTO.getTeaBase().getTeaName()),
                 new WxMpTemplateData("keyword3",pushMessageDTO.getTeaCourse().getCourseStartTime().toString()),
@@ -232,16 +230,7 @@ public class PushMessageServiceImpl implements PushMessageService {
                 new WxMpTemplateData("keyword5",SubCourseEnum.STU_CANCEL_SUB.getMessage()),
                 new WxMpTemplateData("keyword6",tmp),
                 new WxMpTemplateData("keyword7",pushMessageDTO.getTeaCourse().getCourseCause()),
-                new WxMpTemplateData("remark","")*/
-                new WxMpTemplateData("first","课程名称为: "+ pushMessageDTO.getTeaCourse().getCourseName()),
-                //new WxMpTemplateData("keyword1",pushMessageDTO.getTeaCourse().getCourseName()),
-                //new WxMpTemplateData("keyword2",pushMessageDTO.getTeaBase().getTeaName()),
-                //new WxMpTemplateData("keyword3",pushMessageDTO.getTeaCourse().getCourseStartTime().toString()),
-                //new WxMpTemplateData("keyword4",pushMessageDTO.getTeaCourse().getCourseEndTime().toString()),
-                new WxMpTemplateData("keyword2",SubCourseEnum.TEA_CANCEL_SUB.getMessage()),
-                //new WxMpTemplateData("keyword6",tmp),
-                new WxMpTemplateData("keyword3",pushMessageDTO.getTeaCourse().getCourseCause()),
-                new WxMpTemplateData("remark","时间:" + pushMessageDTO.getTeaCourse().getCourseEndTime().toString()+"至"+pushMessageDTO.getTeaCourse().getCourseEndTime().toString())
+                new WxMpTemplateData("remark","")
 
         );
         templateMessage.setData(data);
@@ -271,12 +260,12 @@ public class PushMessageServiceImpl implements PushMessageService {
         templateMessage.setToUser(pushMessageDTO.getTeaBase().getTeaOpenid());
         //设置返回数据
         List<WxMpTemplateData> data = Arrays.asList(
-                new WxMpTemplateData("first",pushMessageDTO.getTeaCourse().getCourseName()),
-                new WxMpTemplateData("keyword1",pushMessageDTO.getFeedBack().getTeaFeedback()),
-                new WxMpTemplateData("keyword3",new Date().toString()),
-                //new WxMpTemplateData("keyword3",pushMessageDTO.getTeaCourse().getCourseEndTime().toString()),
-                //new WxMpTemplateData("keyword4",pushMessageDTO.getTeaBase().getTeaName()),
-                new WxMpTemplateData("remark","学生:"+pushMessageDTO.getTeaBase().getTeaName())
+                new WxMpTemplateData("first","学生的反馈内容"),
+                new WxMpTemplateData("keyword1",pushMessageDTO.getTeaCourse().getCourseName()),
+                new WxMpTemplateData("keyword2",pushMessageDTO.getTeaCourse().getCourseStartTime().toString()),
+                new WxMpTemplateData("keyword3",pushMessageDTO.getTeaCourse().getCourseEndTime().toString()),
+                new WxMpTemplateData("keyword4",pushMessageDTO.getStuBase().getStuName()),
+                new WxMpTemplateData("keyword5",pushMessageDTO.getFeedBack().getTeaFeedback())
         );
         templateMessage.setData(data);
         try {
@@ -289,3 +278,4 @@ public class PushMessageServiceImpl implements PushMessageService {
         }
     }
 }
+*/
