@@ -26,9 +26,9 @@ server:
   port: 8086
 
 projectUrl:
-  weChatMpAuthorize: http://zhiheyikaoqin.cn
-  weChatOpenAuthorize: http://zhiheyikaoqin.cn
-  sdc: http://zhiheyikaoqin.cn
+  weChatMpAuthorize: zhiheyikaoqin.cn
+  weChatOpenAuthorize: zhiheyikaoqin.cn
+  sdc: zhiheyikaoqin.cn
   homeAddress: /user/home
 logging:
   config: classpath:logback-spring.xml
