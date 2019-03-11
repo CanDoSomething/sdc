@@ -3,6 +3,8 @@ package com.zgczx.controller;
 import com.zgczx.config.ProjectUrlConfig;
 import com.zgczx.enums.ResultEnum;
 import com.zgczx.exception.SdcException;
+import com.zgczx.service.StuService;
+import com.zgczx.service.TeaService;
 import com.zgczx.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.api.WxConsts;
@@ -35,6 +37,11 @@ public class WeChatController {
     private final ProjectUrlConfig projectUrlConfig;
 
     private final UserService userService;
+
+    @Autowired
+    private  StuService stuService;
+    @Autowired
+    private  TeaService teaService;
 
     @Autowired
     WeChatController(WxMpService wxMpService,ProjectUrlConfig projectUrlConfig,UserService userService){
@@ -77,10 +84,14 @@ public class WeChatController {
         // 首次创建用户信息
         if(role.equals(UserService.STU_ROLE)){
             // 创建学生账号
-            userService.createStuBase(openid,nickname,headImgUrl);
+            if(!stuService.legalStudent(openid)){
+                userService.createStuBase(openid,nickname,headImgUrl);
+            }
         }else if(role.equals(UserService.TEA_ROLE)){
             // 创建教师账号
-            userService.createTeaBase(openid,nickname,headImgUrl);
+            if(!teaService.legalTeacher(openid)){
+                userService.createTeaBase(openid,nickname,headImgUrl);
+            }
         }
         return "redirect:"+projectUrlConfig.getSdc()
                 .concat("/"+returnUrl)
