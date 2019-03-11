@@ -158,7 +158,7 @@ public class PushMessageServiceImpl implements PushMessageService {
                 //new WxMpTemplateData("keyword2",pushMessageDTO.getTeaBase().getTeaName()),
                 //new WxMpTemplateData("keyword3",pushMessageDTO.getTeaCourse().getCourseStartTime().toString()),
                 //new WxMpTemplateData("keyword4",pushMessageDTO.getTeaCourse().getCourseEndTime().toString()),
-                new WxMpTemplateData("keyword2",SubCourseEnum.STU_CANCEL_SUB.getMessage()),
+                new WxMpTemplateData("keyword2",SubCourseEnum.TEA_CANCEL_SUB.getMessage()),
                 //new WxMpTemplateData("keyword6",tmp),
                 new WxMpTemplateData("keyword3",pushMessageDTO.getTeaCourse().getCourseCause()),
                 new WxMpTemplateData("remark","时间:" + pushMessageDTO.getTeaCourse().getCourseEndTime().toString()+"至"+pushMessageDTO.getTeaCourse().getCourseEndTime().toString())
@@ -238,7 +238,7 @@ public class PushMessageServiceImpl implements PushMessageService {
                 //new WxMpTemplateData("keyword2",pushMessageDTO.getTeaBase().getTeaName()),
                 //new WxMpTemplateData("keyword3",pushMessageDTO.getTeaCourse().getCourseStartTime().toString()),
                 //new WxMpTemplateData("keyword4",pushMessageDTO.getTeaCourse().getCourseEndTime().toString()),
-                new WxMpTemplateData("keyword2",SubCourseEnum.TEA_CANCEL_SUB.getMessage()),
+                new WxMpTemplateData("keyword2",SubCourseEnum.STU_CANCEL_SUB.getMessage()),
                 //new WxMpTemplateData("keyword6",tmp),
                 new WxMpTemplateData("keyword3",pushMessageDTO.getTeaCourse().getCourseCause()),
                 new WxMpTemplateData("remark","时间:" + pushMessageDTO.getTeaCourse().getCourseEndTime().toString()+"至"+pushMessageDTO.getTeaCourse().getCourseEndTime().toString())
