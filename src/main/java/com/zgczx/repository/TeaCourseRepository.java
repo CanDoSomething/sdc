@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -75,7 +76,11 @@ public interface TeaCourseRepository extends JpaRepository<TeaCourse,Integer> {
 
     Page<TeaCourse> findByCourseStatusAndCourseStartTimeIsAfter(Integer courseStatus,Date date,Pageable pageable);
 
-
-
-    List<TeaCourse> findByTeaCodeAndCourseStatusNot(String teaCode,Integer courseStatus);
+    /**
+     * 通过教师编号查找课程状态不在集合中的课程
+     * @param teaCode 教师编号
+     * @param list 课程状态码集合
+     * @return 课程列表
+     */
+    List<TeaCourse> findByTeaCodeAndCourseStatusNotIn(String teaCode,ArrayList<Integer> list);
 }

@@ -26,13 +26,14 @@ public class UserAuthorizeAspect {
     /**
      * 对需要openid验证的添加切点
      */
-    @Pointcut("execution(public * com.zgczx.controller.StuController*.*(..)) ")
+    @Pointcut("(!execution(public * com.zgczx.controller.StuController*.findAllCourse(..))) " +
+            "&& execution(public * com.zgczx.controller.StuController*.*(..))")
     public void verifyStu(){}
 
- /*   @Pointcut("execution(public * com.zgczx.controller.TeaController*.*(..)) ")
-    public void verifyTea(){}*/
+    /*@Pointcut("execution(public * com.zgczx.controller.TeaController*.*(..)) ")
+    public void verifyTea(){}
 
- /*   @Pointcut("execution(public * com.zgczx.controller.UserController*.*(..)) ")
+    @Pointcut("execution(public * com.zgczx.controller.UserController*.*(..)) ")
     public void verifyUser(){}*/
 
    //@Before(value = "verifyStu() || verifyTea()")

@@ -1,7 +1,6 @@
 package com.zgczx.service;
 
-import com.zgczx.dataobject.TeaCourse;
-import com.zgczx.dto.CourseDTO;
+import com.zgczx.dto.PushMessageDTO;
 
 /**
  * @Author: Dqd
@@ -9,7 +8,10 @@ import com.zgczx.dto.CourseDTO;
  * @Description:
  */
 public interface PushMessageService {
-    void pushSubSuccessMessage(CourseDTO courseDTO);
-    void pushSubFailMessage(CourseDTO courseDTO);
-    void pushCancelCourseMessageToStu(TeaCourse teaCourse);
+    void pushSubSuccessMessage(PushMessageDTO pushMessageDTO);
+    void pushSubFailMessage(PushMessageDTO pushMessageDTO);
+    void pushCancelCourseMessageToStu(PushMessageDTO pushMessageDTO);
+    void pushFeedBackMessageToStu(PushMessageDTO pushMessageDTO);
+    void pushFeedBackMessageToTea(PushMessageDTO pushMessageDTO);
+    void pushCancelCourseMessageToTea(PushMessageDTO pushMessageDTO);
 }

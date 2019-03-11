@@ -31,9 +31,10 @@ public class ArticleController {
     }
 
     @PostMapping("getArticleContent")
-    public ResultVO getArticleContent(@RequestParam(value = "artId")Integer artId){
+    public ResultVO getArticleContent(@RequestParam(value = "artId") Integer artId,
+                                      @RequestParam(value = "openid",defaultValue = "null") String openid){
 
-        Article article = articleService.getArticleContent(artId);
+        Article article = articleService.getArticleContent(artId,openid);
 
         return ResultVOUtil.success(article);
     }

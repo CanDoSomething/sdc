@@ -3,12 +3,14 @@ package com.zgczx.service.impl;
 
 import com.zgczx.dataobject.*;
 import com.zgczx.dto.CourseDTO;
+import com.zgczx.dto.PushMessageDTO;
 import com.zgczx.dto.SubDTO;
 import com.zgczx.enums.CourseEnum;
 import com.zgczx.enums.ResultEnum;
 import com.zgczx.enums.SubCourseEnum;
 import com.zgczx.exception.SdcException;
 import com.zgczx.repository.*;
+import com.zgczx.service.PushMessageService;
 import com.zgczx.service.StuService;
 import com.zgczx.service.TeaService;
 import com.zgczx.utils.DateUtil;
@@ -50,6 +52,8 @@ public class StuServiceImpl implements StuService {
     private StuBaseRepository stuBaseRepository;
     @Autowired
     private TeaService teaService;
+    @Autowired
+    private PushMessageService pushMessageService;
 
     private  String info = null;
     /**
@@ -96,9 +100,6 @@ public class StuServiceImpl implements StuService {
      */
     @Override
     public SubCourse order(String stuOpenid, Integer courserId) {
-
-
-
         //1.比较学生的历史预约信息与目标课程的时间是否冲突
         TeaCourse teaCourse = teaCourseRepository.findOne(courserId);
         StuBase stuBase = stuBaseRepository.findByStuOpenid(stuOpenid);
@@ -171,7 +172,9 @@ public class StuServiceImpl implements StuService {
          *  只有该预约状态为预约等待和预约成功时才会发起取消预约。
          *  若预约状态为预约等待，则直接修改为预约取消，并加上原因
          *  若预约状态为预约成功，则修改为预约取消，并加上原因的同时，需要把其他预约失败的学生状态改为预约等待，
-         *  不然没有办法再次选择新的学生作为候选人
+         *  不然没有办法再次选择新的学生作为候选人。
+         *  如果每次教师指定的成功预约的学生都取消了预约，没有一个学生
+         *  预约当前课程的（状态均为学生取消预约），那么教师的课程状态应该改为待预约（300）。
          */
         SubCourse subCourse = subCourseRepository.findOne(subId);
         if(subCourse.getSubStatus().equals(SubCourseEnum.SUB_WAIT.getCode())){
@@ -188,7 +191,42 @@ public class StuServiceImpl implements StuService {
                 subCourseFailed.setSubStatus(SubCourseEnum.SUB_WAIT.getCode());
                 subCourseRepository.save(subCourseFailed);
             }
-            return subCourseRepository.save(subCourse);
+            SubCourse rsSubCourse = subCourseRepository.save(subCourse);
+            //检查当前预约表中的学生预约状态，如果没有处于等待教师选择处理或者等待上课的状态，需要修改课程表中
+            //的状态为等待学生预约
+            List<SubCourse> checkSubCourse = subCourseRepository.findByCourseId(courserId);
+            //默认当前课程是没有学生预约
+            boolean flag = false;
+            for(SubCourse sc : checkSubCourse){
+                if( sc.getSubStatus().equals(SubCourseEnum.SUB_WAIT)||
+                        sc.getSubStatus().equals(SubCourseEnum.SUB_CANDIDATE_SUCCESS)||
+                        sc.getSubStatus().equals(SubCourseEnum.SUB_CANDIDATE_FAILED) ){
+                    //表示还有学生预约
+                    flag = true; break;
+                }
+            }
+            //如果flag是false，则修改课程表状态为等待预约
+            TeaCourse changeTeaCourse = teaCourseRepository.findOne(courserId);
+            changeTeaCourse.setCourseStatus(CourseEnum.SUB_WAIT.getCode());
+            TeaCourse rsChangeTeaCourse = teaCourseRepository.save(changeTeaCourse);
+            if(null == rsChangeTeaCourse){
+                info = "【学生取消预约】 修改课程表中课程字段失败";
+                log.error(info);
+                throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,info);
+            }
+
+            //给教师推送模板消息，学生取消了课程
+            TeaCourse teaCourse = teaCourseRepository.findOne(courserId);
+            TeaBase teaBase = teaBaseRepository.findOne(teaCourse.getTeaCode());
+            PushMessageDTO pushMessageDTO = new PushMessageDTO();
+            teaCourse.setCourseCause(cause);
+            pushMessageDTO.setTeaCourse(teaCourse);
+            pushMessageDTO.setTeaBase(teaBase);
+            StuBase byStuCode = stuBaseRepository.findByStuOpenid(stuOpenid);
+            pushMessageDTO.setStuBase(byStuCode);
+
+            pushMessageService.pushCancelCourseMessageToTea(pushMessageDTO);
+            return rsSubCourse;
         } else {
             info = "【学生取消预约】 预约状态非法，不是预约等待和预约成功，subId="+subId;
             log.error(info);
@@ -358,11 +396,32 @@ public class StuServiceImpl implements StuService {
         }
         /*查找课程信息*/
         TeaCourse one = teaCourseRepository.findOne(courseId);
-        /*判断课程信息是否正常结束,如果不是抛出异常*/
-        if (one==null || !one.getCourseStatus().equals(CourseEnum.COURSE_FINISH.getCode())){
-            info = "课程没有正常结束,不能提交反馈信息";
+        /*
+            提交反馈需要判断课程信息是否正常结束：
+            1.课程状态为结束
+            2.课程状态为正在进行并且状态课程的结束时间早于当前时间
+        */
+        //课程状态为正在进行并且状态课程的结束时间早于当前时间那么需要将课程状态修改为结束
+        if(one != null ){
+            if( one.getCourseStatus().equals(CourseEnum.COURSE_INTERACT.getCode())
+                    &&  one.getCourseEndTime().before(new Date()) ){
+                one.setCourseStatus(CourseEnum.COURSE_FINISH.getCode());
+                TeaCourse updateCourseStatus = teaCourseRepository.save(one);
+                if(null == updateCourseStatus ){
+                    info = "【学生提交课程反馈】 更新数据库异常！";
+                    log.error(info);
+                    throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,info);
+                }
+            }
+            if( !one.getCourseStatus().equals(CourseEnum.COURSE_FINISH.getCode())){
+                info = "【学生提交课程反馈】 当前课程状态不正确，不能提交反馈！";
+                log.error(info);
+                throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
+            }
+        } else {
+            info = "课程信息为空！";
             log.error(info);
-            throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
+            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
         }
         /*根据预约课程id来查找用户是否提交反馈*/
         FeedBack bySubId = feedBackRepository.findBySubId(subId);
@@ -381,11 +440,20 @@ public class StuServiceImpl implements StuService {
         /*保存数据到反馈表*/
         FeedBack save=feedBackRepository.saveAndFlush(bySubId);
         if (save==null){
-            info = "【学生发起反馈】 报存到数据库中失败";
+            info = "【学生发起反馈】 数据库操作失败";
             log.error(info);
             throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,info);
         }
+        //模板消息的封装
+        PushMessageDTO pushMessageDTO = new PushMessageDTO();
+        TeaBase rsTeaBase = teaBaseRepository.findOne(one.getTeaCode());
+        pushMessageDTO.setTeaBase(rsTeaBase);
+        SubCourse rsSubCourse = subCourseRepository.findOne(subId);
+        pushMessageDTO.setStuBase(stuBaseRepository.findByStuCode(rsSubCourse.getStuCode()));
+        pushMessageDTO.setFeedBack(save);
+        pushMessageDTO.setTeaCourse(teaCourseRepository.findByTeaCodeAndCourseId(rsTeaBase.getTeaCode(),courseId));
         FeedBack one1 = feedBackRepository.findOne(save.getFeedbackId());
+        pushMessageService.pushFeedBackMessageToTea(pushMessageDTO);
         return one1;
     }
     /**
@@ -413,6 +481,7 @@ public class StuServiceImpl implements StuService {
         for (SubCourse subCourse : subCoursePage) {
 
             SubDTO subDTO = modelMapper.map(subCourse, SubDTO.class);
+            System.out.println(subCourse.getCourseId()+"--------------");
             TeaCourse teaCourse = teaCourseRepository.findOne(subCourse.getCourseId());
             if (teaCourse==null){
                 info =  "预约表中的课程信息未发现";
