@@ -16,7 +16,7 @@ public interface ArticleService {
      * @param pageSize 页码大小
      * @return 文章列表
      */
-    List<ArticleAbstractDTO> getArticleList(String openid, Integer label,Integer page, Integer pageSize);
+    List<ArticleAbstractDTO> getArticleList(String openid, String label,Integer page, Integer pageSize);
 
     /**
      * 获取文章内容

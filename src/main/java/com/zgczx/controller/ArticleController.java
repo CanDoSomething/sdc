@@ -23,7 +23,7 @@ public class ArticleController {
 
     @PostMapping("getArticleList")
     public ResultVO getArticleList(@RequestParam(value = "openid", defaultValue = "null")String openid,
-                                   @RequestParam(value = "label", defaultValue = "0")Integer label,
+                                   @RequestParam(value = "label", defaultValue = "推荐")String label,
                                    @RequestParam(value = "page",defaultValue = "0") Integer page,
                                    @RequestParam(value = "pageSize", defaultValue = "10")Integer pageSize){
 

@@ -42,18 +42,17 @@ public class ArticleServiceImpl implements ArticleService {
     private ArticleService articleService;
 
     @Override
-    public List<ArticleAbstractDTO> getArticleList(String openid, Integer label, Integer page, Integer pageSize) {
+    public List<ArticleAbstractDTO> getArticleList(String openid, String label, Integer page, Integer pageSize) {
         // openid 暂时没用到
         Pageable pageable = new PageRequest(page, pageSize);
 
-        ArticleLabelEnum articleLabelEnum = EnumUtil.getByCode(label,ArticleLabelEnum.class);
 
         Page<Article> articles;
         //  若没有该标签，则返回所有内容
         // TODO 推荐模块的文章，现在推荐返回的是所有文章
-        if(articleLabelEnum != null && articleLabelEnum.getCode()!=0){
-            String label1 = articleLabelEnum.getMessage();
-            articles = articleRepository.findByArticleLabel1(label1,pageable);
+
+        if(!label.equals(ArticleLabelEnum.RECOMMEND.getMessage())){
+            articles = articleRepository.findByArticleLabel1(label,pageable);
         }else {
             articles =  articleRepository.findAll(pageable);
         }
