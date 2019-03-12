@@ -2,18 +2,23 @@ package com.zgczx.service.impl;
 
 import com.zgczx.dataobject.Article;
 import com.zgczx.dataobject.ArticleScore;
+import com.zgczx.dto.ArticleAbstractDTO;
+import com.zgczx.enums.ArticleLabelEnum;
 import com.zgczx.enums.ResultEnum;
 import com.zgczx.exception.SdcException;
 import com.zgczx.repository.ArticleRepository;
 import com.zgczx.repository.ArticleScoreRepository;
 import com.zgczx.service.ArticleService;
+import com.zgczx.utils.EnumUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.zgczx.utils.DateUtil.getNowTime;
@@ -37,20 +42,37 @@ public class ArticleServiceImpl implements ArticleService {
     private ArticleService articleService;
 
     @Override
-    public List<Article> getArticleList(String openid, Integer page, Integer pageSize) {
+    public List<ArticleAbstractDTO> getArticleList(String openid, Integer label, Integer page, Integer pageSize) {
         // openid 暂时没用到
         Pageable pageable = new PageRequest(page, pageSize);
-        Page<Article> articleList =  articleRepository.findAll(pageable);
 
+        ArticleLabelEnum articleLabelEnum = EnumUtil.getByCode(label,ArticleLabelEnum.class);
 
-        if (articleList.getContent().isEmpty()){
-            String info = "没有该页的文章";
+        Page<Article> articles;
+        //  若没有该标签，则返回所有内容
+        // TODO 推荐模块的文章，现在推荐返回的是所有文章
+        if(articleLabelEnum != null && articleLabelEnum.getCode()!=0){
+            String label1 = articleLabelEnum.getMessage();
+            articles = articleRepository.findByArticleLabel1(label1,pageable);
+        }else {
+            articles =  articleRepository.findAll(pageable);
+        }
+
+        if (articles.getContent().isEmpty()){
+            String info = "没有找到相应的文章";
             log.error(info);
             throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
         }
         log.info("getArticleList--->"+"openid:"+openid+"  "+"pageSize:"+pageSize+"  "+"time:"+getNowTime());
 
-        return articleList.getContent();
+        List<ArticleAbstractDTO> articleAbstractDTOList = new ArrayList<>();
+        for(Article article:articles.getContent()){
+            ArticleAbstractDTO articleAbstractDTO = new ArticleAbstractDTO();
+            BeanUtils.copyProperties(article,articleAbstractDTO);
+            articleAbstractDTOList.add(articleAbstractDTO);
+        }
+
+        return articleAbstractDTOList;
     }
 
     @Override
