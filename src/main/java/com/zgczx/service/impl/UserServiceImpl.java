@@ -2,16 +2,21 @@ package com.zgczx.service.impl;
 
 import com.zgczx.dataobject.StuBase;
 import com.zgczx.dataobject.TeaBase;
+import com.zgczx.dataobject.TeaCourse;
+import com.zgczx.enums.CourseEnum;
 import com.zgczx.enums.UserEnum;
 import com.zgczx.exception.SdcException;
 import com.zgczx.form.StuInfoForm;
 import com.zgczx.form.TeaInfoForm;
 import com.zgczx.repository.StuBaseRepository;
 import com.zgczx.repository.TeaBaseRepository;
+import com.zgczx.repository.TeaCourseRepository;
 import com.zgczx.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * @ClassName: Jason
@@ -27,6 +32,8 @@ public class UserServiceImpl implements UserService {
     private StuBaseRepository stuBaseRepository;
     @Autowired
     private TeaBaseRepository teaBaseRepository;
+    @Autowired
+    private TeaCourseRepository teaCourseRepository;
 
     @Override
     public StuBase createStuBase(String stuOpenid, String nickname, String headImgUrl) {
@@ -138,15 +145,21 @@ public class UserServiceImpl implements UserService {
     @Override
     public String deleteTeaByOpenid(String teaOpenid) {
 
+        //1.找到该老师创建的课程，设置为课程失效
         TeaBase teaBase = teaBaseRepository.findByTeaOpenid(teaOpenid);
+        List<TeaCourse> teaCourseList = teaCourseRepository.findByTeaCode(teaBase.getTeaCode());
+        for(TeaCourse teaCourse:teaCourseList){
+            teaCourse.setCourseStatus(CourseEnum.COURSE_CANCELED.getCode());
+            teaCourseRepository.save(teaCourse);
+        }
+
+        //2.再删除该老师
         if(teaBase!=null){
             teaBaseRepository.delete(teaBase);
             return "删除成功";
         }else {
             return "没有找到，删除失败";
         }
-
-
     }
 
     @Override
