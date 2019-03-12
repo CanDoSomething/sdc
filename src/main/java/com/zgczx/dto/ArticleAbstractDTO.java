@@ -10,6 +10,10 @@ import lombok.Data;
 public class ArticleAbstractDTO {
 
     /**
+     * 文章id
+     */
+    private Integer artId;
+    /**
      * 文章标题
      */
     private String title;
