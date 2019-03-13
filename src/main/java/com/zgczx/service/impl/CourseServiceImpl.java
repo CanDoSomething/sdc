@@ -1,6 +1,7 @@
 package com.zgczx.service.impl;
 
 import com.zgczx.dataobject.*;
+import com.zgczx.dto.OnClassUserInfoDTO;
 import com.zgczx.enums.CourseEnum;
 import com.zgczx.enums.ResultEnum;
 import com.zgczx.enums.SubCourseEnum;
@@ -136,5 +137,40 @@ public class CourseServiceImpl  implements CourseService {
         TeaCourse teaCourse = teaCourseRepository.findOne(courserId);
         /*如果预约课程不存在，抛出异常*/
         return teaCourse != null;
+    }
+
+    @Override
+    public OnClassUserInfoDTO getOnClassUserOpenid(Integer courserId) {
+        // 1.得到教师的openid
+        TeaCourse teaCourse = teaCourseRepository.findOne(courserId);
+        String info;
+        if(teaCourse == null){
+            info = "课程id非法，不存在";
+            throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
+        }
+
+        TeaBase teaBase = teaBaseRepository.findOne(teaCourse.getTeaCode());
+        String teaOpenid = teaBase.getTeaOpenid();
+
+        // 2.得到学生的openid
+        String stuOpenid;
+        List<SubCourse> subCourseList = subCourseRepository.findByCourseIdAndSubStatus(courserId,SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode());
+
+        if(subCourseList.size()>1){
+            info = "课程预约成功的学生大于1人，课程id为"+courserId;
+            throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,info);
+        }else if(subCourseList.size()==1){
+            StuBase stuBase = stuBaseRepository.findByStuCode(subCourseList.get(0).getStuCode());
+            stuOpenid = stuBase.getStuOpenid();
+        }else{
+            stuOpenid = "";
+        }
+
+        OnClassUserInfoDTO onClassUserInfoDTO = new OnClassUserInfoDTO();
+        onClassUserInfoDTO.setCourseId(courserId);
+        onClassUserInfoDTO.setTeaOpenid(teaOpenid);
+        onClassUserInfoDTO.setStuOpenid(stuOpenid);
+
+        return onClassUserInfoDTO;
     }
 }
