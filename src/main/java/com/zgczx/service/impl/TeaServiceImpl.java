@@ -376,8 +376,10 @@ public class TeaServiceImpl implements TeaService {
         }
 
         //修改预约表中被成功选择的学生的学号
-        SubCourse subCourse = subCourseRepository.findByStuCodeAndCourseIdAndSubStatus(stuCode,courseId,
-                SubCourseEnum.SUB_WAIT.getCode());
+        List<Integer> list = new ArrayList<Integer>();
+        list.add(SubCourseEnum.SUB_WAIT.getCode());
+        list.add(SubCourseEnum.SUB_CANDIDATE_FAILED.getCode());
+        SubCourse subCourse = subCourseRepository.findByStuCodeAndCourseIdAndSubStatusIn(stuCode,courseId,list);
         subCourse.setSubStatus(SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode());
         //查找课程表
         TeaCourse one = teaCourseRepository.findOne(courseId);

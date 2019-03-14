@@ -46,10 +46,10 @@ public interface SubCourseRepository extends JpaRepository<SubCourse,Integer> {
      *
      * @param stuCode 学生编号
      * @param courseId 课程编号
-     * @param subStatus 预约状态
+     * @param subStatus 预约状态列表
      * @return 预约课程
      */
-     SubCourse findByStuCodeAndCourseIdAndSubStatus(String stuCode,Integer courseId,Integer subStatus);
+     SubCourse findByStuCodeAndCourseIdAndSubStatusIn(String stuCode,Integer courseId,List<Integer> subStatus);
     /**
      *找到预约等待或预约成功状态的预约信息
      *
