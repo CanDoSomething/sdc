@@ -2,6 +2,7 @@ package com.zgczx.controller;
 
 import com.zgczx.VO.ResultVO;
 import com.zgczx.dataobject.Article;
+import com.zgczx.dto.ArticleAbstractDTO;
 import com.zgczx.service.ArticleService;
 import com.zgczx.utils.ResultVOUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +22,12 @@ public class ArticleController {
     private ArticleService articleService;
 
     @PostMapping("getArticleList")
-    public ResultVO getArticleList(@RequestParam(value = "openid",defaultValue = "null")String openid,
-                                   @RequestParam(value = "page")Integer page,
-                                   @RequestParam(value = "pageSize",defaultValue = "10")Integer pageSize){
+    public ResultVO getArticleList(@RequestParam(value = "openid", defaultValue = "null")String openid,
+                                   @RequestParam(value = "label", defaultValue = "推荐")String label,
+                                   @RequestParam(value = "page",defaultValue = "0") Integer page,
+                                   @RequestParam(value = "pageSize", defaultValue = "10")Integer pageSize){
 
-        List<Article> articleList = articleService.getArticleList(openid,page,pageSize);
+        List<ArticleAbstractDTO> articleList = articleService.getArticleList(openid,label,page,pageSize);
 
         return ResultVOUtil.success(articleList);
     }

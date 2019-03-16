@@ -2,10 +2,12 @@ package com.zgczx.service;
 
 import com.zgczx.dataobject.Article;
 import com.zgczx.dataobject.ArticleScore;
+import com.zgczx.dto.ArticleAbstractDTO;
 
 import java.util.List;
 
 public interface ArticleService {
+
 
     /***
      * 获取文章列表
@@ -14,7 +16,7 @@ public interface ArticleService {
      * @param pageSize 页码大小
      * @return 文章列表
      */
-    List<Article> getArticleList(String openid, Integer page, Integer pageSize);
+    List<ArticleAbstractDTO> getArticleList(String openid, String label,Integer page, Integer pageSize);
 
     /**
      * 获取文章内容

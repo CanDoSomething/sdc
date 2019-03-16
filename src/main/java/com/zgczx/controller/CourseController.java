@@ -2,6 +2,7 @@ package com.zgczx.controller;
 
 import com.zgczx.VO.ResultVO;
 import com.zgczx.dataobject.OnlineCourse;
+import com.zgczx.dto.OnClassUserInfoDTO;
 import com.zgczx.enums.ResultEnum;
 import com.zgczx.exception.SdcException;
 import com.zgczx.service.CourseService;
@@ -56,5 +57,13 @@ public class CourseController {
         Boolean onCourseEnd = courseService.onCourseEnd(courseId);
 
         return  ResultVOUtil.success(onCourseEnd);
+    }
+
+    @GetMapping("getOnClassUserOpenid")
+    public ResultVO getOnClassUserOpenid(@RequestParam(value = "courseId") Integer courseId){
+
+        OnClassUserInfoDTO onClassUserInfoDTO = courseService.getOnClassUserOpenid(courseId);
+
+        return ResultVOUtil.success(onClassUserInfoDTO);
     }
 }

@@ -1,6 +1,7 @@
 package com.zgczx.service;
 
 import com.zgczx.dataobject.OnlineCourse;
+import com.zgczx.dto.OnClassUserInfoDTO;
 
 /**
  * @author  Jason
@@ -53,6 +54,13 @@ public interface CourseService {
      * @return Boolean
      */
     Boolean legalCourse(Integer courserId);
+
+    /**
+     * 根据课程id返回这节课的学生openid和教师openid
+     * @param courserId 课程id
+     * @return OnClassUserInfoDTO
+     */
+    OnClassUserInfoDTO getOnClassUserOpenid(Integer courserId);
 
 
 }
