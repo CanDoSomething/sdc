@@ -2,10 +2,12 @@ package com.zgczx.controller;
 
 import com.zgczx.VO.ResultVO;
 import com.zgczx.dataobject.OnlineCourse;
+import com.zgczx.dataobject.TeaCourse;
 import com.zgczx.dto.OnClassUserInfoDTO;
 import com.zgczx.enums.ResultEnum;
 import com.zgczx.exception.SdcException;
 import com.zgczx.service.CourseService;
+import com.zgczx.service.TeaService;
 import com.zgczx.utils.ResultVOUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +25,8 @@ public class CourseController {
 
     @Autowired
     private CourseService courseService;
+    @Autowired
+    private TeaService teaService;
 
     @GetMapping("getOnlineCourseGroupId")
     public ResultVO getOnlineCourseGroupId(@RequestParam(value = "openid")String openid,
@@ -35,8 +39,12 @@ public class CourseController {
             throw new SdcException(ResultEnum.PARAM_EXCEPTION,"该user不是该课程的参与者");
         }
 
-        //2.返回群组id
+        //2.修改课程状态
+        TeaCourse teaCourse = teaService.finishCourse(courseId);
+
+        //3.返回群组id
         OnlineCourse onlineCourse = courseService.getOnlineCourseGroupId(courseId);
+
 
         return ResultVOUtil.success(onlineCourse.getGroupId());
     }
