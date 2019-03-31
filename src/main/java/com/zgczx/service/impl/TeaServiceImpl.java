@@ -573,7 +573,7 @@ public class TeaServiceImpl implements TeaService {
     public TeaCourse finishCourse(Integer courseId) {
         if(null == courseId){
             info = "【结束课程】 该课程编号为空";
-            log.error("【结束课程】 该课程编号id={}为空",courseId);
+            log.error("【结束课程】 该课程编号id={}为空");
             throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
         }
         TeaCourse teaCourse = teaCourseRepository.findOne(courseId);
@@ -585,37 +585,94 @@ public class TeaServiceImpl implements TeaService {
         Integer courseStatus = teaCourse.getCourseStatus();
 
         Date now = new Date();
+
         // 待预约和预约成功的条件下，判断是否变为正在进行时
-        if(courseStatus.equals(CourseEnum.SUB_WAIT.getCode()) || courseStatus.equals(CourseEnum.SUB_SUCCESS.getCode())){
-            if(teaCourse.getCourseStartTime().before(now) && teaCourse.getCourseEndTime().after(now)){
-                teaCourse.setCourseStatus(CourseEnum.COURSE_INTERACT.getCode());
-                return teaCourseRepository.save(teaCourse);
-            }
-        }
-        if(courseStatus.equals(CourseEnum.SUB_SUCCESS.getCode()) && teaCourse.getCourseStartTime().before(now)){
-            teaCourse.setCourseStatus(CourseEnum.COURSE_INTERACT.getCode());
-            teaCourseRepository.save(teaCourse);
-        }
-        //当前课程只有是处于进行状态或者线下互动才能使用此方式结束课程
-        if(courseStatus.equals(CourseEnum.COURSE_INTERACT.getCode()) ||
-                teaCourse.getCourseInteractive().equals(CourseService.COURSEINTERACTIVE_OFFLINE) ){
-            if(teaCourse.getCourseEndTime().before(now)){
-                teaCourse.setCourseStatus(CourseEnum.COURSE_FINISH.getCode());
-                TeaCourse save = teaCourseRepository.save(teaCourse);
-                if(null == save ){
-                    info = "【结束课程】 修改课程状态异常";
+        //1.当课程状态为预约等待时，若当前时间大于课程开始时间，课程状态改为课程失效，防止创建聊天室。
+        //2.当课程状态为预约成功时，若当前时间在课程进行中时，课程状态改为正在进行;
+        //                     若当前时间晚于课程结束时间，课程状态改为正常结束。
+        //3.当课程状态为正在进行时，若当前时间晚于课程结束时间，课程状态改为正常结束。
+        /*1 当课程状态为预约等待*/
+        if(courseStatus.equals(CourseEnum.SUB_WAIT.getCode())){
+            if(now.after(teaCourse.getCourseStartTime())){
+                teaCourse.setCourseStatus(CourseEnum.COURSE_CANCELED.getCode());
+                TeaCourse saveTeaCourse = teaCourseRepository.save(teaCourse);
+                if(null == saveTeaCourse ){
+                    info = "【结束课程】 当课程状态为预约等待时，若当前时间大于课程开始时间，课程状态改为课程失效，防止创建聊天室。";
                     log.error(info);
                     throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,info);
                 }
-                return save;
+                return saveTeaCourse;
             }
         }
-        // 若没人刷新，且时间到了则直接结束
-        if(teaCourse.getCourseEndTime().before(now)){
-            teaCourse.setCourseStatus(CourseEnum.COURSE_FINISH.getCode());
-            return teaCourseRepository.save(teaCourse);
+        /*2 当课程状态为预约成功*/
+        if(courseStatus.equals(CourseEnum.SUB_SUCCESS.getCode())){
+            if(now.after(teaCourse.getCourseStartTime())){
+                if(now.before(teaCourse.getCourseEndTime())){
+                    teaCourse.setCourseStatus(CourseEnum.COURSE_INTERACT.getCode());
+                    TeaCourse saveTeaCourse = teaCourseRepository.save(teaCourse);
+                    if(null == saveTeaCourse ){
+                        info = "【结束课程】 当课程状态为预约成功时，若当前时间在课程进行中时，课程状态改为正在进行;";
+                        log.error(info);
+                        throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,info);
+                    }
+                    return saveTeaCourse;
+
+                }else{
+                    teaCourse.setCourseStatus(CourseEnum.COURSE_FINISH.getCode());
+                    TeaCourse saveTeaCourse = teaCourseRepository.save(teaCourse);
+                    if(null == saveTeaCourse ){
+                        info = "【结束课程】 当课程状态为预约成功时，若当前时间晚于课程结束时间，课程状态改为正常结束";
+                        log.error(info);
+                        throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,info);
+                    }
+                    return saveTeaCourse;
+                }
+            }
+        }
+        /*3 当课程状态为正在进行*/
+        if(courseStatus.equals(CourseEnum.COURSE_INTERACT.getCode())){
+            if(now.after(teaCourse.getCourseEndTime())){
+                teaCourse.setCourseStatus(CourseEnum.COURSE_FINISH.getCode());
+                TeaCourse saveTeaCourse = teaCourseRepository.save(teaCourse);
+                if(null == saveTeaCourse ){
+                    info = "【结束课程】 当课程状态为正在进行时，若当前时间晚于课程结束时间，课程状态改为正常结束。";
+                    log.error(info);
+                    throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,info);
+                }
+                return saveTeaCourse;
+            }
         }
         return null;
+
+//        if(courseStatus.equals(CourseEnum.SUB_WAIT.getCode()) || courseStatus.equals(CourseEnum.SUB_SUCCESS.getCode())){
+//            if(teaCourse.getCourseStartTime().before(now) && teaCourse.getCourseEndTime().after(now)){
+//                teaCourse.setCourseStatus(CourseEnum.COURSE_INTERACT.getCode());
+//                return teaCourseRepository.save(teaCourse);
+//            }
+//        }
+//        if(courseStatus.equals(CourseEnum.SUB_SUCCESS.getCode()) && teaCourse.getCourseStartTime().before(now)){
+//            teaCourse.setCourseStatus(CourseEnum.COURSE_INTERACT.getCode());
+//            teaCourseRepository.save(teaCourse);
+//        }
+//        //当前课程只有是处于进行状态或者线下互动才能使用此方式结束课程
+//        if(courseStatus.equals(CourseEnum.COURSE_INTERACT.getCode()) ||
+//                teaCourse.getCourseInteractive().equals(CourseService.COURSEINTERACTIVE_OFFLINE) ){
+//            if(teaCourse.getCourseEndTime().before(now)){
+//                teaCourse.setCourseStatus(CourseEnum.COURSE_FINISH.getCode());
+//                TeaCourse save = teaCourseRepository.save(teaCourse);
+//                if(null == save ){
+//                    info = "【结束课程】 修改课程状态异常";
+//                    log.error(info);
+//                    throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,info);
+//                }
+//                return save;
+//            }
+//        }
+//        // 若没人刷新，且时间到了则直接结束
+//        if(teaCourse.getCourseEndTime().before(now)){
+//            teaCourse.setCourseStatus(CourseEnum.COURSE_FINISH.getCode());
+//            return teaCourseRepository.save(teaCourse);
+//        }
     }
 
     /**

@@ -254,7 +254,7 @@ public class TeaController {
      * @return 课程状态为结束的课程
      */
     @PostMapping("/finishCourse")
-    public ResultVO<TeaCourse> finishCourse(Integer courseId) {
+    public ResultVO finishCourse(Integer courseId) {
         TeaCourse teaCourse = teaService.finishCourse(courseId);
         return ResultVOUtil.success(teaCourse);
     }
