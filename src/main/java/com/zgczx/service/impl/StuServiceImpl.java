@@ -177,6 +177,13 @@ public class StuServiceImpl implements StuService {
          *  预约当前课程的（状态均为学生取消预约），那么教师的课程状态应该改为待预约（300）。
          */
         SubCourse subCourse = subCourseRepository.findOne(subId);
+        TeaCourse rsTeaCourse = teaCourseRepository.findOne(courserId);
+        //如果课程结束时间早于当前时间，则不能取消预约
+        if(new Date().after(rsTeaCourse.getCourseStartTime())){
+            info = "【学生取消预约】 当前课程课程状态不允许取消课程！";
+            log.error(info);
+            throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
+        }
         if(subCourse.getSubStatus().equals(SubCourseEnum.SUB_WAIT.getCode())){
             subCourse.setSubStatus(SubCourseEnum.STU_CANCEL_SUB.getCode());
             subCourse.setStuCause(cause);
@@ -184,7 +191,6 @@ public class StuServiceImpl implements StuService {
         }else if(subCourse.getSubStatus().equals(SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode())){
             subCourse.setSubStatus(SubCourseEnum.STU_CANCEL_SUB.getCode());
             subCourse.setStuCause(cause);
-
             List<SubCourse> subCourseListFailed = subCourseRepository.findByCourseIdAndSubStatus(courserId,
                     SubCourseEnum.SUB_CANDIDATE_FAILED.getCode());
             for(SubCourse subCourseFailed:subCourseListFailed){
