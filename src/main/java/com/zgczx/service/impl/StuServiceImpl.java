@@ -472,6 +472,9 @@ public class StuServiceImpl implements StuService {
      **/
     @Override
     public List<SubDTO> lookHistory(Integer page, Integer size, String stuOpenid) {
+
+
+
         StuBase byStuOpenid = stuBaseRepository.findByStuOpenid(stuOpenid);
 
         Sort sort =new Sort(Sort.Direction.DESC,"createTime");
@@ -501,11 +504,22 @@ public class StuServiceImpl implements StuService {
                 throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
             }
 
+            //更新课程状态
+            teaService.finishCourse(teaCourse.getCourseId());
+
             subDTO.setTeaName(teaBase.getTeaName());
             subDTO.setTeaCourse(teaCourse);
             FeedBack feedBack = feedBackRepository.findBySubId(subCourse.getSubId());
             if(null != feedBack){
                 subDTO.setFeedBack(feedBack);
+            }else{
+                //若预约成功，且没有创建反馈，则先创建一条记录，保证可以通过subId提交反馈
+                if (subCourse.getSubStatus().equals(SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode())){
+                    FeedBack addFeedBack = new FeedBack();
+                    addFeedBack.setSubId(subCourse.getSubId());
+                    feedBackRepository.save(addFeedBack);
+                    subDTO.setFeedBack(addFeedBack);
+                }
             }
 
             subDTOList.add(subDTO);

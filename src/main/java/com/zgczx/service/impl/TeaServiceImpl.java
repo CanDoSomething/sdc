@@ -10,7 +10,6 @@ import com.zgczx.enums.SubCourseEnum;
 import com.zgczx.exception.SdcException;
 import com.zgczx.form.TeaCourseForm;
 import com.zgczx.repository.*;
-import com.zgczx.service.CourseService;
 import com.zgczx.service.PushMessageService;
 import com.zgczx.service.TeaService;
 import lombok.extern.slf4j.Slf4j;
@@ -283,8 +282,17 @@ public class TeaServiceImpl implements TeaService {
                 FeedBack feedBack = feedBackRepository.findBySubId(subId);
                 if(null != feedBack){
                     courseDTO.setFeedBack(feedBack);
+                }else{
+                    //没有创建反馈，则先创建一条记录，保证可以通过subId提交反馈
+                    FeedBack addFeedBack = new FeedBack();
+                    addFeedBack.setSubId(subId);
+                    feedBackRepository.save(addFeedBack);
+                    courseDTO.setFeedBack(addFeedBack);
                 }
             }
+
+            //更新课程状态
+            finishCourse(teaCourse.getCourseId());
 
             courseDTOList.add(courseDTO);
         }
