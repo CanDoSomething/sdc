@@ -517,6 +517,16 @@ public class TeaServiceImpl implements TeaService {
         }else{
             proFeedBack.setTeaFeedback(feedBack);
             proFeedBack.setTeaScore(score);
+
+            //推送反馈给学生
+            PushMessageDTO pushMessageDTO= new PushMessageDTO();
+            pushMessageDTO.setTeaCourse(one);
+            pushMessageDTO.setFeedBack(proFeedBack);
+            pushMessageDTO.setTeaBase(byteaOpenid);
+            StuBase byStuCode = stuBaseRepository.findByStuCode(subCourseList.get(0).getStuCode());
+            pushMessageDTO.setStuBase(byStuCode);
+            //教师给学生发送反馈
+            pushMessageService.pushFeedBackMessageToStu(pushMessageDTO);
             return feedBackRepository.save(proFeedBack);
         }
 

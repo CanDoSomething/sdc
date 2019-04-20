@@ -194,7 +194,7 @@ public class PushMessageServiceImpl implements PushMessageService {
         //设置返回数据
         List<WxMpTemplateData> data = Arrays.asList(
                 new WxMpTemplateData("first",pushMessageDTO.getTeaCourse().getCourseName()),
-                new WxMpTemplateData("keyword1",pushMessageDTO.getFeedBack().getTeaScore().toString()),
+                new WxMpTemplateData("keyword1",pushMessageDTO.getFeedBack().getTeaScore()+"分"),
                 new WxMpTemplateData("keyword2",pushMessageDTO.getFeedBack().getTeaFeedback()),
                 new WxMpTemplateData("keyword3",simpleDateFormat.format(new Date())),
                 //new WxMpTemplateData("keyword3",pushMessageDTO.getTeaCourse().getCourseEndTime().toString()),
@@ -277,7 +277,7 @@ public class PushMessageServiceImpl implements PushMessageService {
         //设置返回数据
         List<WxMpTemplateData> data = Arrays.asList(
                 new WxMpTemplateData("first",pushMessageDTO.getTeaCourse().getCourseName()),
-                new WxMpTemplateData("keyword1",pushMessageDTO.getFeedBack().getStuScore().toString()),
+                new WxMpTemplateData("keyword1",pushMessageDTO.getFeedBack().getStuScore()+"分"),
                 new WxMpTemplateData("keyword2",pushMessageDTO.getFeedBack().getStuFeedback()),
                 new WxMpTemplateData("keyword3",simpleDateFormat.format(new Date())),
                 //new WxMpTemplateData("keyword3",pushMessageDTO.getTeaCourse().getCourseEndTime().toString()),
