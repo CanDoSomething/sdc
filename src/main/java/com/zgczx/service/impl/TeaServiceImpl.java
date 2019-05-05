@@ -1,5 +1,6 @@
 package com.zgczx.service.impl;
 
+import com.zgczx.config.MQConfig;
 import com.zgczx.dataobject.*;
 import com.zgczx.dto.CourseDTO;
 import com.zgczx.dto.PushMessageDTO;
@@ -14,6 +15,9 @@ import com.zgczx.service.PushMessageService;
 import com.zgczx.service.TeaService;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageProperties;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,10 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @Author: Dqd
@@ -49,7 +50,8 @@ public class TeaServiceImpl implements TeaService {
     private ModelMapper modelMapper;
     @Autowired
     private PushMessageService pushMessageService;
-
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
     private String info;
     /**
      *新增课程
@@ -167,6 +169,17 @@ public class TeaServiceImpl implements TeaService {
             log.error(info);
             throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,info);
         }
+        //当课程创建成功之后，将课程Id放入MQ中,目前没有设置回调函数
+        String courseId = save.getCourseId().toString();
+        //过期时间设置为当前时间距离课程开始时间的毫秒数
+        Long dateout = courseStartTime.getTimeInMillis() - System.currentTimeMillis();
+        System.out.println("过期时间为:"+ dateout+"转为分钟是："+ (dateout/(1000*60) ) );
+        MessageProperties messageProperties = new MessageProperties();
+        messageProperties.setExpiration(dateout.toString());
+        messageProperties.setCorrelationId(UUID.randomUUID().toString().getBytes());
+        Message message = new Message(courseId.getBytes(), messageProperties);
+        rabbitTemplate.convertAndSend(MQConfig.EXCHANGE, MQConfig.ROUTINGKEY1,message);
+
         return save;
     }
 
