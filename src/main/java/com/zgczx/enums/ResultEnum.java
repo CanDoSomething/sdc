@@ -35,7 +35,10 @@ public enum ResultEnum {
      * 微信公众账号方面错误
      */
     WECHAT_MP_ERROR(504, "微信公众账号方面错误"),
-
+    /**
+     * 课程冲突
+     */
+    COURSE_CONFLICT(505,"当前课程和已有课程冲突")
     ;
 
     private Integer code;
