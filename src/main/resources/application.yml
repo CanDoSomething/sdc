@@ -1,3 +1,7 @@
+server:
+  port: 8086
+  servlet-path: /sdc
+
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
@@ -11,8 +15,6 @@ spring:
     time-zone: GMT+8
 #  jackson:
 #    default-property-inclusion: non_null   #全局设定返回不为空的值
-#server:
-#  servlet-path: /sell
 
 #logging:
 #  pattern:
@@ -22,8 +24,6 @@ spring:
 wechat:
   mpAppId: wx0b6356c5690adc27
   mpAppSecret: 9d09164246aeb4bbae46ec50d7afc6d4
-server:
-  port: 8086
 
 projectUrl:
   weChatMpAuthorize: http://zhiheyikaoqin.cn
