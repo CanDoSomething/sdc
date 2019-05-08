@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -35,6 +36,7 @@ public class PushMessageServiceImpl implements PushMessageService {
     @Autowired
     private StuBaseRepository stuBaseRepository;
     private String info = null;
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     /**
      * 推送给学生的预约课程模板状态消息
@@ -188,11 +190,13 @@ public class PushMessageServiceImpl implements PushMessageService {
         }
         //设置发送给用户的openid
         templateMessage.setToUser(pushMessageDTO.getStuBase().getStuOpenid());
+        System.out.println("发送消息给----》"+pushMessageDTO.getStuBase().getStuOpenid());
         //设置返回数据
         List<WxMpTemplateData> data = Arrays.asList(
                 new WxMpTemplateData("first",pushMessageDTO.getTeaCourse().getCourseName()),
-                new WxMpTemplateData("keyword1",pushMessageDTO.getFeedBack().getTeaFeedback()),
-                new WxMpTemplateData("keyword3",new Date().toString()),
+                new WxMpTemplateData("keyword1",pushMessageDTO.getFeedBack().getTeaScore()+"分"),
+                new WxMpTemplateData("keyword2",pushMessageDTO.getFeedBack().getTeaFeedback()),
+                new WxMpTemplateData("keyword3",simpleDateFormat.format(new Date())),
                 //new WxMpTemplateData("keyword3",pushMessageDTO.getTeaCourse().getCourseEndTime().toString()),
                 //new WxMpTemplateData("keyword4",pushMessageDTO.getTeaBase().getTeaName()),
                 new WxMpTemplateData("remark","教师:"+pushMessageDTO.getTeaBase().getTeaName())
@@ -269,14 +273,16 @@ public class PushMessageServiceImpl implements PushMessageService {
         }
         //设置发送给用户的openid
         templateMessage.setToUser(pushMessageDTO.getTeaBase().getTeaOpenid());
+        System.out.println("发送消息给----》"+pushMessageDTO.getTeaBase().getTeaOpenid());
         //设置返回数据
         List<WxMpTemplateData> data = Arrays.asList(
                 new WxMpTemplateData("first",pushMessageDTO.getTeaCourse().getCourseName()),
-                new WxMpTemplateData("keyword1",pushMessageDTO.getFeedBack().getTeaFeedback()),
-                new WxMpTemplateData("keyword3",new Date().toString()),
+                new WxMpTemplateData("keyword1",pushMessageDTO.getFeedBack().getStuScore()+"分"),
+                new WxMpTemplateData("keyword2",pushMessageDTO.getFeedBack().getStuFeedback()),
+                new WxMpTemplateData("keyword3",simpleDateFormat.format(new Date())),
                 //new WxMpTemplateData("keyword3",pushMessageDTO.getTeaCourse().getCourseEndTime().toString()),
                 //new WxMpTemplateData("keyword4",pushMessageDTO.getTeaBase().getTeaName()),
-                new WxMpTemplateData("remark","学生:"+pushMessageDTO.getTeaBase().getTeaName())
+                new WxMpTemplateData("remark","学生:"+pushMessageDTO.getStuBase().getStuName())
         );
         templateMessage.setData(data);
         try {
