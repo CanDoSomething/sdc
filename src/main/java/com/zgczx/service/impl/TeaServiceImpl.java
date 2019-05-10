@@ -119,13 +119,13 @@ public class TeaServiceImpl implements TeaService {
                         //"即新课程与已有课程前部交叉"
                         ",既新课程与已有课程后部交叉或新课程包含已有课程";
                 log.error(info);
-                throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
+                throw new SdcException(ResultEnum.COURSE_CONFLICT,info);
             }
             if(courseStartTime.getTime().after(teaCourse.getCourseStartTime()) &&
                     courseEndTime.getTime().before(teaCourse.getCourseEndTime())){
                 info = "【教师创建课程】 新课程开始时间晚于已有课程的开始时间且新课程的结束时间早于已有课程的结束时间";
                 log.error(info);
-                throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
+                throw new SdcException(ResultEnum.COURSE_CONFLICT,info);
             }
             if(courseStartTime.getTime().after(teaCourse.getCourseStartTime())
                     && courseEndTime.getTime().after(teaCourse.getCourseEndTime())
@@ -133,19 +133,19 @@ public class TeaServiceImpl implements TeaService {
                 info = "【教师创建课程】 新课程开始时间晚于已有课程的开始时间且新课程的结束时间晚于已有课程的结束时间" +
                         "新课程的开始时间早于已有课程的结束时间";
                 log.error(info);
-                throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
+                throw new SdcException(ResultEnum.COURSE_CONFLICT,info);
             }
             int startTime = courseStartTime.getTime().compareTo(teaCourse.getCourseStartTime());
             int endTime = courseEndTime.getTime().compareTo(teaCourse.getCourseEndTime());
             if(startTime == 0){
                 info = "【教师创建课程】 新课程开始时间等于已有课程的开始时间";
                 log.error(info);
-                throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
+                throw new SdcException(ResultEnum.COURSE_CONFLICT,info);
             }
             if(endTime == 0){
                 info = "【教师创建课程】 新课程结束时间等于已有课程的结束时间";
                 log.error(info);
-                throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
+                throw new SdcException(ResultEnum.COURSE_CONFLICT,info);
             }
         }
         TeaCourse teaCourse = new TeaCourse();
