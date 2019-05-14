@@ -94,6 +94,7 @@ public class WeChatController {
             }
         }
         return "redirect:"+projectUrlConfig.getSdc()
+                .concat("/sdc")
                 .concat("/"+returnUrl)
                 .concat("?openid="+openid)
                 .concat("&path="+path);
@@ -106,7 +107,7 @@ public class WeChatController {
         log.info("returnUrl-->"+returnUrl);
         //1.配置
         //2.调用方法
-        String url = projectUrlConfig.getWeChatMpAuthorize() + "/wechat/userInfoByOpenid?path="+path;
+        String url = projectUrlConfig.getWeChatMpAuthorize() + "/sdc/wechat/userInfoByOpenid?path="+path;
         String redirectUrl =  wxMpService.oauth2buildAuthorizationUrl(url, WxConsts.OAUTH2_SCOPE_BASE, returnUrl);
         log.info("【微信网页授权 仅获取openid】 获取code，result={}",redirectUrl);
         return "redirect:" + redirectUrl;
@@ -125,6 +126,7 @@ public class WeChatController {
         String openid = wxMpOAuth2AccessTokenByOpenid.getOpenId();
         log.info("returnUrl-->"+returnUrl);
         return "redirect:"+projectUrlConfig.getSdc()
+                .concat("/sdc")
                 .concat("/"+returnUrl)
                 .concat("?openid="+openid)
                 .concat("&path="+path);
