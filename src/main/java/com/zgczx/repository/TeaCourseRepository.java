@@ -72,7 +72,8 @@ public interface TeaCourseRepository extends JpaRepository<TeaCourse,Integer> {
      * @param date 当前时间
      * @param pageable 分页器
      * @return 分页的课程信息
-     **/
+     *
+     */
 
     Page<TeaCourse> findByCourseStatusAndCourseStartTimeIsAfter(Integer courseStatus,Date date,Pageable pageable);
 
