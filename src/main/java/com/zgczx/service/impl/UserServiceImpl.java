@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @ClassName: Jason
@@ -43,10 +45,14 @@ public class UserServiceImpl implements UserService {
             log.info("【创建学生】 该学生的openid已经创建，stuOpenid={}",stuOpenid);
             throw new SdcException(UserEnum.stuOpenid_is_created);
         }
-        if(nickname.contains("\\")) {
+        Pattern emoji = Pattern.compile("[\ud83c\udc00-\ud83c\udfff]|[\ud83d\udc00-\ud83d\udfff]|[\u2600-\u27ff]",
+                Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE);
+        Matcher emojiMatcher = emoji.matcher(nickname);
+        if (emojiMatcher.find()) {
             log.info("【创建学生信息】 该学生的昵称中包含非法字符使用Openid={}代替昵称",stuOpenid);
             nickname = stuOpenid;
         }
+
         StuBase stuBase = new StuBase();
         // 学生学籍号暂用openid 代替
         stuBase.setStuCode(stuOpenid);
@@ -65,10 +71,16 @@ public class UserServiceImpl implements UserService {
         if(teaBase_check != null){
             log.info("【创建老师信息】 该老师的teaOpenid已经被创建,teaOpenid={}",teaOpenid);
         }
-        if(nickname.contains("\\")){
+
+
+        Pattern emoji = Pattern.compile("[\ud83c\udc00-\ud83c\udfff]|[\ud83d\udc00-\ud83d\udfff]|[\u2600-\u27ff]",
+                Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE);
+        Matcher emojiMatcher = emoji.matcher(nickname);
+        if (emojiMatcher.find()) {
             log.info("【创建老师】 该老师的昵称中包含非法字符使用Openid={}代替昵称",teaOpenid);
             nickname = teaOpenid;
         }
+
         TeaBase teaBase = new TeaBase();
         // 教师工号暂用openid 代替
         teaBase.setTeaCode(teaOpenid);
