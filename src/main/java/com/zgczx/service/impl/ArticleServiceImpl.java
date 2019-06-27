@@ -9,13 +9,13 @@ import com.zgczx.exception.SdcException;
 import com.zgczx.repository.ArticleRepository;
 import com.zgczx.repository.ArticleScoreRepository;
 import com.zgczx.service.ArticleService;
-import com.zgczx.utils.EnumUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -44,7 +44,8 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public List<ArticleAbstractDTO> getArticleList(String openid, String label, Integer page, Integer pageSize) {
         // openid 暂时没用到
-        Pageable pageable = new PageRequest(page, pageSize);
+        Sort sort = new Sort(Sort.Direction.DESC ,"articleDate");
+        Pageable pageable = new PageRequest(page, pageSize,sort);
 
 
         Page<Article> articles;

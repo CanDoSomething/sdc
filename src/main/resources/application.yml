@@ -32,3 +32,4 @@ projectUrl:
   homeAddress: /user/home
 logging:
   config: classpath:logback-spring.xml
+  level: trace
