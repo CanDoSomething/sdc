@@ -60,6 +60,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public TeaBase createTeaBase(String teaOpenid, String nickname, String headImgUrl) {
 
+        log.info("【创建老师信息】 用户昵称，nickname = {}",nickname);
         TeaBase teaBase_check = teaBaseRepository.findByTeaOpenid(teaOpenid);
         if(teaBase_check != null){
             log.info("【创建老师信息】 该老师的teaOpenid已经被创建,teaOpenid={}",teaOpenid);

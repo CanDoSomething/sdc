@@ -31,7 +31,6 @@ import static com.zgczx.utils.DateUtil.getNowTime;
 @Slf4j
 public class ArticleServiceImpl implements ArticleService {
 
-
     @Autowired
     private ArticleRepository articleRepository;
 
@@ -45,8 +44,8 @@ public class ArticleServiceImpl implements ArticleService {
     public List<ArticleAbstractDTO> getArticleList(String openid, String label, Integer page, Integer pageSize) {
         // openid 暂时没用到
         Sort sort = new Sort(Sort.Direction.DESC ,"articleDate");
-        Pageable pageable = new PageRequest(page, pageSize,sort);
 
+        Pageable pageable = new PageRequest(page, pageSize,sort);
 
         Page<Article> articles;
         //  若没有该标签，则返回所有内容
