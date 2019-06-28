@@ -43,16 +43,16 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public List<ArticleAbstractDTO> getArticleList(String openid, String label, Integer page, Integer pageSize) {
         // openid 暂时没用到
-        Sort sort = new Sort(Sort.Direction.DESC ,"articleDate");
 
-        Pageable pageable = new PageRequest(page, pageSize,sort);
+        Sort sort = new Sort(Sort.Direction.DESC,"articleDate");
+        Pageable pageable = new PageRequest(page,pageSize,sort);
 
         Page<Article> articles;
         //  若没有该标签，则返回所有内容
         // TODO 推荐模块的文章，现在推荐返回的是所有文章
 
         if(!label.equals(ArticleLabelEnum.RECOMMEND.getMessage())){
-            articles = articleRepository.findByArticleLabel1(label,pageable);
+            articles = articleRepository.findLabeledArticle(label,pageable);
         }else {
             articles =  articleRepository.findAll(pageable);
         }
@@ -66,6 +66,9 @@ public class ArticleServiceImpl implements ArticleService {
 
         List<ArticleAbstractDTO> articleAbstractDTOList = new ArrayList<>();
         for(Article article:articles.getContent()){
+            if(article.getArticleDate().contains("年")){
+                continue;
+            }
             ArticleAbstractDTO articleAbstractDTO = new ArticleAbstractDTO();
             BeanUtils.copyProperties(article,articleAbstractDTO);
             articleAbstractDTOList.add(articleAbstractDTO);

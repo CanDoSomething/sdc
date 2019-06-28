@@ -26,11 +26,11 @@ import java.net.URLEncoder;
  *
  * @author Jason
  */
+
 @Controller
 @RequestMapping("/wechat")
 @Slf4j
 public class WeChatController {
-
 
     private final WxMpService wxMpService;
 
