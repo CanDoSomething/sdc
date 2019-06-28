@@ -22,7 +22,10 @@ public interface ArticleRepository extends JpaRepository<Article,Integer> {
             countQuery = "select count(a.*) from article a ")
     Page<Article> findByArticleLabel1(String label1, Pageable pageable);*/
 
-    @Query( value = "SELECT a FROM Article a WHERE a.articleLabel1 = ?1 ")
+    @Query( value = "SELECT a FROM Article a WHERE NOT (a.articleDate like CONCAT('%','年','%') ) and a.articleLabel1 = ?1 ")
     Page<Article> findLabeledArticle(String label1, Pageable pageable);
+
+    @Query(value = "SELECT a FROM Article a  WHERE NOT (a.articleDate like CONCAT('%','年','%') )")
+    Page<Article> findAllTheArticle(Pageable pageable);
 
 }

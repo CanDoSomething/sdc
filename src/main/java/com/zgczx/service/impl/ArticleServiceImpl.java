@@ -54,7 +54,7 @@ public class ArticleServiceImpl implements ArticleService {
         if(!label.equals(ArticleLabelEnum.RECOMMEND.getMessage())){
             articles = articleRepository.findLabeledArticle(label,pageable);
         }else {
-            articles =  articleRepository.findAll(pageable);
+            articles =  articleRepository.findAllTheArticle(pageable);
         }
 
         if (articles.getContent().isEmpty()){
@@ -66,9 +66,6 @@ public class ArticleServiceImpl implements ArticleService {
 
         List<ArticleAbstractDTO> articleAbstractDTOList = new ArrayList<>();
         for(Article article:articles.getContent()){
-            if(article.getArticleDate().contains("年")){
-                continue;
-            }
             ArticleAbstractDTO articleAbstractDTO = new ArticleAbstractDTO();
             BeanUtils.copyProperties(article,articleAbstractDTO);
             articleAbstractDTOList.add(articleAbstractDTO);
