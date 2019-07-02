@@ -114,9 +114,11 @@
             <version>1.7.0</version>
         </dependency>
         <!--RabbitMQ-->
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-amqp -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-amqp</artifactId>
+            <version>2.0.0.RELEASE</version>
         </dependency>
     </dependencies>
 
