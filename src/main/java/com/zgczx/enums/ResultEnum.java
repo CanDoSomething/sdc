@@ -38,7 +38,12 @@ public enum ResultEnum {
     /**
      * 课程冲突
      */
-    COURSE_CONFLICT(505,"当前课程和已有课程冲突")
+    COURSE_CONFLICT(505,"当前课程和已有课程冲突"),
+    /**
+     * 当前用户未注册
+     */
+    USER_NOT_REGISTER(506,"当前用户未注册")
+
     ;
 
     private Integer code;

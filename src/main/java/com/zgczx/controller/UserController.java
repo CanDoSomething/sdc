@@ -8,6 +8,7 @@ import com.zgczx.dataobject.StuBase;
 import com.zgczx.dataobject.TeaBase;
 import com.zgczx.enums.ResultEnum;
 import com.zgczx.exception.SdcException;
+import com.zgczx.exception.UserRegisterException;
 import com.zgczx.form.StuInfoForm;
 import com.zgczx.form.TeaInfoForm;
 import com.zgczx.service.UserService;
@@ -63,9 +64,9 @@ public class UserController {
         //3.若都不存在，即为未注册
         if(null == stuBase1 && null ==teaBase1 &&
                 null == stuBase && null ==teaBase){
-            info = "【该openid没有注册】 "+openid;
+            info = "【该openid没有注册】 " + openid;
             log.info(info);
-            throw new SdcException(ResultEnum.INFO_NOTFOUND_EXCEPTION,info);
+            throw new UserRegisterException(ResultEnum.USER_NOT_REGISTER , info);
         }
 
         if(stuBase != null){
