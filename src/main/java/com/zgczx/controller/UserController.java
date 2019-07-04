@@ -52,7 +52,8 @@ public class UserController {
     @GetMapping("/queryUserInfo")
     @ResponseBody
     public ResultVO<?> queryUserInfo(@RequestParam("openid") String openid){
-
+        log.info("进入queryUserInfo页面{}" , openid );
+        System.out.println("进入queryUserInfo页面--->"+openid);
         //1. openid是否存在数据库
         StuBase stuBase = userService.findStuBaseByOpenid(openid);
         TeaBase teaBase = userService.findTeaBaseByOpenid(openid);
@@ -74,8 +75,8 @@ public class UserController {
         }else {
             return ResultVOUtil.success(teaBase);
         }
-
     }
+
     @GetMapping("/logout")
     public ModelAndView logout(HttpServletRequest request,
                        HttpServletResponse response){
