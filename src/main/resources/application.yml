@@ -22,8 +22,8 @@ spring:
 #  level: info
 
 wechat:
-  mpAppId: wx0b6356c5690adc27
-  mpAppSecret: 9d09164246aeb4bbae46ec50d7afc6d4
+  mpAppId: wxfeddd8f8e80367ec
+  mpAppSecret: 8060842eca94b5eac16c259a4dedc401
 
 projectUrl:
   weChatMpAuthorize: http://zhiheyikaoqin.cn
