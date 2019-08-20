@@ -12,6 +12,6 @@ else
 
    echo "Start success to start $PROJECTNAME ...."
 
-   nohup java -jar sdc-0.0.1-SNAPSHOT.jar  >> catalina.out  2>&1 &
-
+   #nohup java -jar sdc-0.0.1-SNAPSHOT.jar  >> catalina.out  2>&1 &
+    nohup mvn spring-boot:run -Drun.project=sdc  >> catalina.out  2>&1 &
 fi
