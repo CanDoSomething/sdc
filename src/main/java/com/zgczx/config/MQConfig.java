@@ -16,7 +16,7 @@ public class MQConfig {
     //配置消息队列
     public static final String DELAY_QUEUE2 = "delay_queue2";
     //主机ip
-    public static final String IP = "58.119.112.12";
+    public static final String IP = "58.119.112.13";
     //端口号
     public static final Integer PORT = 5672;
     //用户名
