@@ -57,8 +57,8 @@ public class WeChatController {
 
         //1.配置
         //2.调用方法
-        //String url = projectUrlConfig.getWeChatMpAuthorize() + "/sdc/wechat/userInfo?role="+role+"&path="+path;
-        String url = projectUrlConfig.getWeChatMpAuthorize() + "/wechat/userInfo?role="+role+"&path="+path;
+        String url = projectUrlConfig.getWeChatMpAuthorize() + "/sdc/wechat/userInfo?role="+role+"&path="+path;
+        //String url = projectUrlConfig.getWeChatMpAuthorize() + "/wechat/userInfo?role="+role+"&path="+path;
         String redirectUrl =  wxMpService.oauth2buildAuthorizationUrl(url, WxConsts.OAUTH2_SCOPE_USER_INFO, URLEncoder.encode(returnUrl));
         log.info("【微信网页授权】 获取code，result={}",redirectUrl);
         return "redirect:" + redirectUrl;
