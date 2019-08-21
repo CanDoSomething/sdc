@@ -1,6 +1,6 @@
 server:
   port: 8086
-  servlet-path: /sdc
+  servlet-path: /
 
 spring:
   datasource:
@@ -25,10 +25,15 @@ wechat:
   mpAppId: wx0b6356c5690adc27
   mpAppSecret: 9d09164246aeb4bbae46ec50d7afc6d4
 
+#projectUrl:
+#  weChatMpAuthorize: http://zhiheyikaoqin.cn
+#  weChatOpenAuthorize: http://zhiheyikaoqin.cn
+#  sdc: http://zhiheyikaoqin.cn
+#  homeAddress: /user/home
 projectUrl:
-  weChatMpAuthorize: http://zhiheyikaoqin.cn
-  weChatOpenAuthorize: http://zhiheyikaoqin.cn
-  sdc: http://zhiheyikaoqin.cn
+  weChatMpAuthorize: http://58.119.112.12/sdc
+  weChatOpenAuthorize: http://58.119.112.12/sdc
+  sdc: http://58.119.112.12/sdc
   homeAddress: /user/home
 logging:
   config: classpath:logback-spring.xml
