@@ -116,6 +116,5 @@ public class ArticleServiceImpl implements ArticleService {
         log.info("putScore--->"+"openid:"+openid+"  "+"artId:"+artId+"  "+"score:"+score+"  "+"time:"+getNowTime());
 
         return savedArticleScore;
-
     }
 }

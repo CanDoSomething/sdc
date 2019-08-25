@@ -27,5 +27,4 @@ public interface ArticleRepository extends JpaRepository<Article,Integer> {
 
     @Query(value = "SELECT a FROM Article a  WHERE NOT (a.articleDate like CONCAT('%','年','%') )")
     Page<Article> findAllTheArticle(Pageable pageable);
-
 }

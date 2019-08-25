@@ -1,13 +1,13 @@
 server:
   port: 8086
-  servlet-path: /
+  servlet-path: /sdc
 
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    username: bigdata
-    password: 123456
-    url: jdbc:mysql://58.119.112.10:3306/studevelope?characterEncoding=utf-8&useSSL=false
+    username: sdc
+    password: 123456@sdc
+    url: jdbc:mysql://58.119.112.10:11030/studevelope?characterEncoding=utf-8&useSSL=false
   jpa:
     show-sql: true
   jackson:
@@ -30,12 +30,6 @@ projectUrl:
   weChatOpenAuthorize: http://zhiheyikaoqin.cn
   sdc: http://zhiheyikaoqin.cn
   homeAddress: /user/home
-
-#projectUrl:
-#  weChatMpAuthorize: http://zhongkeruitong.top/sdc
-#  weChatOpenAuthorize: http://zhongkeruitong.top/sdc
-#  sdc: http://zhongkeruitong.top/sdc
-#  homeAddress: /user/home
 logging:
   config: classpath:logback-spring.xml
   level: trace
