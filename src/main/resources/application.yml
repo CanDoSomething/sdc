@@ -26,9 +26,9 @@ wechat:
   mpAppSecret: 9d09164246aeb4bbae46ec50d7afc6d4
 
 projectUrl:
-  weChatMpAuthorize: http://zhiheyikaoqin.cn/sdc
-  weChatOpenAuthorize: http://zhiheyikaoqin.cn/sdc
-  sdc: http://zhiheyikaoqin.cn/sdc
+  weChatMpAuthorize: http://zhiheyikaoqin.cn
+  weChatOpenAuthorize: http://zhiheyikaoqin.cn
+  sdc: http://zhiheyikaoqin.cn
   homeAddress: /user/home
 
 #projectUrl:
