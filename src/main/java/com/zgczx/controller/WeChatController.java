@@ -94,7 +94,7 @@ public class WeChatController {
             }
         }
         return "redirect:"+projectUrlConfig.getSdc()
-                .concat("/sdc")
+                .concat("")
                 .concat("/"+returnUrl)
                 .concat("?openid="+openid)
                 .concat("&path="+path);
