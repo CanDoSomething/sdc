@@ -5,7 +5,9 @@
           if (item.indexOf('=') !== -1) {
             obj[item.split('=')[0]] = item.split('=')[1]
           } else {
-            obj.baseUrl = item
+            <!-- obj.baseUrl = item -->
+            obj.baseUrl = item.split('/')[0] + item.split('/')[2]
+
           }
         })
         if (typeof obj.path !== 'undefined') {
