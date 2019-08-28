@@ -27,10 +27,10 @@ public class UserAuthorizeExceptionHandler {
        // String returnUrl = userAuthorizeException.getReturnUrl()+"?"+userAuthorizeException.getQueryString();
        // redirectAttributes.addAttribute("returnUrl",returnUrl);
         return new ModelAndView("redirect:"
-                .concat(projectUrlConfig.getWeChatMpAuthorize())
+                .concat(projectUrlConfig.getWeChatMpAuthorize()).concat("/sdc/sdc")
                 .concat("/wechat/authorizeByOpenid")
                 .concat("?returnUrl=")
-                .concat(projectUrlConfig.getSdc())
+                .concat(projectUrlConfig.getSdc()).concat("/sdc/sdc")
                 .concat("/user/login")
         );
     }
