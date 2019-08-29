@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -59,6 +60,8 @@ public class UserServiceImpl implements UserService {
         stuBase.setStuOpenid(stuOpenid);
         stuBase.setStuNickname(nickname);
         stuBase.setStuHeadimgurl(headImgUrl);
+        stuBase.setCreateTime(new Date());
+        stuBase.setUpdateTime(new Date());
         StuBase saved_stuBase = stuBaseRepository.save(stuBase);
         return saved_stuBase;
     }
@@ -87,6 +90,8 @@ public class UserServiceImpl implements UserService {
         teaBase.setTeaOpenid(teaOpenid);
         teaBase.setTeaNickname(nickname);
         teaBase.setTeaHeadimgurl(headImgUrl);
+        teaBase.setCreateTime(new Date());
+        teaBase.setUpdateTime(new Date());
         TeaBase saved_teaBase = teaBaseRepository.save(teaBase);
         return saved_teaBase;
     }
