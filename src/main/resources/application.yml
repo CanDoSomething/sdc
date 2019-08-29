@@ -1,6 +1,6 @@
 server:
   port: 8086
-  servlet-path: /sdc
+  servlet-path: /
 
 spring:
   datasource:
