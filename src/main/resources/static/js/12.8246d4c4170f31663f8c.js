@@ -1,2 +1,0 @@
-webpackJsonp([12],{JA07:function(e,n,t){"use strict";Object.defineProperty(n,"__esModule",{value:!0});var r={data:function(){return{a:"s"}}},u=function(){var e=this,n=e.$createElement;return(e._self._c||n)("div",[e._v("前沿技术")])},l=[],a={render:u,staticRenderFns:l},s=a,c=t("VU/8"),i=c(r,s,!1,null,null,null);n.default=i.exports}});
-//# sourceMappingURL=12.8246d4c4170f31663f8c.js.map
