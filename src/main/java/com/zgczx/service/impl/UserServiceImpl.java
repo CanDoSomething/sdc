@@ -3,6 +3,7 @@ package com.zgczx.service.impl;
 import com.zgczx.dataobject.StuBase;
 import com.zgczx.dataobject.TeaBase;
 import com.zgczx.dataobject.TeaCourse;
+import com.zgczx.dataobject.UserFeedBack;
 import com.zgczx.enums.CourseEnum;
 import com.zgczx.enums.UserEnum;
 import com.zgczx.exception.SdcException;
@@ -11,6 +12,7 @@ import com.zgczx.form.TeaInfoForm;
 import com.zgczx.repository.StuBaseRepository;
 import com.zgczx.repository.TeaBaseRepository;
 import com.zgczx.repository.TeaCourseRepository;
+import com.zgczx.repository.UserFeedBackRepository;
 import com.zgczx.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +39,8 @@ public class UserServiceImpl implements UserService {
     private TeaBaseRepository teaBaseRepository;
     @Autowired
     private TeaCourseRepository teaCourseRepository;
+    @Autowired
+    private UserFeedBackRepository userFeedBackRepository;
 
     @Override
     public StuBase createStuBase(String stuOpenid, String nickname, String headImgUrl) {
@@ -205,5 +209,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public TeaBase findTeaBaseByTeaCode(String teaCode) {
         return teaBaseRepository.findOne(teaCode);
+    }
+
+    @Override
+    public UserFeedBack addUserFeedBack(UserFeedBack userFeedBack) {
+        userFeedBack.setInsertTime(new Date());
+        UserFeedBack saveUserFeedBack = userFeedBackRepository.save(userFeedBack);
+        return saveUserFeedBack;
     }
 }

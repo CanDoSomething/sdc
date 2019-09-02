@@ -2,6 +2,7 @@ package com.zgczx.service;
 
 import com.zgczx.dataobject.StuBase;
 import com.zgczx.dataobject.TeaBase;
+import com.zgczx.dataobject.UserFeedBack;
 import com.zgczx.form.StuInfoForm;
 import com.zgczx.form.TeaInfoForm;
 
@@ -104,6 +105,12 @@ public interface UserService {
      */
     TeaBase findTeaBaseByTeaCode(String teaCode);
 
-
+    /**
+     * 用户新增系统反馈
+     *
+     * @param userFeedBack 反馈基本信息
+     * @return 反馈基本信息
+     */
+    UserFeedBack addUserFeedBack(UserFeedBack userFeedBack);
 
 }

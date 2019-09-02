@@ -6,6 +6,7 @@ import com.zgczx.config.ProjectUrlConfig;
 import com.zgczx.constant.CookieConstant;
 import com.zgczx.dataobject.StuBase;
 import com.zgczx.dataobject.TeaBase;
+import com.zgczx.dataobject.UserFeedBack;
 import com.zgczx.enums.ResultEnum;
 import com.zgczx.exception.SdcException;
 import com.zgczx.exception.UserRegisterException;
@@ -156,6 +157,13 @@ public class UserController {
         String str = userService.deleteStuByOpenid(stuOpenid);
 
         return ResultVOUtil.success(str);
+    }
+    @PostMapping("/addUserFeedBack")
+    @ResponseBody
+    public  ResultVO<?> addUserFeedBack(UserFeedBack userFeedBack){
+
+        UserFeedBack rsUserFeedBack = userService.addUserFeedBack(userFeedBack);
+        return ResultVOUtil.success(rsUserFeedBack);
     }
 
 }
