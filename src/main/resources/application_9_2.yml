@@ -5,9 +5,9 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    username: sdc
-    password: 123456@sdc
-    url: jdbc:mysql://58.119.112.10:11030/studevelope?characterEncoding=utf-8&useSSL=false
+    username: bigdata
+    password: 123456
+    url: jdbc:mysql://58.119.112.10:3306/studevelope?characterEncoding=utf-8&useSSL=false
   jpa:
     show-sql: true
   jackson:
@@ -22,14 +22,20 @@ spring:
 #  level: info
 
 wechat:
-  mpAppId: wxfeddd8f8e80367ec
-  mpAppSecret: 8060842eca94b5eac16c259a4dedc401
+  mpAppId: wx0b6356c5690adc27
+  mpAppSecret: 9d09164246aeb4bbae46ec50d7afc6d4
 
 projectUrl:
   weChatMpAuthorize: http://zhiheyikaoqin.cn
   weChatOpenAuthorize: http://zhiheyikaoqin.cn
   sdc: http://zhiheyikaoqin.cn
   homeAddress: /user/home
+
+#projectUrl:
+#  weChatMpAuthorize: http://zhongkeruitong.top/sdc
+#  weChatOpenAuthorize: http://zhongkeruitong.top/sdc
+#  sdc: http://zhongkeruitong.top/sdc
+#  homeAddress: /user/home
 logging:
   config: classpath:logback-spring.xml
   level: trace
