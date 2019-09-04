@@ -43,6 +43,7 @@ public class PushMessageServiceImpl implements PushMessageService {
      *
      * @param pushMessageDTO 封装的课程消息对象
      */
+
     @Override
     @Transactional(rollbackFor=Exception.class)
     public void pushSubSuccessMessage(PushMessageDTO pushMessageDTO) {
@@ -66,7 +67,7 @@ public class PushMessageServiceImpl implements PushMessageService {
                 new WxMpTemplateData("keyword1",pushMessageDTO.getTeaBase().getTeaName()),
                 //new WxMpTemplateData("keyword2","行了嘛"),
                 new WxMpTemplateData("keyword3",tmp),
-                new WxMpTemplateData("keyword4",pushMessageDTO.getTeaCourse().getCourseEndTime().toString()+"至"+pushMessageDTO.getTeaCourse().getCourseEndTime().toString()),
+                new WxMpTemplateData("keyword4",pushMessageDTO.getTeaCourse().getCourseStartTime().toString()+"至"+pushMessageDTO.getTeaCourse().getCourseEndTime().toString()),
                 //new WxMpTemplateData("keyword5", SubCourseEnum.SUB_CANDIDATE_SUCCESS.getMessage()),
                 //new WxMpTemplateData("keyword6",tmp),
                 new WxMpTemplateData("remark",pushMessageDTO.getTeaCourse().getCourseCause())
@@ -111,7 +112,7 @@ public class PushMessageServiceImpl implements PushMessageService {
                 new WxMpTemplateData("keyword2",SubCourseEnum.SUB_CANDIDATE_FAILED.getMessage()),
                 //new WxMpTemplateData("keyword6",tmp),
                 new WxMpTemplateData("keyword3",pushMessageDTO.getTeaCourse().getCourseCause()),
-                new WxMpTemplateData("remark","时间:" + pushMessageDTO.getTeaCourse().getCourseEndTime().toString()+"至"+pushMessageDTO.getTeaCourse().getCourseEndTime().toString())
+                new WxMpTemplateData("remark","时间:" + pushMessageDTO.getTeaCourse().getCourseStartTime().toString()+"至"+pushMessageDTO.getTeaCourse().getCourseEndTime().toString())
         );
         templateMessage.setData(data);
         try {
@@ -163,7 +164,7 @@ public class PushMessageServiceImpl implements PushMessageService {
                 new WxMpTemplateData("keyword2",SubCourseEnum.TEA_CANCEL_SUB.getMessage()),
                 //new WxMpTemplateData("keyword6",tmp),
                 new WxMpTemplateData("keyword3",pushMessageDTO.getTeaCourse().getCourseCause()),
-                new WxMpTemplateData("remark","时间:" + pushMessageDTO.getTeaCourse().getCourseEndTime().toString()+"至"+pushMessageDTO.getTeaCourse().getCourseEndTime().toString())
+                new WxMpTemplateData("remark","时间:" + pushMessageDTO.getTeaCourse().getCourseStartTime().toString()+"至"+pushMessageDTO.getTeaCourse().getCourseEndTime().toString())
         );
         templateMessage.setData(data);
         try {
@@ -245,7 +246,7 @@ public class PushMessageServiceImpl implements PushMessageService {
                 new WxMpTemplateData("keyword2",SubCourseEnum.STU_CANCEL_SUB.getMessage()),
                 //new WxMpTemplateData("keyword6",tmp),
                 new WxMpTemplateData("keyword3",pushMessageDTO.getTeaCourse().getCourseCause()),
-                new WxMpTemplateData("remark","时间:" + pushMessageDTO.getTeaCourse().getCourseEndTime().toString()+"至"+pushMessageDTO.getTeaCourse().getCourseEndTime().toString())
+                new WxMpTemplateData("remark","时间:" + pushMessageDTO.getTeaCourse().getCourseStartTime().toString()+"至"+pushMessageDTO.getTeaCourse().getCourseEndTime().toString())
 
         );
         templateMessage.setData(data);
