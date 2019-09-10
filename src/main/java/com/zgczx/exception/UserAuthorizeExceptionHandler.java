@@ -34,5 +34,4 @@ public class UserAuthorizeExceptionHandler {
                 .concat("/user/login")
         );
     }
-
 }
