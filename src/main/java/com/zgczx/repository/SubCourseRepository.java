@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 public interface SubCourseRepository extends JpaRepository<SubCourse,Integer> {
 
+    List<SubCourse> findByCourseIdAndSubStatusIn(Integer courseId, List<Integer> subStatus,Pageable pageable);
+
     List<SubCourse> findByCourseId(Integer courseId);
     /**
      *查找到学生对应的所有课程信息

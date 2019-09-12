@@ -24,7 +24,7 @@ public interface TeaCourseRepository extends JpaRepository<TeaCourse,Integer> {
      * @param pageable 分页条件
      * @return 所有课程列表
      */
-    @Query("select teaCourse from TeaCourse teaCourse where teaCourse.teaCode = ?1 ORDER BY teaCourse.courseDate desc")
+    @Query("select teaCourse from TeaCourse teaCourse where teaCourse.teaCode = ?1 AND teaCourse.originId = -1 ORDER BY teaCourse.courseDate desc")
     Page<TeaCourse> findAllTeaCourse(String teaCode,Pageable pageable);
 
     /**
@@ -61,8 +61,8 @@ public interface TeaCourseRepository extends JpaRepository<TeaCourse,Integer> {
      * @param pageable 分页
      * @return 课程列表
      */
-    @Query("select tea from TeaCourse tea where courseEndTime >= ?1 and courseStatus = 300 or courseStatus = 301 or " +
-            "courseStatus = 302")
+    @Query("select tea from TeaCourse tea where (courseEndTime >= ?1 and courseStatus = 300 or courseStatus = 301 or " +
+            "courseStatus = 302) and originId = -1")
     Page<TeaCourse> findAllCourse(Date date,Pageable pageable);
 
     /**
@@ -84,4 +84,6 @@ public interface TeaCourseRepository extends JpaRepository<TeaCourse,Integer> {
      * @return 课程列表
      */
     List<TeaCourse> findByTeaCodeAndCourseStatusNotIn(String teaCode,ArrayList<Integer> list);
+
+    List<TeaCourse> findByTeaCodeAndOriginId(String teaCode,Integer originCourseId);
 }

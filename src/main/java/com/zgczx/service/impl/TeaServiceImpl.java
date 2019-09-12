@@ -1,5 +1,6 @@
 package com.zgczx.service.impl;
 
+import com.zgczx.config.DateConfig;
 import com.zgczx.config.MQConfig;
 import com.zgczx.dataobject.*;
 import com.zgczx.dto.CourseDTO;
@@ -62,123 +63,159 @@ public class TeaServiceImpl implements TeaService {
      */
     @Override
     @Transactional(rollbackFor=Exception.class)
-    public TeaCourse createCourse(TeaCourseForm teaCourseForm,String teaOpenid) {
+    public List<TeaCourse> createCourse(TeaCourseForm teaCourseForm,String teaOpenid) {
         // 判断课程上课日期，开始时间，结束时间是否合法？通过String来接收参数，格式转换后是否合法？
-        Date strCourseStartTime = teaCourseForm.getCourseStartTime();
-        Date strCourseEndTime = teaCourseForm.getCourseEndTime();
-        Date strCourseDate = teaCourseForm.getCourseDate();
-        Date strToday = new Date();
+        int allPeriods = teaCourseForm.getAllPeriod();
+        int originId = -1;
+        String dayWeek = null;
+        List<TeaCourse> rsTeaCourseList = new ArrayList<>(8);
+        Date firstCourseStartTime = teaCourseForm.getCourseStartTime();
+        Date firstCourseEndTime = teaCourseForm.getCourseEndTime();
+        /*int startHours = firstCourseStartTime.getHours();
+        int startMinutes = firstCourseStartTime.getMinutes();
+        int startSeconds = firstCourseStartTime.getSeconds();
 
-        //转化为Calendar类型比较日期
-        Calendar courseStartTime = Calendar.getInstance();
-        courseStartTime.setTime(strCourseStartTime);
+        int endHours = firstCourseEndTime.getHours();
+        int endMinutes = firstCourseEndTime.getMinutes();
+        int endSeconds = firstCourseEndTime.getSeconds();*/
+        Calendar currentCourseStartTime = Calendar.getInstance();
+        currentCourseStartTime.setTime(firstCourseStartTime);
+
+        dayWeek = DateConfig.DATE[currentCourseStartTime.get(Calendar.DAY_OF_WEEK)-1];
+
+        Calendar currentCourseEndTime = Calendar.getInstance();
+        currentCourseEndTime.setTime(firstCourseEndTime);
+
         Calendar courseEndTime = Calendar.getInstance();
-        courseEndTime.setTime(strCourseEndTime);
-        Calendar courseDate = Calendar.getInstance();
-        courseDate.setTime(strCourseDate);
-        Calendar today = Calendar.getInstance();
-        today.setTime(strToday);
+        courseEndTime.setTime(firstCourseEndTime);
 
-        //1.上课开始时间不得早于或等于当前时间
-        if(courseStartTime.before(today)){
-            info = "【教师创建课程】 上课开始时间不得早于或等于当前时间";
-            log.error(info);
-            throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
-        }
-        //2.结束时间不得早于开始时间
-        if(courseEndTime.before(courseStartTime)){
-            info = "【教师创建课程】 上课结束时间不得早于或等于上课开始时间";
-            log.error(info);
-            throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
-        }
-        //3.上课日期不能小于当前日期
-        Calendar yesterday = Calendar.getInstance();
-        yesterday.setTime(new Date());
-        yesterday.add(Calendar.DAY_OF_MONTH,-1);
-        log.info("yesterday="+yesterday.getTime());
+        Calendar courseStartTime = Calendar.getInstance();
+        courseStartTime .setTime(firstCourseStartTime);
 
-        if(courseDate.before(yesterday)){
-            info = "【教师创建课程】 上课日期不得早于当前时间";
-            log.error(info);
-            throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
-        }
-        TeaBase teaBase = teaBaseRepository.findByTeaOpenid(teaOpenid);
-        ArrayList<Integer> list = new ArrayList<>();
-        list.add(CourseEnum.COURSE_FINISH.getCode());
-        list.add(CourseEnum.COURSE_CANCELED.getCode());
-        List<TeaCourse> byTeaCode = teaCourseRepository
-                .findByTeaCodeAndCourseStatusNotIn(teaBase.getTeaCode(),list);
+        courseEndTime.set(Calendar.DATE,courseEndTime.get(Calendar.DATE) + 7*(teaCourseForm.getAllPeriod() - 1) );
+        for(int ii = 0; ii < allPeriods ; ii++) {
+            if(ii != 0){
+                currentCourseStartTime.set(Calendar.DATE,currentCourseStartTime.get(Calendar.DATE) + 7 );
+                currentCourseEndTime.set(Calendar.DATE,currentCourseEndTime.get(Calendar.DATE) + 7 );
+            }
+            System.out.println("根据课时数量而定的课程时间----->" + currentCourseStartTime.getTime());
+            //转化为Calendar类型比较日期
+            Date strToday = new Date();
+            Calendar today = Calendar.getInstance();
+            today.setTime(strToday);
 
-        for(TeaCourse teaCourse : byTeaCode){
-            //后部交叉和新建课程包含已有课程都会拦截
-            if (courseStartTime.getTime().before(teaCourse.getCourseStartTime()) &&
-                    //courseStartTime.getTime().before(teaCourse.getCourseEndTime()) &&
-                    courseEndTime.getTime().after(teaCourse.getCourseStartTime())){
-                info = "【教师创建课程】 新课程开始时间早于已有课程的开始时间且" +
-                        //"新课程的结束时间早于课程的结束时间" +
-                        "且新课程的结束时间晚于已有课程的开始时间" +
-                        //"即新课程与已有课程前部交叉"
-                        ",既新课程与已有课程后部交叉或新课程包含已有课程";
+            //1.上课开始时间不得早于或等于当前时间
+            if (currentCourseStartTime.before(today)) {
+                info = "【教师创建课程】 上课开始时间不得早于或等于当前时间";
                 log.error(info);
-                throw new SdcException(ResultEnum.COURSE_CONFLICT,info);
+                throw new SdcException(ResultEnum.PARAM_EXCEPTION, info);
             }
-            if(courseStartTime.getTime().after(teaCourse.getCourseStartTime()) &&
-                    courseEndTime.getTime().before(teaCourse.getCourseEndTime())){
-                info = "【教师创建课程】 新课程开始时间晚于已有课程的开始时间且新课程的结束时间早于已有课程的结束时间";
+            //2.结束时间不得早于开始时间
+            if (currentCourseEndTime.before(currentCourseStartTime)) {
+                info = "【教师创建课程】 上课结束时间不得早于或等于上课开始时间";
                 log.error(info);
-                throw new SdcException(ResultEnum.COURSE_CONFLICT,info);
+                throw new SdcException(ResultEnum.PARAM_EXCEPTION, info);
             }
-            if(courseStartTime.getTime().after(teaCourse.getCourseStartTime())
-                    && courseEndTime.getTime().after(teaCourse.getCourseEndTime())
-                    && courseStartTime.getTime().before(teaCourse.getCourseEndTime())){
-                info = "【教师创建课程】 新课程开始时间晚于已有课程的开始时间且新课程的结束时间晚于已有课程的结束时间" +
-                        "新课程的开始时间早于已有课程的结束时间";
-                log.error(info);
-                throw new SdcException(ResultEnum.COURSE_CONFLICT,info);
-            }
-            int startTime = courseStartTime.getTime().compareTo(teaCourse.getCourseStartTime());
-            int endTime = courseEndTime.getTime().compareTo(teaCourse.getCourseEndTime());
-            if(startTime == 0){
-                info = "【教师创建课程】 新课程开始时间等于已有课程的开始时间";
-                log.error(info);
-                throw new SdcException(ResultEnum.COURSE_CONFLICT,info);
-            }
-            if(endTime == 0){
-                info = "【教师创建课程】 新课程结束时间等于已有课程的结束时间";
-                log.error(info);
-                throw new SdcException(ResultEnum.COURSE_CONFLICT,info);
-            }
-        }
-        TeaCourse teaCourse = new TeaCourse();
-        //由于前台时间传递的是String不能直接使用modelMapper转化
-        teaCourse.setTeaCode(teaCourseForm.getTeaCode());
-        teaCourse.setCourseDate(strCourseDate);
-        teaCourse.setCourseStartTime(strCourseStartTime);
-        teaCourse.setCourseEndTime(strCourseEndTime);
-        teaCourse.setCourseLocation(teaCourseForm.getCourseLocation());
-        teaCourse.setCourseName(teaCourseForm.getCourseName());
-        teaCourse.setCourseStatus(CourseEnum.SUB_WAIT.getCode());
-        teaCourse.setCourseInteractive(teaCourseForm.getCourseInteractive());
-        teaCourse.setCourseLocation(teaCourseForm.getCourseLocation());
-        teaCourse.setCourseType(teaCourseForm.getCourseType());
+            //3.上课日期不能小于当前日期
+            Calendar yesterday = Calendar.getInstance();
+            yesterday.setTime(new Date());
+            yesterday.add(Calendar.DAY_OF_MONTH, -1);
+            log.info("yesterday=" + yesterday.getTime());
 
-        TeaCourse save = teaCourseRepository.save(teaCourse);
-        if(null == save){
-            info = "【教师创建课程】 课程信息插入数据库出现异常";
-            log.error(info);
-            throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,info);
+            if (currentCourseStartTime.before(yesterday)) {
+                info = "【教师创建课程】 上课日期不得早于当前时间";
+                log.error(info);
+                throw new SdcException(ResultEnum.PARAM_EXCEPTION, info);
+            }
+            TeaBase teaBase = teaBaseRepository.findByTeaOpenid(teaOpenid);
+            ArrayList<Integer> list = new ArrayList<>();
+            list.add(CourseEnum.COURSE_FINISH.getCode());
+            list.add(CourseEnum.COURSE_CANCELED.getCode());
+            List<TeaCourse> byTeaCode = teaCourseRepository
+                    .findByTeaCodeAndCourseStatusNotIn(teaBase.getTeaCode(), list);
+
+            for (TeaCourse teaCourse : byTeaCode) {
+                //后部交叉和新建课程包含已有课程都会拦截
+                if (currentCourseStartTime.getTime().before(teaCourse.getCourseStartTime()) &&
+                        //courseStartTime.getTime().before(teaCourse.getCourseEndTime()) &&
+                        currentCourseEndTime.getTime().after(teaCourse.getCourseStartTime())) {
+                    info = "【教师创建课程】 新课程开始时间早于已有课程的开始时间且" +
+                            //"新课程的结束时间早于课程的结束时间" +
+                            "且新课程的结束时间晚于已有课程的开始时间" +
+                            //"即新课程与已有课程前部交叉"
+                            ",既新课程与已有课程后部交叉或新课程包含已有课程";
+                    log.error(info);
+                    throw new SdcException(ResultEnum.COURSE_CONFLICT, info);
+                }
+                if (currentCourseStartTime.getTime().after(teaCourse.getCourseStartTime()) &&
+                        currentCourseEndTime.getTime().before(teaCourse.getCourseEndTime())) {
+                    info = "【教师创建课程】 新课程开始时间晚于已有课程的开始时间且新课程的结束时间早于已有课程的结束时间";
+                    log.error(info);
+                    throw new SdcException(ResultEnum.COURSE_CONFLICT, info);
+                }
+                if (currentCourseStartTime.getTime().after(teaCourse.getCourseStartTime())
+                        && currentCourseEndTime.getTime().after(teaCourse.getCourseEndTime())
+                        && currentCourseStartTime.getTime().before(teaCourse.getCourseEndTime())) {
+                    info = "【教师创建课程】 新课程开始时间晚于已有课程的开始时间且新课程的结束时间晚于已有课程的结束时间" +
+                            "新课程的开始时间早于已有课程的结束时间";
+                    log.error(info);
+                    throw new SdcException(ResultEnum.COURSE_CONFLICT, info);
+                }
+                int startTime = currentCourseStartTime.getTime().compareTo(teaCourse.getCourseStartTime());
+                int endTime = currentCourseEndTime.getTime().compareTo(teaCourse.getCourseEndTime());
+                if (startTime == 0) {
+                    info = "【教师创建课程】 新课程开始时间等于已有课程的开始时间";
+                    log.error(info);
+                    throw new SdcException(ResultEnum.COURSE_CONFLICT, info);
+                }
+                if (endTime == 0) {
+                    info = "【教师创建课程】 新课程结束时间等于已有课程的结束时间";
+                    log.error(info);
+                    throw new SdcException(ResultEnum.COURSE_CONFLICT, info);
+                }
+            }
+            TeaCourse teaCourse = new TeaCourse();
+            //由于前台时间传递的是String不能直接使用modelMapper转化
+            teaCourse.setTeaCode(teaCourseForm.getTeaCode());
+            System.out.println(" 时间为---> " + currentCourseStartTime.getTime());
+            teaCourse.setCourseDate(courseStartTime.getTime());
+            teaCourse.setCourseStartTime(currentCourseStartTime.getTime());
+            teaCourse.setCourseEndTime(currentCourseEndTime.getTime());
+
+            teaCourse.setCourseLocation(teaCourseForm.getCourseLocation());
+            teaCourse.setCourseName(teaCourseForm.getCourseName());
+            teaCourse.setCourseStatus(CourseEnum.SUB_WAIT.getCode());
+            teaCourse.setCourseInteractive(teaCourseForm.getCourseInteractive());
+            teaCourse.setCourseLocation(teaCourseForm.getCourseLocation());
+            teaCourse.setAllPeriods(teaCourseForm.getAllPeriod());
+            teaCourse.setCurrentPeriod(ii + 1);
+            teaCourse.setCourseType(teaCourseForm.getCourseType());
+            teaCourse.setOriginId(originId);
+            teaCourse.setCourseEndDate(courseEndTime.getTime());
+            teaCourse.setDayOfWeek(dayWeek);
+
+            TeaCourse save = teaCourseRepository.save(teaCourse);
+            if (null == save) {
+                info = "【教师创建课程】 课程信息插入数据库出现异常";
+                log.error(info);
+                throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION, info);
+            }
+            if(ii == 0){
+                originId = save.getCourseId();
+            }
+            rsTeaCourseList.add(save);
+            //当课程创建成功之后，将课程Id放入MQ中,目前没有设置回调函数
+            String courseId = save.getCourseId().toString();
+            //过期时间设置为当前时间距离课程开始时间的毫秒数
+            Long dateout = currentCourseStartTime.getTimeInMillis() - System.currentTimeMillis();
+            System.out.println("过期时间为:" + dateout + "转为分钟是：" + (dateout / (1000 * 60)));
+            MessageProperties messageProperties = new MessageProperties();
+            messageProperties.setExpiration(dateout.toString());
+            messageProperties.setCorrelationId(UUID.randomUUID().toString().getBytes());
+            Message message = new Message(courseId.getBytes(), messageProperties);
+            rabbitTemplate.convertAndSend(MQConfig.EXCHANGE, MQConfig.ROUTINGKEY1, message);
         }
-        //当课程创建成功之后，将课程Id放入MQ中,目前没有设置回调函数
-        String courseId = save.getCourseId().toString();
-        //过期时间设置为当前时间距离课程开始时间的毫秒数
-        Long dateout = courseStartTime.getTimeInMillis() - System.currentTimeMillis();
-        System.out.println("过期时间为:"+ dateout+"转为分钟是："+ (dateout/(1000*60) ) );
-        MessageProperties messageProperties = new MessageProperties();
-        messageProperties.setExpiration(dateout.toString());
-        messageProperties.setCorrelationId(UUID.randomUUID().toString().getBytes());
-        Message message = new Message(courseId.getBytes(), messageProperties);
-        rabbitTemplate.convertAndSend(MQConfig.EXCHANGE, MQConfig.ROUTINGKEY1,message);
-        return save;
+        return rsTeaCourseList;
     }
 
 
@@ -193,6 +230,7 @@ public class TeaServiceImpl implements TeaService {
     @Transactional(rollbackFor=Exception.class)
     public TeaCourse cancelCourse(Integer courseId,String teaOpenid,String cancelReason) {
 
+        List<TeaCourse> courseExpectFirstCourse = null;
         // 取消课程之前需要判断当前课程是否为该老师的课程
         TeaBase teaBase = teaBaseRepository.findByTeaOpenid(teaOpenid);
 
@@ -207,12 +245,22 @@ public class TeaServiceImpl implements TeaService {
         Integer status = teaCourse.getCourseStatus();
         if(status.intValue() == CourseEnum.SUB_WAIT.getCode() ||
                 status.intValue() == CourseEnum.SUB_SUCCESS.getCode() ){
+
             teaCourse.setCourseCause(cancelReason);
+            //获取课时一的课程id
+            courseExpectFirstCourse
+                    = teaCourseRepository.findByTeaCodeAndOriginId(teaBase.getTeaCode(), teaCourse.getCourseId());
+
             //如果当前已经有学生预约成功则给该学生发送消息通知
            /* if(status.intValue() == SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode()){
                 pushMessageService.pushCancelCourseMessageToStu();
             }*/
             teaCourse.setCourseStatus(CourseEnum.COURSE_CANCELED.getCode());
+            for(TeaCourse teaCourse1 : courseExpectFirstCourse){
+                teaCourse1.setCourseCause(cancelReason);
+                teaCourse1.setCourseStatus(CourseEnum.COURSE_CANCELED.getCode());
+            }
+
         } else {
             info = "【教师取消课程】 课程状态不正确";
             log.error("【教师取消课程】 课程状态不正确，teaCourseId={},teaCourseIdStatus={}",
@@ -245,6 +293,15 @@ public class TeaServiceImpl implements TeaService {
             }
         }
         TeaCourse save = teaCourseRepository.save(teaCourse);
+        for(TeaCourse teaCourse1 : courseExpectFirstCourse){
+            System.out.println("-------->" + teaCourse1.getCourseStatus());
+            TeaCourse save1 = teaCourseRepository.save(teaCourse1);
+            if(null == save1) {
+                info = "【取消课程】取消课程失败！";
+                log.error(info);
+                throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,info);
+            }
+        }
         if(null == save) {
             info = "【取消课程】取消课程失败！";
             log.error(info);
@@ -334,7 +391,12 @@ public class TeaServiceImpl implements TeaService {
         //设置分页参数
         Pageable pageable = new PageRequest(page, pageSize);
         //查找提交预约请求的候选人
-        List<SubCourse> allCandidate = subCourseRepository.findByCourseId(courserId, pageable);
+        //List<SubCourse> allCandidate = subCourseRepository.findByCourseId(courserId, pageable);
+        List<Integer> rsList = new ArrayList<>();
+        rsList.add(SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode());
+        rsList.add(SubCourseEnum.SUB_WAIT.getCode());
+        rsList.add(SubCourseEnum.SUB_CANDIDATE_FAILED.getCode());
+        List<SubCourse> allCandidate = subCourseRepository.findByCourseIdAndSubStatusIn(courserId,rsList,pageable);
         List<StuBaseDTO > stuBaseDTOList = new ArrayList<>();
 
         for(SubCourse candidate : allCandidate){
@@ -363,41 +425,10 @@ public class TeaServiceImpl implements TeaService {
         //1.通过学生微信id来进行获取学生编号
         StuBase byStuOpenid = stuBaseRepository.findByStuOpenid(stuOpenId);
         String stuCode = byStuOpenid.getStuCode();
-        //2.若存在已经预约成功的学生，且不为之前的预约成功的学生，则成功预约的转改为预约失败。
-        List<SubCourse> subCourseSuccessUpdateList = subCourseRepository.findByCourseIdAndSubStatus(courseId,
-                SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode());
-        //预约成功的候选人只可能有一个
-        if(null != subCourseSuccessUpdateList && subCourseSuccessUpdateList.size() > 0){
-            SubCourse subCourseSuccessUpdate = subCourseSuccessUpdateList.get(0);
-            String stuCode1 = subCourseSuccessUpdate.getStuCode();
-            //两次选择同一个成功预约候选人
-            if(stuCode.equals(stuCode1)){
-                return subCourseSuccessUpdate;
-            }
-            //修改原来预约成功候选人状态为失败
-            subCourseSuccessUpdate.setSubStatus(SubCourseEnum.SUB_CANDIDATE_FAILED.getCode());
-            SubCourse save = subCourseRepository.save(subCourseSuccessUpdate);
-            if(null == save){
-                info = "【教师选择候选预约学生】 替换原预约成功学生失败！";
-                log.error(info);
-                throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,info);
-            }
-            //给原成功预约候选人发送预约被替代的模板消息
-            TeaCourse tmpTeaCourse  = teaCourseRepository.findOne(courseId);
-            String teaCode = tmpTeaCourse.getTeaCode();
-            TeaBase useTeaBase = teaBaseRepository.findOne(teaCode);
-            PushMessageDTO tmpCourseDTO = new PushMessageDTO();
-            tmpCourseDTO.setTeaCourse(tmpTeaCourse);
-            tmpCourseDTO.setTeaBase(useTeaBase);
-            tmpCourseDTO.setStuBase(stuBaseRepository.findByStuCode(stuCode1));
-            //tmpCourseDTO.setStudentCode(stuCode1);
-            pushMessageService.pushSubFailMessage(tmpCourseDTO);
-        }
 
-        //修改预约表中被成功选择的学生的学号
+        //2.修改预约表中被成功选择的学生的学号
         List<Integer> list = new ArrayList<Integer>();
         list.add(SubCourseEnum.SUB_WAIT.getCode());
-        list.add(SubCourseEnum.SUB_CANDIDATE_FAILED.getCode());
         SubCourse subCourse = subCourseRepository.findByStuCodeAndCourseIdAndSubStatusIn(stuCode,courseId,list);
         subCourse.setSubStatus(SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode());
         //查找课程表
@@ -418,26 +449,6 @@ public class TeaServiceImpl implements TeaService {
         TeaBase one1 = teaBaseRepository.findOne(one.getTeaCode());
         pushMessageDTO.setTeaBase(one1);
         pushMessageService.pushSubSuccessMessage(pushMessageDTO);
-
-        //选择之后候选人之后 ，发送消息给没有入选的候选人提示预约失败
-        List<SubCourse> byCourseIdAndSubStatus = subCourseRepository.findByCourseIdAndSubStatus(courseId,
-                SubCourseEnum.SUB_WAIT.getCode());
-        for(SubCourse subCourse1 : byCourseIdAndSubStatus){
-            if(!subCourse1.getStuCode().equals(stuCode)){
-                //将当前预约信息改成学生预约失效
-                subCourse1.setSubStatus(SubCourseEnum.SUB_CANDIDATE_FAILED.getCode());
-                SubCourse save = subCourseRepository.save(subCourse1);
-                if(null == save){
-                    info = "【教师选择候选预约学生】更新教师课程表失败";
-                    log.error(info);
-                    throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,info);
-                }
-                //推送预约失败的模板消息
-                String rsStuCode = subCourse1.getStuCode();
-                pushMessageDTO.setStuBase(stuBaseRepository.findByStuCode(rsStuCode));
-                pushMessageService.pushSubFailMessage(pushMessageDTO);
-            }
-        }
         return subCourse;
     }
 
@@ -617,7 +628,7 @@ public class TeaServiceImpl implements TeaService {
 
         //1.当课程状态为预约等待时，若当前时间大于课程开始时间，课程状态改为课程失效，防止创建聊天室。
         //2.当课程状态为预约成功时，若当前时间在课程进行中时，课程状态改为正在进行;
-        //                     若当前时间晚于课程结束时间，课程状态改为正常结束。
+        //若当前时间晚于课程结束时间，课程状态改为正常结束。
         //3.当课程状态为正在进行时，若当前时间晚于课程结束时间，课程状态改为正常结束。
         /*1 当课程状态为预约等待*/
         if(courseStatus.equals(CourseEnum.SUB_WAIT.getCode())){
@@ -634,6 +645,10 @@ public class TeaServiceImpl implements TeaService {
         }
         /*2 当课程状态为预约成功*/
         if(courseStatus.equals(CourseEnum.SUB_SUCCESS.getCode())){
+
+
+
+
             if(now.after(teaCourse.getCourseStartTime())){
                 if(now.before(teaCourse.getCourseEndTime())){
                     teaCourse.setCourseStatus(CourseEnum.COURSE_INTERACT.getCode());

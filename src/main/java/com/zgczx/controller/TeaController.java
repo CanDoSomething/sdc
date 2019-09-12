@@ -53,7 +53,7 @@ public class TeaController {
     @PostMapping("/createCourse")
     public ResultVO createCourse(@Valid TeaCourseForm teaCourseForm,
                                             BindingResult bindingResult,
-                                            @RequestParam("teaOpenid") String teaOpenid){
+                                 @RequestParam("teaOpenid") String teaOpenid){
         //后台进行表单验证，若参数不正确抛出异常
         if(bindingResult.hasErrors()){
             info = "【教师课程填写】 参数不正确 ，"+ bindingResult.getFieldError().getDefaultMessage();
@@ -68,8 +68,8 @@ public class TeaController {
         }
 
         //前台传递过来的参数封装之后插入课程中
-        TeaCourse course = teaService.createCourse(teaCourseForm,teaOpenid);
-        return ResultVOUtil.success(course);
+        List<TeaCourse> rsCourseList = teaService.createCourse(teaCourseForm, teaOpenid);
+        return ResultVOUtil.success(rsCourseList);
     }
 
     /**
@@ -170,10 +170,8 @@ public class TeaController {
 
         /*
          * 判断courseId和stuOpenid是否合法
-         * 根据课程找到是否已经存在预约成功的学生
-         * 若存在，改为预约失败；若不存在，则该学生的预约状态改为预约成功，其他提交预约请求的学生都改为预约失败
-         * 注意：假如有的请求改为预约失败，就不能再预约拉。此时来了新的预约请求，请求状态为提交请求，可以选择新的
-         * 请求而替代原来的请求
+         * 教师可以选择多名预约候选学生进行上课
+         *
          */
 
         //1.根据courseId和stuOpenid判断是否合法

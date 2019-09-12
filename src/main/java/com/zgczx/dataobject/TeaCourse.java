@@ -3,6 +3,7 @@ package com.zgczx.dataobject;
 import lombok.Data;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -36,6 +37,7 @@ public class TeaCourse {
     /**
      * 课程日期
      */
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date courseDate;
     /**
      * 课程开始时间
@@ -74,5 +76,27 @@ public class TeaCourse {
      * 课程类型
      */
     private String courseType;
+    /**
+     * 当前课时
+     */
+    private Integer currentPeriod;
+    /**
+     * 所有课时
+     */
+    private Integer allPeriods;
+    /**
+     * 当前课程第一课时的id编号
+     */
+    private Integer originId;
+
+    /**
+     * 课程始终日期
+     */
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date courseEndDate;
+    /**
+     * 每周上课的日期
+     */
+    private String dayOfWeek;
 
 }

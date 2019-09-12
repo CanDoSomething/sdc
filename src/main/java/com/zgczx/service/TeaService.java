@@ -24,7 +24,7 @@ public interface TeaService {
      * @param teaOpenid 教师微信唯一凭证
      * @return 创建成功的课程
      */
-    TeaCourse createCourse(TeaCourseForm teaCourseForm,String teaOpenid);
+    List<TeaCourse> createCourse(TeaCourseForm teaCourseForm,String teaOpenid);
 
     /**
      * 取消课程

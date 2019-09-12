@@ -63,4 +63,10 @@ public class TeaCourseForm {
      */
     @NotEmpty(message = "课程类型必填，请在‘专业-心理-志愿-其他’中四选一")
     private String courseType;
+
+    /**
+     * 所有课时
+     */
+    @NotNull(message = "请填写共有课时数量")
+    private Integer allPeriod;
 }

@@ -152,7 +152,25 @@ public class StuServiceImpl implements StuService {
 
         //3.课程状态改为已被学生预约
         teaCourse.setCourseStatus(CourseEnum.SUB_SUCCESS.getCode());
-        teaCourseRepository.save(teaCourse);
+        List<TeaCourse> byTeaCodeAndOriginId
+                = teaCourseRepository.findByTeaCodeAndOriginId(teaCourse.getTeaCode(), teaCourse.getCourseId());
+        for(TeaCourse teaCourse1 : byTeaCodeAndOriginId ){
+            teaCourse1.setCourseStatus(CourseEnum.SUB_SUCCESS.getCode());
+        }
+        TeaCourse save1 = teaCourseRepository.save(teaCourse);
+        if(null == save1){
+            info = "【学生发起预约课程请求】 学生预约课程，修改原课程状态失败";
+            log.error(info);
+            throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,info);
+        }
+        for(TeaCourse teaCourse1 : byTeaCodeAndOriginId ){
+            save1 = teaCourseRepository.save(teaCourse1);
+            if(null == save1){
+                info = "【学生发起预约课程请求】 学生预约课程，修改原课程状态失败";
+                log.error(info);
+                throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,info);
+            }
+        }
         return save;
     }
 
@@ -171,8 +189,7 @@ public class StuServiceImpl implements StuService {
         /*
          *  只有该预约状态为预约等待和预约成功时才会发起取消预约。
          *  若预约状态为预约等待，则直接修改为预约取消，并加上原因
-         *  若预约状态为预约成功，则修改为预约取消，并加上原因的同时，需要把其他预约失败的学生状态改为预约等待，
-         *  不然没有办法再次选择新的学生作为候选人。
+         *  若预约状态为预约成功，则修改为预约取消，并加上原因的同时
          *  如果每次教师指定的成功预约的学生都取消了预约，没有一个学生
          *  预约当前课程的（状态均为学生取消预约），那么教师的课程状态应该改为待预约（300）。
          */
@@ -191,29 +208,26 @@ public class StuServiceImpl implements StuService {
         }else if(subCourse.getSubStatus().equals(SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode())){
             subCourse.setSubStatus(SubCourseEnum.STU_CANCEL_SUB.getCode());
             subCourse.setStuCause(cause);
-            List<SubCourse> subCourseListFailed = subCourseRepository.findByCourseIdAndSubStatus(courserId,
-                    SubCourseEnum.SUB_CANDIDATE_FAILED.getCode());
-            for(SubCourse subCourseFailed:subCourseListFailed){
-                subCourseFailed.setSubStatus(SubCourseEnum.SUB_WAIT.getCode());
-                subCourseRepository.save(subCourseFailed);
-            }
             SubCourse rsSubCourse = subCourseRepository.save(subCourse);
-            //检查当前预约表中的学生预约状态，如果没有处于等待教师选择处理或者等待上课的状态，需要修改课程表中
-            //的状态为等待学生预约
-            List<SubCourse> checkSubCourse = subCourseRepository.findByCourseId(courserId);
-            //默认当前课程是没有学生预约
-            boolean flag = false;
-            for(SubCourse sc : checkSubCourse){
-                if( sc.getSubStatus().equals(SubCourseEnum.SUB_WAIT)||
-                        sc.getSubStatus().equals(SubCourseEnum.SUB_CANDIDATE_SUCCESS)||
-                        sc.getSubStatus().equals(SubCourseEnum.SUB_CANDIDATE_FAILED) ){
-                    //表示还有学生预约
-                    flag = true; break;
+
+            //如果只有一个学生预约成功，则修改课程表状态为等待预约；若多个学生预约成功了该课程则课程状态不变
+            TeaCourse changeTeaCourse = teaCourseRepository.findOne(courserId);
+            List<SubCourse> subCoursesList = subCourseRepository.findByCourseId(courserId);
+            Short flagSub = 0;
+            for(SubCourse subCourse1 : subCoursesList){
+                if(subCourse1.getSubId() != subId && (subCourse1.getSubStatus()
+                        .equals(SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode()) )  ){
+                    flagSub = 1;
+                    break;
+                } else if(subCourse1.getCourseId() != courserId && subCourse1.getSubStatus().equals(SubCourseEnum.SUB_WAIT.getCode()) ){
+                    flagSub = 2;
                 }
             }
-            //如果flag是false，则修改课程表状态为等待预约
-            TeaCourse changeTeaCourse = teaCourseRepository.findOne(courserId);
-            changeTeaCourse.setCourseStatus(CourseEnum.SUB_WAIT.getCode());
+            if(flagSub == 1 || flagSub == 2){
+                changeTeaCourse.setCourseStatus(CourseEnum.SUB_SUCCESS.getCode());
+            } else {
+                changeTeaCourse.setCourseStatus(CourseEnum.SUB_WAIT.getCode());
+            }
             TeaCourse rsChangeTeaCourse = teaCourseRepository.save(changeTeaCourse);
             if(null == rsChangeTeaCourse){
                 info = "【学生取消预约】 修改课程表中课程字段失败";

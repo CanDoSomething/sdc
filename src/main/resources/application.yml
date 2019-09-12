@@ -6,8 +6,8 @@ spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
     username: bigdata
-    password: 123456
-    url: jdbc:mysql://58.119.112.10:3306/studevelope?characterEncoding=utf-8&useSSL=false
+    password: 123456!
+    url: jdbc:mysql://58.119.112.10:3306/studevelope-backup?characterEncoding=utf-8&useSSL=false
   jpa:
     show-sql: true
   jackson:
