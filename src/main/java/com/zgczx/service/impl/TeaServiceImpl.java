@@ -646,9 +646,6 @@ public class TeaServiceImpl implements TeaService {
         /*2 当课程状态为预约成功*/
         if(courseStatus.equals(CourseEnum.SUB_SUCCESS.getCode())){
 
-
-
-
             if(now.after(teaCourse.getCourseStartTime())){
                 if(now.before(teaCourse.getCourseEndTime())){
                     teaCourse.setCourseStatus(CourseEnum.COURSE_INTERACT.getCode());
@@ -674,6 +671,14 @@ public class TeaServiceImpl implements TeaService {
         }
         /*3 当课程状态为正在进行*/
         if(courseStatus.equals(CourseEnum.COURSE_INTERACT.getCode())){
+            //如果还有剩余节次的课程没有完成，则状态仍为 正在进行
+            List<TeaCourse> rsOriginId = teaCourseRepository.findByOriginId(courseId);
+            for(TeaCourse teaCourse1 : rsOriginId) {
+                if(now.before(teaCourse1.getCourseEndDate())){
+                    return null;
+                }
+            }
+
             if(now.after(teaCourse.getCourseEndTime())){
                 teaCourse.setCourseStatus(CourseEnum.COURSE_FINISH.getCode());
                 TeaCourse saveTeaCourse = teaCourseRepository.save(teaCourse);

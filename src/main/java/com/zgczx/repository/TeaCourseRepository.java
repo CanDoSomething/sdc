@@ -86,4 +86,6 @@ public interface TeaCourseRepository extends JpaRepository<TeaCourse,Integer> {
     List<TeaCourse> findByTeaCodeAndCourseStatusNotIn(String teaCode,ArrayList<Integer> list);
 
     List<TeaCourse> findByTeaCodeAndOriginId(String teaCode,Integer originCourseId);
+
+    List<TeaCourse> findByOriginId(Integer originId);
 }
