@@ -99,7 +99,8 @@ public class CourseServiceImpl  implements CourseService {
 
         TeaCourse teaCourse = teaCourseRepository.findOne(courseId);
 
-        Date courseEndTime = teaCourse.getCourseEndTime();
+        //Date courseEndTime = teaCourse.getCourseEndTime();
+        Date courseEndTime = teaCourse.getCourseEndDate();
 
         Date now = new Date();
 
