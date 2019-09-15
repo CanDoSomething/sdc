@@ -65,7 +65,7 @@ public class TeaServiceImpl implements TeaService {
     @Transactional(rollbackFor=Exception.class)
     public List<TeaCourse> createCourse(TeaCourseForm teaCourseForm,String teaOpenid) {
         // 判断课程上课日期，开始时间，结束时间是否合法？通过String来接收参数，格式转换后是否合法？
-        int allPeriods = teaCourseForm.getAllPeriod();
+        int allPeriods = teaCourseForm.getAllPeriods();
         int originId = -1;
         String dayWeek = null;
         List<TeaCourse> rsTeaCourseList = new ArrayList<>(8);
@@ -92,7 +92,7 @@ public class TeaServiceImpl implements TeaService {
         Calendar courseStartTime = Calendar.getInstance();
         courseStartTime .setTime(firstCourseStartTime);
 
-        courseEndTime.set(Calendar.DATE,courseEndTime.get(Calendar.DATE) + 7*(teaCourseForm.getAllPeriod() - 1) );
+        courseEndTime.set(Calendar.DATE,courseEndTime.get(Calendar.DATE) + 7*(teaCourseForm.getAllPeriods() - 1) );
         for(int ii = 0; ii < allPeriods ; ii++) {
             if(ii != 0){
                 currentCourseStartTime.set(Calendar.DATE,currentCourseStartTime.get(Calendar.DATE) + 7 );
@@ -187,7 +187,7 @@ public class TeaServiceImpl implements TeaService {
             teaCourse.setCourseStatus(CourseEnum.SUB_WAIT.getCode());
             teaCourse.setCourseInteractive(teaCourseForm.getCourseInteractive());
             teaCourse.setCourseLocation(teaCourseForm.getCourseLocation());
-            teaCourse.setAllPeriods(teaCourseForm.getAllPeriod());
+            teaCourse.setAllPeriods(teaCourseForm.getAllPeriods());
             teaCourse.setCurrentPeriod(ii + 1);
             teaCourse.setCourseType(teaCourseForm.getCourseType());
             teaCourse.setOriginId(originId);
