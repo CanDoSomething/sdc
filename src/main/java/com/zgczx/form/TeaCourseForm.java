@@ -68,5 +68,5 @@ public class TeaCourseForm {
      * 所有课时
      */
     @NotNull(message = "请填写共有课时数量")
-    private Integer allPeriod;
+    private Integer allPeriods;
 }
