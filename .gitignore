@@ -17,7 +17,7 @@
 *.ipr
 /logs/
 /.idea/
-
+*.yml
 ### NetBeans ###
 /nbproject/private/
 /build/
