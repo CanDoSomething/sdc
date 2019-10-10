@@ -88,4 +88,13 @@ public interface TeaCourseRepository extends JpaRepository<TeaCourse,Integer> {
     List<TeaCourse> findByTeaCodeAndOriginId(String teaCode,Integer originCourseId);
 
     List<TeaCourse> findByOriginId(Integer originId);
+
+    /**
+     * 通过教师编号和课程开始时间查找出所有课程
+     *
+     * @param teaCode
+     * @param courseDate
+     * @return
+     */
+    List<TeaCourse> findByTeaCodeAndCourseDate(String teaCode,Date courseDate);
 }

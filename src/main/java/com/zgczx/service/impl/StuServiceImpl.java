@@ -24,6 +24,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 /**
@@ -100,6 +101,7 @@ public class StuServiceImpl implements StuService {
      */
     @Override
     public SubCourse order(String stuOpenid, Integer courserId) {
+
         //1.比较学生的历史预约信息与目标课程的时间是否冲突
         TeaCourse teaCourse = teaCourseRepository.findOne(courserId);
         StuBase stuBase = stuBaseRepository.findByStuOpenid(stuOpenid);
@@ -113,27 +115,60 @@ public class StuServiceImpl implements StuService {
             throw new SdcException(ResultEnum.SUB_FAIL,info);
         }
 
+        //学生当前想要预约的课程列表(课时数>=1)
+        List<TeaCourse> curSubCourseList
+                = teaCourseRepository.findByTeaCodeAndCourseDate(teaCourse.getTeaCode(), teaCourse.getCourseDate());
 
         /*查询该学生的预约列表*/
         List<SubCourse> subCourseList = subCourseRepository.findByStuCode(stuBase.getStuCode());
         for (SubCourse subCourse : subCourseList) {
+
             /*找到提交预约请求和预约成功的所有预约信息*/
             if (subCourse.getSubStatus().equals(SubCourseEnum.SUB_WAIT.getCode()) ||
                     subCourse.getSubStatus().equals(SubCourseEnum.SUB_CANDIDATE_SUCCESS.getCode())){
                 /*根据课程id查找到课程信息*/
                 TeaCourse teaCourseRepositoryOne = teaCourseRepository.findOne(subCourse.getCourseId());
-
-                /*
-                 * 判断预约时间是否冲突
-                 * 目标课程的开始时间晚于历史预约课程的结束时间或者历史预约课程的开始时间晚于目标课程的结束时间
-                 */
-                if(!DateUtil.compareTime(teaCourse.getCourseStartTime(),teaCourseRepositoryOne.getCourseEndTime()) &&
-                        !DateUtil.compareTime(teaCourseRepositoryOne.getCourseStartTime(),teaCourse.getCourseEndTime())){
-                    /*抛出预约冲突异常*/
-                    info = "【学生发起预约课程请求】 与历史预约课程的时间冲突";
+                if(null == teaCourseRepositoryOne) {
+                    info = "【学生发起预约课程请求】未找到学生预约的某门课程";
                     log.error(info);
                     throw new SdcException(ResultEnum.SUB_FAIL,info);
                 }
+
+                List<TeaCourse> byTeaCodeAndCourseDate
+                        = teaCourseRepository.findByTeaCodeAndCourseDate(teaCourseRepositoryOne.getTeaCode()
+                                            , teaCourseRepositoryOne.getCourseDate());
+                //逐一判断课程时间是否有冲突
+                Calendar currentCourseStartCalender = Calendar.getInstance();
+                Calendar currentCourseEndCalender = Calendar.getInstance();
+                Calendar agoCourseStartCalender = Calendar.getInstance();
+                Calendar agoCourseEndCalender = Calendar.getInstance();
+
+                for(TeaCourse agoSubCourse : byTeaCodeAndCourseDate) {
+                    agoCourseStartCalender.setTime(agoSubCourse.getCourseStartTime());
+                    agoCourseEndCalender.setTime(agoSubCourse.getCourseEndTime());
+
+                    for(TeaCourse curSubCourse: curSubCourseList){
+                        currentCourseStartCalender.setTime(curSubCourse.getCourseStartTime());
+                        currentCourseEndCalender.setTime(curSubCourse.getCourseEndTime());
+                        /**
+                         * 滑动窗口法判断当前预约的课程是和以往预约课程冲突
+                         */
+                        judgeCourseConflict(agoCourseStartCalender,agoCourseEndCalender,currentCourseStartCalender,currentCourseEndCalender);
+
+                    }
+                }
+
+                /*
+                 * 判断预约时间是否冲突
+                 * 目标课程的开始时间晚于历史预约课程的结束时间 或者 历史预约课程的开始时间晚于目标课程的结束时间
+                 *//*
+                if(!DateUtil.compareTime(teaCourse.getCourseStartTime(),teaCourseRepositoryOne.getCourseEndTime()) &&
+                        !DateUtil.compareTime(teaCourseRepositoryOne.getCourseStartTime(),teaCourse.getCourseEndTime())){
+                    *//*抛出预约冲突异常*//*
+                    info = "【学生发起预约课程请求】 与历史预约课程的时间冲突";
+                    log.error(info);
+                    throw new SdcException(ResultEnum.SUB_FAIL,info);
+                }*/
             }
         }
 
@@ -172,6 +207,35 @@ public class StuServiceImpl implements StuService {
             }
         }
         return save;
+    }
+
+    private void judgeCourseConflict(Calendar agoCourseStartCalender, Calendar agoCourseEndCalender, Calendar currentCourseStartCalender, Calendar currentCourseEndCalender) {
+
+        //之前的课程开始时间比当前预约课程开始时间早，且结束时间比当前预约课程开始时间晚
+        if(agoCourseStartCalender.before(currentCourseStartCalender)
+                && agoCourseEndCalender.after(currentCourseStartCalender) ){
+            info = "【学生发起预约课程请求】与历史预约课程的时间冲突，之前的课程开始时间比当前预约课程开始时间早，且结束时间比当前预约课程开始时间晚";
+            log.error(info);
+            throw new SdcException(ResultEnum.SUB_FAIL,info);
+        }
+        if(agoCourseStartCalender.before(currentCourseStartCalender)
+                && agoCourseEndCalender.after(currentCourseStartCalender)){
+            info = "【学生发起预约课程请求】与历史预约课程的时间冲突，之前的课程开始时间比当前预约课程开始时间早，且结束时间比当前预约课程结束时间晚";
+            log.error(info);
+            throw new SdcException(ResultEnum.SUB_FAIL,info);
+        }
+        if(agoCourseStartCalender.after(currentCourseStartCalender)
+                && agoCourseEndCalender.before(currentCourseStartCalender)){
+            info = "【学生发起预约课程请求】与历史预约课程的时间冲突，之前的课程开始时间比当前预约课程开始时间晚，且结束时间比当前预约课程结束时间早";
+            log.error(info);
+            throw new SdcException(ResultEnum.SUB_FAIL,info);
+        }
+        if(agoCourseStartCalender.after(currentCourseStartCalender)
+                && agoCourseEndCalender.before(currentCourseStartCalender)){
+            info = "【学生发起预约课程请求】与历史预约课程的时间冲突，之前的课程开始时间比当前预约课程开始时间晚，且结束时间比当前预约课程结束时间晚";
+            log.error(info);
+            throw new SdcException(ResultEnum.SUB_FAIL,info);
+        }
     }
 
     /**
