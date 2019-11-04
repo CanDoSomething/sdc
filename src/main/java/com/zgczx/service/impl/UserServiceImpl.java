@@ -48,7 +48,8 @@ public class UserServiceImpl implements UserService {
         StuBase stuBase_check = stuBaseRepository.findByStuOpenid(stuOpenid);
         if(stuBase_check !=null){
             log.info("【创建学生】 该学生的openid已经创建，stuOpenid={}",stuOpenid);
-            throw new SdcException(UserEnum.stuOpenid_is_created);
+            //throw new SdcException(UserEnum.stuOpenid_is_created);
+            return stuBase_check;
         }
         Pattern emoji = Pattern.compile("[\ud83c\udc00-\ud83c\udfff]|[\ud83d\udc00-\ud83d\udfff]|[\u2600-\u27ff]",
                 Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE);
