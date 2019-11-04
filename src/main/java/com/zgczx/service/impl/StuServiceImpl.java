@@ -630,6 +630,9 @@ public class StuServiceImpl implements StuService {
     @Override
     public Boolean legalStudent(String stuOpenid) {
         StuBase byStuOpenid = stuBaseRepository.findByStuOpenid(stuOpenid);
+        if(null == byStuOpenid ){
+            return false;
+        }
         if(StringUtils.isEmpty(byStuOpenid.getStuName()) || StringUtils.isEmpty(byStuOpenid.getStuCode())){
             return false;
         }
