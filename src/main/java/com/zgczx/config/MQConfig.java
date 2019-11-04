@@ -24,7 +24,7 @@ public class MQConfig {
     //密码
     public static final String PASSWD = "zkrtFCZ812" ;
     //VHOST
-    public static final String VHOST = "vhost_sdc";
+    public static final String VHOST = "/vhost_sdc";
     //最大当前消费者
     public static final Integer MAXCONCURRENTCONSUMERS = 1;
     //当前消费者数量
