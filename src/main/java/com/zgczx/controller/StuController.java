@@ -67,7 +67,7 @@ public class StuController {
 
         //1.根据stuOpenid和courserId判断是否合法
         if(!stuService.legalStudent(stuOpenid)){
-            String logInfo = "【预约课程】 【数据检验】stuOpenid 非法，stuOpenid="+stuOpenid;
+            String logInfo = "【预约课程】 【数据检验】学生部分信息为空！，stuOpenid="+stuOpenid;
             log.info(logInfo);
             throw new SdcException(ResultEnum.PARAM_EXCEPTION,logInfo);
         }

@@ -1,6 +1,7 @@
 package com.zgczx.dataobject;
 
 import lombok.Data;
+import lombok.ToString;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -20,6 +21,7 @@ import java.util.Date;
 @Entity
 @Data
 @DynamicUpdate
+@ToString
 public class TeaCourse {
 
     @Id

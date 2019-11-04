@@ -18,4 +18,9 @@ public interface TeaBaseRepository extends JpaRepository<TeaBase,String> {
      */
     TeaBase findByTeaOpenid(String teaOpenid);
 
+    /**
+     * 根据teaCode获取教师基本信息
+     */
+    TeaBase findByTeaCode(String teaCode);
+
 }

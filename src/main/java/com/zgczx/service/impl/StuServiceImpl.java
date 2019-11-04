@@ -13,7 +13,6 @@ import com.zgczx.repository.*;
 import com.zgczx.service.PushMessageService;
 import com.zgczx.service.StuService;
 import com.zgczx.service.TeaService;
-import com.zgczx.utils.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +21,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
 /**
  *
  * @Author chen
@@ -66,7 +68,7 @@ public class StuServiceImpl implements StuService {
      * @return 课程信息列表
      */
     @Override
-    public List<CourseDTO> findAllCourse(Integer page,Integer size) {
+    public List<CourseDTO> findAllCourse(Integer page, Integer size) {
         //先按照课程日期降序排序
         Sort sort = new Sort(Sort.Direction.DESC,"courseDate");
         /*设置分页*/
@@ -100,6 +102,7 @@ public class StuServiceImpl implements StuService {
      * @return 预约课程信息
      */
     @Override
+    @Transactional(rollbackFor=Exception.class)
     public SubCourse order(String stuOpenid, Integer courserId) {
 
         //1.比较学生的历史预约信息与目标课程的时间是否冲突
@@ -119,8 +122,21 @@ public class StuServiceImpl implements StuService {
         List<TeaCourse> curSubCourseList
                 = teaCourseRepository.findByTeaCodeAndCourseDate(teaCourse.getTeaCode(), teaCourse.getCourseDate());
 
+        /**
+         * 查询学生最近七天   ‘预约等待和预约成功’ 的预约课程列表
+         * 如果最近七天有预约那么就不能再次预约课程
+         */
+        List<SubCourse> subCourseList = subCourseRepository.findByStuCodeAndLastSevenDays(stuBase.getStuCode());
+        subCourseList.forEach(subCourse -> {
+            log.info("当前学生预约的课程信息{}",subCourse);
+        });
+        //最近有预约或者预约成功的课程 那么不能再次预约
+        if(0 != subCourseList.size()){
+            info = "【学生发起预约课程请求】 最近七天预约过课程，不能再次提交预约，请等待老师审核批准原预约课程！";
+            log.error(info);
+            throw new SdcException(ResultEnum.CANTNOT_SUBCOURSE_LEAST_SEVEN_DAYS , info);
+        }
         /*查询该学生的预约列表*/
-        List<SubCourse> subCourseList = subCourseRepository.findByStuCode(stuBase.getStuCode());
         for (SubCourse subCourse : subCourseList) {
 
             /*找到提交预约请求和预约成功的所有预约信息*/
@@ -179,11 +195,22 @@ public class StuServiceImpl implements StuService {
         /*设置新的预约对象为等待预约状态*/
         subCourse.setSubStatus(SubCourseEnum.SUB_WAIT.getCode());
         SubCourse save = subCourseRepository.save(subCourse);
-        if (save==null){
+        if (save == null) {
             info = "【学生发起预约课程请求】 预约信息没有保存到数据库，预约课程失败";
             log.error(info);
             throw new SdcException(ResultEnum.DATABASE_OP_EXCEPTION,info);
         }
+
+        //学生预约的课程预约信息推送给教师
+        PushMessageDTO pushMessageDTO = new PushMessageDTO();
+        pushMessageDTO.setStuBase(stuBase);
+        TeaBase byTeaCode = teaBaseRepository.findByTeaCode(teaCourse.getTeaCode());
+        pushMessageDTO.setTeaBase(byTeaCode);
+        pushMessageDTO.setTeaCourse(teaCourse);
+        pushMessageDTO.setFeedBack(null);
+
+        pushMessageService.pushSubcourseMessageToTea(pushMessageDTO);
+
 
         //3.课程状态改为已被学生预约
         teaCourse.setCourseStatus(CourseEnum.SUB_SUCCESS.getCode());
@@ -248,7 +275,7 @@ public class StuServiceImpl implements StuService {
      * @return SubCourse 取消后的课程内容
      */
     @Override
-    public SubCourse cancelOrder(String cause,String stuOpenid,Integer courserId,Integer subId) {
+    public SubCourse cancelOrder(String cause, String stuOpenid, Integer courserId, Integer subId) {
 
         /*
          *  只有该预约状态为预约等待和预约成功时才会发起取消预约。
@@ -317,10 +344,6 @@ public class StuServiceImpl implements StuService {
             throw new SdcException(ResultEnum.PARAM_EXCEPTION,info);
         }
     }
-
-
-
-
 
 
 
@@ -405,12 +428,6 @@ public class StuServiceImpl implements StuService {
 
 
 
-
-
-
-
-
-
 //        /*找到预约表信息--根据学生编号与课程id查找到未失效的预约信息*/
 //        List<Integer> list=new ArrayList<>();
 //        list.add(SubCourseEnum.SUB_WAIT.getCode());
@@ -471,7 +488,7 @@ public class StuServiceImpl implements StuService {
      * @return:
      */
     @Override
-    public FeedBack feedBack(Integer courseId, String message, Integer score,Integer subId) {
+    public FeedBack feedBack(Integer courseId, String message, Integer score, Integer subId) {
         /*如果评分不正确，抛出异常*/
         if (score>5 || score<0){
             info = "【学生发起反馈请求】 反馈参数异常";
@@ -613,6 +630,9 @@ public class StuServiceImpl implements StuService {
     @Override
     public Boolean legalStudent(String stuOpenid) {
         StuBase byStuOpenid = stuBaseRepository.findByStuOpenid(stuOpenid);
+        if(StringUtils.isEmpty(byStuOpenid.getStuName()) || StringUtils.isEmpty(byStuOpenid.getStuCode())){
+            return false;
+        }
         return byStuOpenid != null;
     }
 

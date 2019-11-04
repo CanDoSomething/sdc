@@ -97,4 +97,13 @@ public interface TeaCourseRepository extends JpaRepository<TeaCourse,Integer> {
      * @return
      */
     List<TeaCourse> findByTeaCodeAndCourseDate(String teaCode,Date courseDate);
+
+
+    /**
+     * 找到所有课程状态为已被预约的课程
+     * @param status 401
+     * @return
+     */
+    List<TeaCourse> findByCourseStatus(int status);
+
 }

@@ -42,7 +42,11 @@ public enum ResultEnum {
     /**
      * 当前用户未注册
      */
-    USER_NOT_REGISTER(506,"当前用户未注册")
+    USER_NOT_REGISTER(506,"当前用户未注册"),
+    /**
+     * 最近七天不能预约课程
+     */
+    CANTNOT_SUBCOURSE_LEAST_SEVEN_DAYS(507,"最近七天预约过课程，不能再次提交预约，请等待老师审核批准原预约课程！")
 
     ;
 

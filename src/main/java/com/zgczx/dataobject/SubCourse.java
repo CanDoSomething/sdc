@@ -1,6 +1,7 @@
 package com.zgczx.dataobject;
 
 import lombok.Data;
+import lombok.ToString;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -19,6 +20,7 @@ import java.util.Date;
 @Entity
 @DynamicUpdate
 @DynamicInsert
+@ToString
 public class SubCourse {
 
     @Id

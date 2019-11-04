@@ -14,4 +14,6 @@ public interface PushMessageService {
     void pushFeedBackMessageToStu(PushMessageDTO pushMessageDTO);
     void pushFeedBackMessageToTea(PushMessageDTO pushMessageDTO);
     void pushCancelCourseMessageToTea(PushMessageDTO pushMessageDTO);
+    void pushSubcourseMessageToTea(PushMessageDTO pushMessageDTO);
+    void pushTipsToStu();
 }

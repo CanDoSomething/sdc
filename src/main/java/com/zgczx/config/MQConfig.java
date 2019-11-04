@@ -16,7 +16,7 @@ public class MQConfig {
     //配置消息队列
     public static final String DELAY_QUEUE2 = "delay_queue2";
     //主机ip
-    public static final String IP = "58.119.112.13";
+    public static final String IP = "127.0.0.1";
     //端口号
     public static final Integer PORT = 5672;
     //用户名
@@ -24,7 +24,7 @@ public class MQConfig {
     //密码
     public static final String PASSWD = "zkrtFCZ812" ;
     //VHOST
-    public static final String VHOST = "/vhost_sdc";
+    public static final String VHOST = "vhost_sdc";
     //最大当前消费者
     public static final Integer MAXCONCURRENTCONSUMERS = 1;
     //当前消费者数量
